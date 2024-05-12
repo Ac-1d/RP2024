@@ -18,6 +18,13 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue")
+  },
+  {
+    path: "/comments",
+    name: "Comments",
+    // 加入新的路由
+    component: () =>
+      import("../views/Comments.vue")
   }
 ];
 
