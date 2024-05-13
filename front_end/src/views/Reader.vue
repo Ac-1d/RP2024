@@ -1,9 +1,14 @@
 <template>
-  <div ref="viewer"></div>
+  <div class="reader">
+    <div class="reader-test">
+      <div id="read">阅读器在这</div>
+      <div>阅读器不在这</div>
+    </div>
+  </div>
 </template>
 
 <script>
-import ePub from 'epubjs';
+import Epub from "epubjs";
 
 export default {
   mounted() {
@@ -11,13 +16,13 @@ export default {
   },
   methods: {
     loadEpub() {
-      const viewer = this.$refs.viewer;
-      const book = ePub("@/books_tmp/09.epub");
-
-      book.renderTo(viewer, {
-        width: "100%",
-        height: "100%"
+      this.book = new Epub("books_tmp/09.epub");
+      console.log(this.book);
+      this.rendition = this.book.renderTo("read", {
+        width: window.innerWidth,
+        height: window.innerHeight
       });
+      this.rendition.display();
     }
   }
 };
