@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="comments">
     <!-- 评论显示 -->
     <div v-for="(comment, index) in comments" :key="index" class="comment">
       <h6>{{ comment.author }}:</h6>
@@ -11,8 +11,11 @@
       <div v-if="comment.showReply" class="sub-comment">  
         <!-- 回复框 -->
         <form @submit.prevent="addReply(index, $event)">  
-          <input type="text" v-model="comment.replyText" placeholder="输入你的回复...">  
-          <button type="submit" >提交</button>  
+          <textarea v-model="comment.replyText" placeholder="输入你的回复..."
+          @input="checkReplyLength"></textarea>  
+          <br/><button type="submit" :disabled="comment.replyLengthExceeded">
+            提交</button>  
+          <p>剩余</p>
         </form>  
         <!-- 回复显示 -->
         <div v-for="(reply, replyIndex) in comment.replies" :key="replyIndex" class="reply">  
@@ -21,12 +24,14 @@
       </div>
     </div>
     <!-- 评论框 -->
-    <form @submit.prevent="addComment">
-      <textarea v-model="newCommentText" placeholder="输入你的评论..."  
-      @input="checkCommentLength"></textarea>
-      <p>剩余字数 {{ remainingText }}</p>
-      <button type="submit" :disabled="commentLengthExceeded">提交</button>
-    </form>
+    <div class="comment-box">
+      <form @submit.prevent="addComment">
+        <textarea v-model="newCommentText" placeholder="输入你的评论..."  
+        @input="checkCommentLength"></textarea>
+        <p>剩余字数 {{ remainingRelpyText(index) }}</p>
+        <button type="submit" :disabled="commentLengthExceeded">提交</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -41,7 +46,8 @@ export default {
           likes: 0, 
           showReply: false,
           replyText: '',
-          replies: [{text:'你好', author:'李正阳'},]
+          replyLengthExceeded: false,
+          replies: [{text:'你好', author:'李正阳'},],
         },
         // 更多评论...  
         // 可以通过后端，从数据库中调用
@@ -56,6 +62,9 @@ export default {
   computed: {
     remainingText(){
       return this.maxText-this.newCommentText.length;
+    },
+    remainingRelpyText(index){
+      return this.maxText-this.comments[index].newReply.length;
     }
   },
   methods: {
@@ -67,6 +76,7 @@ export default {
           showReply: false,
           likes: 0, 
           replyText: '',
+          replyLengthExceeded: false,
           replies: []
         };
         this.comments.push(newComment);
@@ -102,7 +112,11 @@ export default {
       }  
       // 阻止表单默认的提交行为  
       event.preventDefault();  
-    }
+    },
+    checkReplyLength(index) {  
+      this.comments[index].replyLengthExceeded = 
+        this.comments[index].newReply.length > this.maxText;  
+    },  // 检查评论的长度，不能超过maxText
   }
 };  
 </script>
