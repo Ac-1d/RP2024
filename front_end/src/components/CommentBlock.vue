@@ -25,8 +25,9 @@
         <textarea v-model="newCommentText" placeholder="输入你的评论..."  
         @input="checkCommentLength"></textarea>
         <p>剩余字数 {{ remainingText }}</p>
+        <!-- 显示回复给某人 -->
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
-        <!-- 返回评论 -->
+        <!-- 退出回复，返回评论 -->
         <button v-if="replying" @click="endReply()">返回评论</button>
         <button type="submit" :disabled="commentLengthExceeded">提交</button>
       </form>
@@ -37,22 +38,17 @@
 <script>
 export default {
   name: "CommentBlock",
+  props: {
+    maxText: {
+      type: Number, // 指定这个 prop 是数字类型
+      // 可以指定其他验证规则，如 default, required 等
+      default: 10 // 如果 prop 未被传递，则默认值为 42
+    }
+  },
   data() {
     return {
-      comments: [
-        { 
-          text: '这是一条评论', 
-          author: '张三', 
-          likes: 0, 
-          showReply: false,
-          replyText: '',
-          replies: [{text:'你好', author:'李正阳'},],
-        },
-        // 更多评论...  
-        // 可以通过后端，从数据库中调用
-      ],
+      comments: [],
       newCommentText: '',
-      maxText: 10,
       commentLengthExceeded: false,
       replying: false,
       replyIndex: 0,
@@ -66,6 +62,12 @@ export default {
     }
   },
   methods: {
+    getChildData() {
+      return this.data;
+    },
+    setComment(inData) {
+      this.comments = inData;
+    },
     addComment() {
       if (this.newCommentText) {
         if (this.replying) {
