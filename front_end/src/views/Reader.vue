@@ -1,15 +1,17 @@
 <template>
   <div class="reader">
     <EBook/>
-    <control/>
   </div>
 </template>
 
 <script>
-import EBook from "@/components/Reader/EBook.vue";
+import EBook from "@/components/EBook.vue";
 
 export default {
   name: "Reader",
+  props: [
+    'showNav'
+  ],
   components: {
     EBook
   }

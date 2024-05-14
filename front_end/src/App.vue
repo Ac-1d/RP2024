@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- TODO: 搞不懂为什么nav页面会显示在所有页面中，索性暂时注释掉，手动切换路由 -->
+    <!-- TODO: 隐藏导航栏需要vuex，从长计议 -->
     <div id="nav" v-if="showNav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
@@ -10,7 +10,13 @@
   </div>
 </template>
 <script>
- 
+export default {
+  data() {
+    return {
+      showNav: false
+    }
+  }
+}
 </script>
 <style lang="less">
 #app {
