@@ -1,6 +1,6 @@
 <template>
   <div class="comments">
-    <CommentBlock />
+    <CommentBlock :maxText="20" myname="Yining"/>
   </div>
 </template>
 

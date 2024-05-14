@@ -43,6 +43,10 @@ export default {
       type: Number, // 指定这个 prop 是数字类型
       // 可以指定其他验证规则，如 default, required 等
       default: 10 // 如果 prop 未被传递，则默认值为 42
+    },
+    myname: {
+      type: String,
+      default: '匿名'
     }
   },
   data() {
@@ -52,7 +56,6 @@ export default {
       commentLengthExceeded: false,
       replying: false,
       replyIndex: 0,
-      myname: '匿名'
       // 当前用户名
     };
   },
