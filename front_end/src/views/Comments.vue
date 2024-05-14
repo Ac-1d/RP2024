@@ -1,25 +1,31 @@
 <template>
   <div>
+    <!-- 评论显示 -->
     <div v-for="(comment, index) in comments" :key="index" class="comment">
       <h6>{{ comment.author }}:</h6>
       <p>{{ comment.text }} 赞：{{ comment.likes }}</p>
       <button @click="likeComment(index)">点赞</button>
       <button @click="deleteComment(index)">删除</button>
       <button @click="showReply(index)">评论</button>
+      <!-- 回复区 -->
       <div v-if="comment.showReply" class="sub-comment">  
+        <!-- 回复框 -->
         <form @submit.prevent="addReply(index, $event)">  
           <input type="text" v-model="comment.replyText" placeholder="输入你的回复...">  
-          <button type="submit">提交</button>  
+          <button type="submit" >提交</button>  
         </form>  
+        <!-- 回复显示 -->
         <div v-for="(reply, replyIndex) in comment.replies" :key="replyIndex" class="reply">  
           <p>{{ reply.text }} - {{ reply.author }}</p>  
         </div>  
       </div>
     </div>
-
+    <!-- 评论框 -->
     <form @submit.prevent="addComment">
-      <input type="text" v-model="newCommentText" placeholder="输入你的评论...">
-      <button type="submit">提交</button>
+      <textarea v-model="newCommentText" placeholder="输入你的评论..."  
+      @input="checkCommentLength"></textarea>
+      <p>剩余字数 {{ remainingText }}</p>
+      <button type="submit" :disabled="commentLengthExceeded">提交</button>
     </form>
   </div>
 </template>
@@ -41,9 +47,16 @@ export default {
         // 可以通过后端，从数据库中调用
       ],
       newCommentText: '',
+      maxText: 10,
+      commentLengthExceeded: false,
       myname: '匿名'
       // 当前用户名
     };
+  },
+  computed: {
+    remainingText(){
+      return this.maxText-this.newCommentText.length;
+    }
   },
   methods: {
     addComment() {
@@ -60,6 +73,9 @@ export default {
         this.newCommentText = '';
       }
     },
+    checkCommentLength() {  
+      this.commentLengthExceeded = this.newCommentText.length > this.maxText;  
+    },  // 检查评论的长度，不能超过maxText
     likeComment(index) {
       if (index < this.comments.length && index >= 0) {
         this.comments[index].likes++;
