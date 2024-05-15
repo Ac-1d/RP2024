@@ -1,22 +1,23 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <!-- TODO: 隐藏导航栏需要vuex，从长计议 -->
+    <div id="nav" v-if="showNav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> | 
-      <router-link to="/comments">Comments</router-link> |
-      <!-- 加入页面内导航用于调试 -->
+      <router-link to="/about">About</router-link> |
       <router-link to="/reader">Reader</router-link>
     </div>
-    <!-- TODO: 搞不懂为什么nav页面会显示在所有页面中，索性暂时注释掉，手动切换路由 -->
-    <!-- <div id="nav"> -->
-      <!-- <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> | -->
-      <!-- <router-link to="/reader">Reader</router-link> -->
-    <!-- </div> -->
     <router-view />
   </div>
 </template>
-
+<script>
+export default {
+  data() {
+    return {
+      showNav: false
+    }
+  }
+}
+</script>
 <style lang="less">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
