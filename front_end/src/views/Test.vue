@@ -14,7 +14,8 @@ export default {
     return {
       'message': 'hello',
       'name': 'Lzy',
-      'to': 'Zhang'
+      'to': 'Zhang',
+      'file': './Test.vue'
     }
   }
 }
