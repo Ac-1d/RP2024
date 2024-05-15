@@ -138,8 +138,15 @@ export default {
 </script>
 
 <style scoped>
-.comment {
+.comments {
   margin-bottom: 10px;
+  .comment-box {
+    position: fixed;
+    bottom: 5px;
+    width: 200px;
+    background-color: white;
+  }
   /* 其他样式... */
 }
+
 </style>
