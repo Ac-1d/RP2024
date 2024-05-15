@@ -1,9 +1,14 @@
 <template>
   <div class="comments">
+    <!-- 用户信息 -->
+    <div class="info">
+      <p>用户名：{{ myname }}</p>
+      <p>ID-{{ myid }}</p>
+    </div>
     <!-- 评论显示 -->
     <div v-for="(comment, index) in comments" :key="index" class="comment">
       <!-- 循环显示的每条评论 -->
-      <div class="single-comment">
+      <div>
         <h6>{{ comment.author }}:</h6>
         <p>{{ comment.text }} 赞：{{ comment.likes }}</p>
         <button @click="likeComment(index)">点赞</button>
@@ -42,11 +47,16 @@ export default {
     maxText: {
       type: Number, // 指定这个 prop 是数字类型
       // 可以指定其他验证规则，如 default, required 等
-      default: 10 // 如果 prop 未被传递，则默认值为 42
+      default: 500 // 如果 prop 未被传递，则默认值为 42
     },
     myname: {
       type: String,
       default: '匿名'
+    },
+    myid: {
+      type: Number,
+      default: 0
+      // 默认id暂定为0
     }
   },
   data() {
@@ -67,10 +77,10 @@ export default {
   methods: {
     getChildData() {
       return this.data;
-    },
+    },// 试图加上getter供外部获取数据，暂时不起作用
     setComment(inData) {
       this.comments = inData;
-    },
+    },// 试图让这个函数来在外部加上已有评论，但是暂不起作用
     addComment() {
       if (this.newCommentText) {
         if (this.replying) {
@@ -113,18 +123,6 @@ export default {
         this.comments[index].showReply = !(this.comments[index].showReply);
       }  
     },
-    addReply(index, event) {
-      if (index < this.comments.length && index >= 0 && this.comments[index].replyText) {  
-        const newReply = {
-          text: this.comments[index].replyText,  
-          author: this.myname,  
-        };
-        this.comments[index].replies.push(newReply);  
-        this.comments[index].replyText = ''; // 清空输入框  
-      }  
-      // 阻止表单默认的提交行为  
-      event.preventDefault();  
-    },
     beginReply(index){
       this.replyIndex=index;
       this.replying=true;
@@ -140,12 +138,19 @@ export default {
 <style scoped>
 .comments {
   margin-bottom: 10px;
+  .comment {
+    position: float;
+    top: 200px;
+    bottom: 200px;
+  } 
+  /* 如果修改，注意效果 */
   .comment-box {
     position: fixed;
     bottom: 5px;
     width: 200px;
     background-color: white;
   }
+  /* 如果修改，注意效果 */
   /* 其他样式... */
 }
 
