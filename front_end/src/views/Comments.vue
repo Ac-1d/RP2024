@@ -1,5 +1,5 @@
 <template>
-  <div class="comments">
+  <div class="comment">
     <CommentBlock :maxText="20" myname="Yining"/>
   </div>
 </template>
@@ -29,6 +29,9 @@ CommentBlock.comments = [
 <style scoped>
 .comment {
   margin-bottom: 10px;
+  width: 200px;
+  float: left;
+  background-color: rgb(0, 213, 255);
   /* 其他样式... */
 }
 </style>

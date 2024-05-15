@@ -20,5 +20,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
+
 # Personal notes
 note
+src/views/Test.vue

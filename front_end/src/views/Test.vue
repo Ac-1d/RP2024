@@ -12,7 +12,8 @@
 export default {
   data(){
     return {
-      'message': 'hello'
+      'message': 'hello',
+      'name': 'Lzy'
     }
   }
 }
