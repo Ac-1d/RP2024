@@ -4,6 +4,8 @@ import Epub from "epubjs";
 export function useEpub() {
   let book
   let rendition
+  let _element
+  let _options
 
   function createBook(urlOrData, options) {
     if (!urlOrData) {
@@ -20,6 +22,8 @@ export function useEpub() {
       return
     }
     rendition = book.renderTo(element, options)
+    _element = element
+    _options = options
     return rendition
   }
 
@@ -66,5 +70,26 @@ export function useEpub() {
     return;
   }
 
-  return { createBook, render, display, getBook, getRendition, nextPage, prevPage , setFontSize}
+  /** 切换页面视图（连续/分页） */
+  function setViewStyle() {
+    if("flow" in _options)
+      delete _options.flow
+    else
+      _options.flow = "scrolled-doc"
+    rendition.destroy()
+    rendition = book.renderTo(_element, _options)
+    rendition.display()
+    return
+  }
+
+
+
+  /** 用于hack epubjs源码^^ */
+  function test() {
+    debugger
+    rendition.themes.update();
+    debugger
+  }
+
+  return { createBook, render, display, getBook, getRendition, nextPage, prevPage , setFontSize, setViewStyle, test}
 }

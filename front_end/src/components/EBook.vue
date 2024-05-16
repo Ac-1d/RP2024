@@ -16,6 +16,8 @@
         调整字体大小：
         <input type="text" v-model="fontSize">
         <div>{{ fontSize }}</div>
+        <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
+        <button @click="test">点我查看代码实现</button>
       </div>
       <div id="progressBar">这里是进度条</div>
     </div>
@@ -51,7 +53,8 @@ export default {
       this.epubReader.createBook("books_tmp/09.epub");
       this.epubReader.render("epub_render", {
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
+        flow: "scrolled-doc"
       });
       this.epubReader.display();
     },
@@ -67,6 +70,12 @@ export default {
     changeFontSize(fontSize) {
       console.log("call setFontSize");
       this.epubReader.setFontSize(fontSize);
+    },
+    changeViewStyle() {
+      this.epubReader.setViewStyle();
+    },
+    test() {
+      this.epubReader.test();
     }
   },
 };
