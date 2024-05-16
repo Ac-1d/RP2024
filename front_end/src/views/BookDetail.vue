@@ -82,6 +82,7 @@ export default {
 <style scoped>
 .book-detail {
   margin: 20px;
+  text-align: left
 }
 .book-info {
   display: flex;
