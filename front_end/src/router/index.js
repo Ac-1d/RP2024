@@ -20,6 +20,13 @@ const routes = [
       import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
   {
+    path: "/comments",
+    name: "Comments",
+    // 加入新的路由
+    component: () =>
+      import("../views/Comments.vue")
+  },
+  {
     path: "/reader",
     name: "Reader",
     component: () =>
