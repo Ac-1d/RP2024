@@ -11,6 +11,7 @@
       <div>
         <h6>{{ comment.author }}:</h6>
         <p>{{ comment.text }} 赞：{{ comment.likes }}</p>
+        <p>{{ comment.currentTime }}</p>
         <button @click="likeComment(index)">点赞</button>
         <button @click="deleteComment(index)">删除</button>
         <button @click="showReply(index)">展开</button>
@@ -97,7 +98,8 @@ export default {
             showReply: false,
             likes: 0, 
             replyText: '',
-            replies: []
+            replies: [],
+            currentTime: new Date()
           };
           this.comments.push(newComment);
         }

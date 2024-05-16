@@ -43,13 +43,13 @@ CommentBlock.comments = [
   margin-bottom: 10px;
   width: 200px;
   float: left;
-  background-color: rgb(0, 213, 255);
+  background-color: rgb(0, 200, 255);
   /* 其他样式... */
 }
 .message {
   margin-bottom: 10px;
   width: 300px;
   float: right;
-  background-color: rgb(174, 255, 0);
+  background-color: rgb(150, 255, 0);
 }
 </style>
