@@ -8,6 +8,11 @@
         <h3>{{ book.title }}</h3>
         <p><strong>作者:</strong> {{ book.author }}</p>
         <p><strong>分类:</strong> {{ book.category }}</p>
+        <p><strong>出版社:</strong> {{ book.publisher }}</p>
+        <p><strong>出版时间:</strong> {{ book.publish_date }}</p>
+        <p><strong>页数:</strong> {{ book.pages }}</p>
+        <p><strong>价格:</strong> {{ book.price }}</p>
+        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
         <p><strong>描述:</strong> {{ book.description }}</p>
       </div>
     </transition>
@@ -78,8 +83,8 @@ export default {
 }
 .details {
   position: absolute; /* 确保详情框是绝对定位的 */
-  top: -10px;
-  left: 170px; /* 根据需要调整位置 */
+  top: 0;
+  left: 160px; /* 根据需要调整位置 */
   width: 300px; /* 增加宽度 */
   background: white; /* 设置背景颜色 */
   border: 1px solid #ccc;

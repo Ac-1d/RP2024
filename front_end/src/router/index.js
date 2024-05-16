@@ -1,7 +1,16 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import BookDetail from "../views/BookDetail.vue"; // 引入 BookDetail 组件
+import BookDetail from "../views/BookDetail.vue";
+import Bookshelf from "../views/Bookshelf.vue";
+import Ebooks from "../views/Ebooks.vue";
+import Rankings from "../views/Rankings.vue";
+import Reports from "../views/Reports.vue";
+import Search from "../views/Search.vue";
+import About from "../views/About.vue";
+import Reader from "../views/Reader.vue";
+import Login from "../views/Login.vue";
+import Register from "../views/Register.vue";
 
 Vue.use(VueRouter);
 
@@ -14,30 +23,53 @@ const routes = [
   {
     path: "/about",
     name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
-  },
-  {
-    path: "/comments",
-    name: "Comments",
-    // 加入新的路由
-    component: () =>
-      import("../views/Comments.vue")
+    component: About
   },
   {
     path: "/reader",
     name: "Reader",
-    component: () =>
-      import("../views/Reader.vue")
+    component: Reader
+  },
+  {
+    path: "/bookshelf",
+    name: "Bookshelf",
+    component: Bookshelf
+  },
+  {
+    path: "/ebooks",
+    name: "Ebooks",
+    component: Ebooks
+  },
+  {
+    path: "/rankings",
+    name: "Rankings",
+    component: Rankings
+  },
+  {
+    path: "/reports",
+    name: "Reports",
+    component: Reports
+  },
+  {
+    path: "/search",
+    name: "Search",
+    component: Search
   },
   {
     path: "/book/:bookId",
     name: "BookDetail",
     component: BookDetail,
     props: true
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register
   }
 ];
 
