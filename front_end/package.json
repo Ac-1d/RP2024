@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/vue": "^2.0.0",
+    "axios": "^1.6.8",
     "core-js": "^3.6.4",
     "epubjs": "^0.3.93",
     "jszip": "^3.10.1",

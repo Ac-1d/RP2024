@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import BookDetail from "../views/BookDetail.vue"; // 引入 BookDetail 组件
 
 Vue.use(VueRouter);
 
@@ -18,6 +19,12 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue")
+  },
+  {
+    path: "/book/:bookId",
+    name: "BookDetail",
+    component: BookDetail,
+    props: true
   }
 ];
 
