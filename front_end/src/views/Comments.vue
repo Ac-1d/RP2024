@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="comment">
-      <CommentBlock :myid="100" myname="李正阳"/>
+      <CommentBlock :maxText=600 :myid=100 myname="李正阳"/>
+      <!-- 设置数字类型要用' :attribute=value '的形式 -->
     </div>
     <div class="message">
       <MessageBlock />

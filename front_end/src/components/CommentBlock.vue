@@ -42,6 +42,8 @@
 </template>
 
 <script>
+import {currentTime} from "../js/Time.js";
+
 export default {
   name: "CommentBlock",
   props: {
@@ -99,7 +101,7 @@ export default {
             likes: 0, 
             replyText: '',
             replies: [],
-            currentTime: new Date()
+            currentTime: currentTime()
           };
           this.comments.push(newComment);
         }

@@ -15,7 +15,8 @@
     <div id="content">
       <div v-if="page==0">
         <h1>写信</h1>
-        <textarea v-model="content"></textarea>
+        <textarea v-model="sendto" @input="checkExeed(100)"></textarea>
+        <textarea v-model="content" @input="checkExeed(2000)"></textarea>
         <button type="submit" :disabled="mailLengthExceeded">提交</button>
       </div>
       <div v-else-if="page==1">
@@ -74,16 +75,18 @@ export default{
   data() {
     return {
       recvs: [
-        {from: "0someone-foryou", title: "0xxx-foryou", date: "2024.5.16"},
-        {from: "1someone-foryou", title: "1xxx-foryou", date: "2024.5.17"},
+        {from: "0someone-foryou", title: "0xxx-foryou", date: "2024-05-16 12:00:00"},
+        {from: "1someone-foryou", title: "1xxx-foryou", date: "2024-05-17 18:30:00"},
       ], // 收到的信息recvs: [{from, title, datetime, read, content}],
       sends: [], 
       drafts: [], 
       page: 1, // 写信0，收信1，发件箱2，草稿箱3，默认收信
       mailLengthExceeded: false,
+      sendto: ''
     }
   }
-}</script>
+}
+</script>
 
 <style scoped>
 #messages{
