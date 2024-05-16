@@ -45,6 +45,7 @@ export function useEpub() {
     if(rendition)
       rendition.destroy()
     rendition = book.renderTo(element, options)
+    console.log(options)
     defaultStyleInit()
     rendition.display()
     _element = element

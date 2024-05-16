@@ -1,8 +1,7 @@
 <template>
-  <div id="ebook">
+  <div id="ebook" @mouseup="getSelectedTextPosition">
     <!-- TODO: 窗口大小溢出，原因未知 -->
-    <div id="epub_render"></div>
-    <!-- TODO: 弃用蒙版换页，改为按钮换页，但仍需蒙版来放置按钮 -->
+    <div id="epub_render" @click="checkclick"></div>
     <div id="mask">
       <button id="tableButton" @click="callTable">点我呼出菜单</button>
       <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
@@ -20,6 +19,7 @@
         <button @click="test">点我查看代码实现</button>
         <button @click="changeTheme(0)">点我切换浅色模式</button>
         <button @click="changeTheme(1)">点我切换深色模式</button>
+        <button @click="getLocation">点我获取locations</button>
       </div>
       <div id="progressBar">这里是进度条</div>
     </div>
@@ -56,7 +56,8 @@ export default {
       this.epubReader.render("epub_render", {
         width: window.innerWidth,
         height: window.innerHeight,
-        flow: "scrolled-doc"
+        flow: "scrolled-doc",
+        allowScriptedContent: true
       });
     },
     prevPage() {
@@ -78,8 +79,37 @@ export default {
     changeTheme(index) {
       this.epubReader.setTheme(index);
     },
+    getSelectedTextPosition() {
+      var selection = window.getSelection(); // 获取用户选择的文本
+      if (selection.rangeCount > 0) { // 如果存在选中文本
+        var range = selection.getRangeAt(0); // 获取选中文本的范围
+        var startContainer = range.startContainer; // 起始节点
+        var startOffset = range.startOffset; // 起始偏移量
+        var endContainer = range.endContainer; // 结束节点
+        var endOffset = range.endOffset; // 结束偏移量
+
+        console.log("Start Node:", startContainer);
+        console.log("Start Offset:", startOffset);
+        console.log("End Node:", endContainer);
+        console.log("End Offset:", endOffset);
+      } else {
+        console.log("No text selected.");
+      }
+    },
+    getLocation() {
+      this.epubReader.getBook().locations.generate(0)
+    //   let cfi = this.epubReader.getBook().locations[0];
+    //   this.epubReader.getRendition().annotations.underline(cfi, {}, this.emptyFunction(), "", {
+    // "background-color": "rgba(255, 255, 0, 0.5)",
+    //       })
+    },
     test() {
       this.epubReader.test();
+    },
+    emptyFunction() {
+    },
+    checkclick() {
+      console.log("success click the block")
     }
   },
 };
@@ -88,20 +118,13 @@ export default {
 <style lang="scss" scoped>
 #ebook {
   position: relative;
-  #epub_render {
-    width: 100%;
-    height: 100vh;
-    justify-content: center;
-    align-content: center;
-  }
+  // #epub_render {
+  //   width: 100%;
+  //   height: 100vh;
+  //   justify-content: center;
+  //   align-content: center;
+  // }
   #mask {
-    // position: absolute;
-    // top: 0;
-    // left: 100;
-    // width: 100%;
-    // height: 100%;
-    // z-index: 90;
-    // display: flex;
     #tableButton {
       position: fixed;
       left: 50%;
@@ -120,13 +143,6 @@ export default {
     }
   }
   #table {
-    // position: absolute;
-    // top: 0;
-    // left: 0;
-    // width: 100%;
-    // height: 100%;
-    // z-index: 100;
-    // display: flex;
     #bookInfo {
       position: fixed;
       top: 0;
