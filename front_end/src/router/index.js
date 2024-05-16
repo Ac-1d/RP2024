@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import BookDetail from "../views/BookDetail.vue"; // 引入 BookDetail 组件
 
 Vue.use(VueRouter);
 
@@ -31,6 +32,10 @@ const routes = [
     name: "Reader",
     component: () =>
       import("../views/Reader.vue")
+    path: "/book/:bookId",
+    name: "BookDetail",
+    component: BookDetail,
+    props: true
   }
 ];
 
