@@ -18,6 +18,8 @@
         <div>{{ fontSize }}</div>
         <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
         <button @click="test">点我查看代码实现</button>
+        <button @click="changeTheme(0)">点我切换浅色模式</button>
+        <button @click="changeTheme(1)">点我切换深色模式</button>
       </div>
       <div id="progressBar">这里是进度条</div>
     </div>
@@ -31,7 +33,7 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: false,
+      showTable: true,
       fontSize: ''
     }
   },
@@ -56,7 +58,6 @@ export default {
         height: window.innerHeight,
         flow: "scrolled-doc"
       });
-      this.epubReader.display();
     },
     prevPage() {
       this.epubReader.prevPage();
@@ -73,6 +74,9 @@ export default {
     },
     changeViewStyle() {
       this.epubReader.setViewStyle();
+    },
+    changeTheme(index) {
+      this.epubReader.setTheme(index);
     },
     test() {
       this.epubReader.test();
