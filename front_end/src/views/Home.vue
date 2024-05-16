@@ -1,5 +1,19 @@
 <template>
   <div class="home">
+    <!-- 顶级导航栏 -->
+    <TopNavBar />
+
+    <!-- 中间导航栏 -->
+    <MiddleNavBar />
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav-bar">
+      <router-link to="/bookshelf">购书单</router-link>
+      <router-link to="/ebooks">电子图书</router-link>
+      <router-link to="/rankings">2023年度榜单</router-link>
+      <router-link to="/reports">2023年度报告</router-link>
+    </div>
+
     <!-- 顶部分类栏 -->
     <div class="category-bar">
       <span class="title">新书速递</span>
@@ -33,12 +47,16 @@
 </template>
 
 <script>
+import TopNavBar from "@/components/TopNavBar.vue";
+import MiddleNavBar from "@/components/MiddleNavBar.vue";
 import Book from "@/components/Book.vue";
 import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 
 export default {
   name: "Home",
   components: {
+    TopNavBar,
+    MiddleNavBar,
     Book
   },
   data() {
@@ -46,7 +64,8 @@ export default {
       books: booksData, // 使用本地的 books.json 数据
       currentPage: 1, // 当前页码
       booksPerPage: 10, // 每页显示的书籍数量
-      selectedCategory: "全部" // 当前选中的分类
+      selectedCategory: "全部", // 当前选中的分类
+      query: "" // 搜索查询
     };
   },
   computed: {
@@ -82,6 +101,11 @@ export default {
     filterBooks(category) {
       this.selectedCategory = category;
       this.currentPage = 1; // 重置到第一页
+    },
+    search() {
+      if (this.query.trim()) {
+        this.$router.push({name: 'Search', query: {q: this.query}});
+      }
     }
   }
 };
@@ -90,6 +114,58 @@ export default {
 <style scoped>
 .home {
   text-align: center;
+}
+
+.middle-nav-bar {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  padding: 5px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #ddd;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ccc;
+}
+
+.bottom-nav-bar {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.bottom-nav-bar a {
+  margin-right: 15px;
+  color: #555;
+  text-decoration: none;
+}
+
+.bottom-nav-bar a:hover {
+  text-decoration: underline;
 }
 
 /* 顶部分类栏样式 */
