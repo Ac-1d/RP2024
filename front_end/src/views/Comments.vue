@@ -1,15 +1,22 @@
 <template>
-  <div class="comment">
-    <CommentBlock :maxText="600" myname="李正阳"/>
+  <div>
+    <div class="comment">
+      <CommentBlock :myid="100" myname="李正阳"/>
+    </div>
+    <div class="message">
+      <MessageBlock />
+    </div>
   </div>
 </template>
 
 <script>
 import CommentBlock from "@/components/CommentBlock.vue";
+import MessageBlock from "@/components/MessageBlock.vue";
 export default {
   name: "Comments",
   components: {
-    CommentBlock
+    CommentBlock,
+    MessageBlock
   },
   data() {
     return {
@@ -25,13 +32,6 @@ CommentBlock.comments = [
     showReply: false, // 仅限网页的属性
     replyText: '', // 仅限网页的属性
     replies: [{text:'你好', author:'李正阳'},],
-
-    // text: this.newCommentText, 
-    // author: this.myname, 
-    // showReply: false,
-    // likes: 0, 
-    // replyText: '',
-    // replies: []
   },
   // 更多评论...  
   // 可以通过后端暴露的接口，从数据库中调用
@@ -45,5 +45,11 @@ CommentBlock.comments = [
   float: left;
   background-color: rgb(0, 213, 255);
   /* 其他样式... */
+}
+.message {
+  margin-bottom: 10px;
+  width: 300px;
+  float: right;
+  background-color: rgb(174, 255, 0);
 }
 </style>

@@ -30,7 +30,7 @@
         <textarea v-model="newCommentText" placeholder="输入你的评论..."  
         @input="checkCommentLength"></textarea>
         <p>剩余字数 {{ remainingText }}</p>
-        <!-- 显示回复给某人 -->
+        <!-- 显示正在回复给某人 -->
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
         <!-- 退出回复，返回评论 -->
         <button v-if="replying" @click="endReply()">返回评论</button>
@@ -46,8 +46,7 @@ export default {
   props: {
     maxText: {
       type: Number, // 指定这个 prop 是数字类型
-      // 可以指定其他验证规则，如 default, required 等
-      default: 500 // 如果 prop 未被传递，则默认值为 42
+      default: 500 // 默认值 500
     },
     myname: {
       type: String,
@@ -55,7 +54,7 @@ export default {
     },
     myid: {
       type: Number,
-      default: 0
+      default: 100
       // 默认id暂定为0
     }
   },
@@ -143,14 +142,14 @@ export default {
     top: 200px;
     bottom: 200px;
   } 
-  /* 如果修改，注意效果 */
+  /* 这里固定评论显示区的位置；如果修改，注意效果 */
   .comment-box {
     position: fixed;
     bottom: 5px;
     width: 200px;
     background-color: white;
   }
-  /* 如果修改，注意效果 */
+  /* 这里将评论框固定在屏幕下方；如果修改，注意效果 */
   /* 其他样式... */
 }
 
