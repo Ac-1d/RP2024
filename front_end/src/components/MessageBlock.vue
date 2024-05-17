@@ -15,8 +15,13 @@
     <div id="content">
       <div v-if="page==0">
         <h1>写信</h1>
-        <MyInput :maxLen="1000" v-model="content" name="发送"></MyInput>
-        <p>内容是{{ content }}</p>
+        <p>收件人：</p>
+        <input v-model="sendto" @input="sendto=sendto.substring(0,127)"/>
+        <p>内容：</p>
+        <textarea v-model="content" @input="content=content.substring(0,32768)"/>
+        <button type="submit" @clicked="submitMessage">发送</button>
+        <!-- 邮箱一般没有字数限制但是我不会写，就先加上 -->
+        <!-- <p>内容是{{ content }}</p>调试用 -->
       </div><!-- 写信 -->
       <div v-else-if="page==1">
         <h1>收信</h1>
@@ -38,13 +43,11 @@
 </template>
 
 <script>
-import MyInput from "@/components/MyInput.vue";
 import MyTable from "@/components/MyTable.vue";
 
 export default{
   name: "MessageBlock",
   components: {
-    MyInput,
     MyTable
   },
   props: {
@@ -75,6 +78,11 @@ export default{
       page: 1, 
       sendto: '',
       content: ''
+    }
+  },
+  methods: {
+    submitMessage(){
+      console.log('submit an Email')// 提交信件
     }
   }
 }

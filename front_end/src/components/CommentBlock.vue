@@ -28,7 +28,8 @@
     <!-- 评论、回复框 -->
     <div class="comment-box">
       <form @submit.prevent="addComment">
-        <MyInput :maxLen="500" v-model="newCommentText" name="提交"/>
+        <textarea v-model="content" @input="content=content.substring(0,1023)"/>
+        <p>{{ content.length }}/1024</p>
         <!-- 显示正在回复给某人 -->
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
         <!-- 退出回复，返回评论 -->
@@ -40,13 +41,9 @@
 
 <script>
 import {currentTime} from "../js/Time.js";
-import MyInput from "@/components/MyInput.vue";
 
 export default {
   name: "CommentBlock",
-  components: {
-    MyInput
-  },
   props: {
     myname: {
       type: String,
@@ -61,7 +58,7 @@ export default {
   data() {
     return {
       comments: [],
-      newCommentText: '',
+      content: '',
       replying: false,
       replyIndex: 0,
       // 当前用户名
