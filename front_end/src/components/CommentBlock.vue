@@ -28,14 +28,11 @@
     <!-- 评论、回复框 -->
     <div class="comment-box">
       <form @submit.prevent="addComment">
-        <textarea v-model="newCommentText" placeholder="输入你的评论..."  
-        @input="checkCommentLength"></textarea>
-        <p>剩余字数 {{ remainingText }}</p>
+        <MyInput :maxLen="500" v-model="newCommentText" name="提交"/>
         <!-- 显示正在回复给某人 -->
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
         <!-- 退出回复，返回评论 -->
         <button v-if="replying" @click="endReply()">返回评论</button>
-        <button type="submit" :disabled="commentLengthExceeded">提交</button>
       </form>
     </div>
   </div>
@@ -43,14 +40,14 @@
 
 <script>
 import {currentTime} from "../js/Time.js";
+import MyInput from "@/components/MyInput.vue";
 
 export default {
   name: "CommentBlock",
+  components: {
+    MyInput
+  },
   props: {
-    maxText: {
-      type: Number, // 指定这个 prop 是数字类型
-      default: 500 // 默认值 500
-    },
     myname: {
       type: String,
       default: '匿名'
@@ -65,7 +62,6 @@ export default {
     return {
       comments: [],
       newCommentText: '',
-      commentLengthExceeded: false,
       replying: false,
       replyIndex: 0,
       // 当前用户名
@@ -108,9 +104,6 @@ export default {
         this.newCommentText = '';
       }
     },
-    checkCommentLength() {  
-      this.commentLengthExceeded = this.newCommentText.length > this.maxText;  
-    },  // 检查评论的长度，不能超过maxText
     likeComment(index) {
       if (index < this.comments.length && index >= 0) {
         this.comments[index].likes++;

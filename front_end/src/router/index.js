@@ -11,6 +11,7 @@ import About from "../views/About.vue";
 import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
+import Comments from "../views/Comments.vue";// 调试用，合并的时候可以删掉
 
 Vue.use(VueRouter);
 
@@ -70,6 +71,11 @@ const routes = [
     path: "/register",
     name: "Register",
     component: Register
+  },
+  {// 调试用，合并的时候可以删掉
+    path: "/comments",
+    name: "Comments",
+    component: Comments
   }
 ];
 

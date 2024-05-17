@@ -15,9 +15,8 @@
     <div id="content">
       <div v-if="page==0">
         <h1>写信</h1>
-        <textarea v-model="sendto" @input="checkExeed(100)"></textarea>
-        <textarea v-model="content" @input="checkExeed(2000)"></textarea>
-        <button type="submit" :disabled="mailLengthExceeded">提交</button>
+        <MyInput :maxLen="1000" v-model="content" name="发送"></MyInput>
+        <p>内容是{{ content }}</p>
       </div>
       <div v-else-if="page==1">
         <h1>收信</h1>
@@ -55,8 +54,13 @@
 </template>
 
 <script>
+import MyInput from "@/components/MyInput.vue";
+
 export default{
   name: "MessageBlock",
+  components: {
+    MyInput
+  },
   props: {
     maxText: {
       type: Number, 
@@ -69,8 +73,7 @@ export default{
     myid: {
       type: Number,
       default: 0
-    },
-    content: String
+    }
   },
   data() {
     return {
@@ -80,9 +83,9 @@ export default{
       ], // 收到的信息recvs: [{from, title, datetime, read, content}],
       sends: [], 
       drafts: [], 
-      page: 1, // 写信0，收信1，发件箱2，草稿箱3，默认收信
-      mailLengthExceeded: false,
-      sendto: ''
+      page: 1, 
+      sendto: '',
+      content: ''
     }
   }
 }

@@ -13,6 +13,7 @@
 <script>
 import CommentBlock from "@/components/CommentBlock.vue";
 import MessageBlock from "@/components/MessageBlock.vue";
+
 export default {
   name: "Comments",
   components: {
@@ -25,18 +26,6 @@ export default {
     }
   }
 };
-CommentBlock.comments = [
-  { 
-    text: '这是一条评论', 
-    author: '张三', 
-    likes: 0,
-    showReply: false, // 仅限网页的属性
-    replyText: '', // 仅限网页的属性
-    replies: [{text:'你好', author:'李正阳'},],
-  },
-  // 更多评论...  
-  // 可以通过后端暴露的接口，从数据库中调用
-];
 </script>
 
 <style scoped>
