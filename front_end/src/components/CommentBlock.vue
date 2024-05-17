@@ -67,11 +67,6 @@ export default {
       // 当前用户名
     };
   },
-  computed: {
-    remainingText(){
-      return this.maxText-this.newCommentText.length;
-    }
-  },
   methods: {
     getChildData() {
       return this.data;

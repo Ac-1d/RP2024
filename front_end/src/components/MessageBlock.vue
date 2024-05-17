@@ -17,35 +17,19 @@
         <h1>写信</h1>
         <MyInput :maxLen="1000" v-model="content" name="发送"></MyInput>
         <p>内容是{{ content }}</p>
-      </div>
+      </div><!-- 写信 -->
       <div v-else-if="page==1">
         <h1>收信</h1>
-        <table>
-          <thead> 
-            <!-- 表头 -->
-            <tr>
-              <th>发件人</th>
-              <th>标题</th>
-              <th>日期</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(recv, index) in recvs" :key="index">
-              <td>{{ recv.from }}</td>
-              <td>{{ recv.title }}</td>
-              <td>{{ recv.date }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- 发信人from 主题title 是否已读 -->
-        <!-- 通过v-for来实现显示 -->
-      </div>
+        <MyTable :rows="recvs"/>
+      </div><!-- 收信 -->
       <div v-else-if="page==2">
         <h1>已发送</h1>
-      </div>
+        <MyTable :rows="sends"/>
+      </div><!-- 已发送 -->
       <div v-else-if="page==3">
         <h1>草稿箱</h1>
-      </div>
+        <MyTable :rows="drafts"/>
+      </div><!-- 草稿箱 -->
     </div>
     <!-- 发送消息板块 表单 -->
     <div id="send-message">
@@ -55,11 +39,13 @@
 
 <script>
 import MyInput from "@/components/MyInput.vue";
+import MyTable from "@/components/MyTable.vue";
 
 export default{
   name: "MessageBlock",
   components: {
-    MyInput
+    MyInput,
+    MyTable
   },
   props: {
     maxText: {
@@ -78,10 +64,13 @@ export default{
   data() {
     return {
       recvs: [
-        {from: "0someone-foryou", title: "0xxx-foryou", date: "2024-05-16 12:00:00"},
-        {from: "1someone-foryou", title: "1xxx-foryou", date: "2024-05-17 18:30:00"},
+        {from: "Lily", title: "Bills",    date: "2024-05-16 12:00:00"},
+        {from: "Bill", title: "Business", date: "2024-05-17 18:30:00"},
       ], // 收到的信息recvs: [{from, title, datetime, read, content}],
-      sends: [], 
+      sends: [
+        {to: 'Bob',    title:'Welcome',   date:"2024-11-16 12:00:00"},
+        {to: 'Alice',  title:'Assignment',date:"2024-02-15 16:00:00"}
+      ], 
       drafts: [], 
       page: 1, 
       sendto: '',
