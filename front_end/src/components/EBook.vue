@@ -42,7 +42,8 @@ export default {
       showTable: false,
       fontSize: '',
       pageNumber: '',
-      testPageNumber:''
+      testPageNumber:'',
+      noteType:'none'
     }
   },
   props: [
@@ -55,12 +56,13 @@ export default {
     rendition.on("selected", (cfiRange, contents) =>{
       console.log("listener detectes text selected:", cfiRange, contents)
       this.epubReader.setForNote(cfiRange, contents)
-      // this.epubReader.getRendition().annotations.highlight(cfiRange, {}, () => {})
-      // window.getSelection().removeAllRanges();
+      
     })
     rendition.on("mouseup", ()=> {
       console.log("listener detectes mouseup")
-      this.epubReader.highLightText()
+      this.epubReader.setTakeNoteAvailable()
+      console.log("this.epubReader.takeNoteAvailable: ", this.epubReader.takeNoteAvailable)
+      this.epubReader.takeNote()
     })
   },
   watch: {
