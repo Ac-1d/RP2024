@@ -1,5 +1,5 @@
 <template>
-  <div id="ebook" @mouseup="getSelectedTextPosition">
+  <div id="ebook">
     <!-- TODO: 窗口大小溢出，原因未知 -->
     <div id="epub_render" @click="checkclick"></div>
     <div id="mask">
@@ -16,12 +16,18 @@
         <input type="text" v-model="fontSize">
         <div>{{ fontSize }}</div>
         <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
-        <button @click="test">点我查看代码实现</button>
+        <button @click="test">点我调用test()</button>
         <button @click="changeTheme(0)">点我切换浅色模式</button>
         <button @click="changeTheme(1)">点我切换深色模式</button>
-        <button @click="getLocation">点我获取locations</button>
+        <button @click="changeLocation">点我修改至储存location位置</button>
+        <input type="text" v-model="testPageNumber">
       </div>
-      <div id="progressBar">这里是进度条</div>
+      <div id="progressBar">
+        这里是进度条
+        <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
+        <input type="range" v-model="pageNumber">
+      </div>
+      
     </div>
   </div>
 </template>
@@ -33,8 +39,10 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: true,
-      fontSize: ''
+      showTable: false,
+      fontSize: '',
+      pageNumber: '',
+      testPageNumber:''
     }
   },
   props: [
@@ -43,11 +51,29 @@ export default {
   mounted() {
     this.epubReader = useEpub();
     this.loadEpub();
+    let rendition = this.epubReader.getRendition()
+    rendition.on("selected", (cfiRange, contents) =>{
+      console.log("listener detectes text selected:", cfiRange, contents)
+      this.epubReader.setForNote(cfiRange, contents)
+      // this.epubReader.getRendition().annotations.highlight(cfiRange, {}, () => {})
+      // window.getSelection().removeAllRanges();
+    })
+    rendition.on("mouseup", ()=> {
+      console.log("listener detectes mouseup")
+      this.epubReader.highLightText()
+    })
   },
   watch: {
     fontSize(newValue) {
       console.log("call fontSize in watch");
       this.changeFontSize(newValue);
+    },
+    pageNumber(newValue) {
+      // console.log("pageNumber changed", newValue)
+      this.changePage(newValue)
+    },
+    testPageNumber(newValue) {
+      this.epubReader.test(newValue)
     }
   },
   methods: {
@@ -56,7 +82,7 @@ export default {
       this.epubReader.render("epub_render", {
         width: window.innerWidth,
         height: window.innerHeight,
-        flow: "scrolled-doc",
+        // flow: "scrolled-doc",
         allowScriptedContent: true
       });
     },
@@ -79,6 +105,9 @@ export default {
     changeTheme(index) {
       this.epubReader.setTheme(index);
     },
+    changePage(pageNumber) {
+      this.epubReader.setPage(pageNumber)
+    },
     getSelectedTextPosition() {
       var selection = window.getSelection(); // 获取用户选择的文本
       if (selection.rangeCount > 0) { // 如果存在选中文本
@@ -96,12 +125,8 @@ export default {
         console.log("No text selected.");
       }
     },
-    getLocation() {
-      this.epubReader.getBook().locations.generate(0)
-    //   let cfi = this.epubReader.getBook().locations[0];
-    //   this.epubReader.getRendition().annotations.underline(cfi, {}, this.emptyFunction(), "", {
-    // "background-color": "rgba(255, 255, 0, 0.5)",
-    //       })
+    changeLocation() {
+      this.epubReader.setLatedPage()
     },
     test() {
       this.epubReader.test();
@@ -112,6 +137,9 @@ export default {
       console.log("success click the block")
     }
   },
+  beforeDestroy() {
+    // TODO: 销毁监听器
+  }
 };
 </script>
 
