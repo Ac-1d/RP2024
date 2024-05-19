@@ -34,6 +34,7 @@
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
         <!-- 退出回复，返回评论 -->
         <button v-if="replying" @click="endReply()">返回评论</button>
+        <button type="submit">发送</button>
       </form>
     </div>
   </div>
@@ -72,10 +73,10 @@ export default {
       this.comments = inData;
     },// 试图让这个函数来在外部加上已有评论，但是暂不起作用
     addComment() {
-      if (this.newCommentText) {
+      if (this.content) {
         if (this.replying) {
           const newReply = {
-            text: this.newCommentText, 
+            text: this.content, 
             author: this.myname
           };
           this.comments[this.replyIndex].replies.push(newReply);
@@ -83,7 +84,7 @@ export default {
         }
         else {
           const newComment = { 
-            text: this.newCommentText, 
+            text: this.content, 
             author: this.myname, 
             showReply: false,
             likes: 0, 
@@ -93,7 +94,7 @@ export default {
           };
           this.comments.push(newComment);
         }
-        this.newCommentText = '';
+        this.content = '';
       }
     },
     likeComment(index) {
