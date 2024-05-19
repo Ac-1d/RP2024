@@ -76,6 +76,15 @@ const routes = [
     path: "/comments",
     name: "Comments",
     component: Comments
+  },
+  {
+    path: "/Center",
+    name: "Center",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+       import(/* webpackChunkName: "center" */ "../views/centre.vue")
   }
 ];
 
