@@ -1,5 +1,5 @@
 <template>
-  <div class="top-nav-bar">
+  <div class="top-nav-bar" v-if="showNavBar">
     <div class="left-links">
       <router-link to="/">Home</router-link>
       <router-link to="/about">About</router-link>
@@ -14,7 +14,12 @@
 
 <script>
 export default {
-  name: "TopNavBar"
+  name: "TopNavBar",
+  data() {
+    return {
+      showNavBar: false
+    }
+  }
 };
 </script>
 
