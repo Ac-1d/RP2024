@@ -21,13 +21,16 @@
         <button @click="changeTheme(1)">点我切换深色模式</button>
         <button @click="changeLocation">点我修改至储存location位置</button>
         <input type="text" v-model="testPageNumber">
+        <button @click="changeTakeNoteType('highlight')">点我标记高亮</button>
+        <button @click="changeTakeNoteType('underline')">点我做笔记</button>
+        <button @click="testIsRemove=!testIsRemove">点我切换查看/删除</button>
+        <input type="text" id="note" v-if="isTakeNote" @keyup.enter="hideInput" v-model="noteText">
       </div>
       <div id="progressBar">
         这里是进度条
         <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
         <input type="range" v-model="pageNumber">
       </div>
-      
     </div>
   </div>
 </template>
@@ -43,7 +46,10 @@ export default {
       fontSize: '',
       pageNumber: '',
       testPageNumber:'',
-      noteType:'none'
+      testIsRemove: false,
+      takeNoteType: 'underline',
+      isTakeNote: false,
+      noteText: ''
     }
   },
   props: [
@@ -56,13 +62,21 @@ export default {
     rendition.on("selected", (cfiRange, contents) =>{
       console.log("listener detectes text selected:", cfiRange, contents)
       this.epubReader.setForNote(cfiRange, contents)
-      
     })
     rendition.on("mouseup", ()=> {
       console.log("listener detectes mouseup")
-      this.epubReader.setTakeNoteAvailable()
-      console.log("this.epubReader.takeNoteAvailable: ", this.epubReader.takeNoteAvailable)
-      this.epubReader.takeNote()
+      if(this.takeNoteType == 'underline')
+        this.isTakeNote = true
+      this.epubReader.takeNote(this.takeNoteType)
+    })
+    rendition.on("markClicked", (cfiRange)=> {
+      console.log("listener detectes 'markClicked'")
+      console.log(cfiRange)
+      if(this.testIsRemove)
+        this.epubReader.removeMark(cfiRange)
+      else {
+        console.log(this.epubReader.getNoteText(cfiRange)) 
+      }
     })
   },
   watch: {
@@ -129,6 +143,13 @@ export default {
     },
     changeLocation() {
       this.epubReader.setLatedPage()
+    },
+    changeTakeNoteType(takeNoteType) {
+      this.takeNoteType = takeNoteType
+    },
+    hideInput() {
+      this.isTakeNote = false
+      this.epubReader.setNoteText(this.noteText)
     },
     test() {
       this.epubReader.test();
