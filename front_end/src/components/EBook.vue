@@ -8,7 +8,10 @@
       <button id="prevPageButton" @click="prevPage">点我向前翻页</button>
     </div>
     <div id="table" v-if="showTable">
-      <div id="bookInfo">这里是书籍信息</div>
+      <div id="bookInfo">
+        <h1>这里是书籍信息</h1>
+        <!-- TODO: 加载parseBook返回的书籍信息，包括目录跳转 -->
+      </div>
       <div id="setting">
         <h1>这里是设置</h1>
         <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
@@ -94,7 +97,8 @@ export default {
   },
   methods: {
     loadEpub() {
-      this.epubReader.createBook("books_tmp/09.epub");
+      this.epubReader.createBook("books_tmp/moby-dick.epub");
+      this.epubReader.parseBook()
       this.epubReader.render("epub_render", {
         width: window.innerWidth,
         height: window.innerHeight,

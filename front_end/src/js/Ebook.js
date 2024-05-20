@@ -14,8 +14,6 @@ export function useEpub() {
    * 好像存起来也没啥用，先存着吧
    */
   let locations
-  /**目录  */
-  let navigation
   /**在切换渲染参数前储存当前阅读位置
    * 后续可以考虑缓存该属性
    */
@@ -28,6 +26,7 @@ export function useEpub() {
   ]
   let fillColorIndex = 0
   let takeNoteAvailable = false
+  let navigation = []
   let noteList = []
   let themeList = [
     {
@@ -59,8 +58,6 @@ export function useEpub() {
     }
     book.ready
       .then(() => {
-        navigation = book.navigation
-        console.log(navigation)
         console.log("Location init...")
         return book.locations.generate()
       })
@@ -307,11 +304,60 @@ export function useEpub() {
     return {startCfi, endCfi}
   }
 
-  /**用于hack epubjs源码^^
-   * 或是一些临时的测试函数
+  function parseBook() {
+    let url
+    let metadata
+    book.loaded.cover.then((cover) =>{
+      if(cover){
+        book.archive.createUrl(cover).then((_url) =>{
+          url = _url
+          console.log("parse url:", url)
+        })
+      }
+      else{//TODO: 无封面加载一个默认封面
+        
+      }
+    })
+    book.loaded.metadata.then((_metadata) =>{
+      metadata = _metadata
+      console.log("parse metadata:", metadata)
+    })
+    book.loaded.navigation.then((nav) =>{
+      console.log("nav.toc:", nav.toc)
+      nav.toc.forEach((toc) =>{
+        navigation.push({'id': toc.id, 'href': toc.href, 'label': toc.label})
+      })
+      console.log("parse navigation")
+    })
+    return {url, metadata, navigation}
+  }
+
+  /**toc{0:}
+   * 0{label,parent,subitems}
+   * subitems
+   * 其实大多数电子书没有子目录，这个解析子目录的方法从长计议
    */
-  function test() {
-    console.log("-----------")
+  // function tocTree2List(toc) {
+
+  // }
+
+  function doSearch(q) {
+    return Promise.all(
+      book.spine.spineItems.map((section) => 
+        section
+          .load(book.load.bind(book))
+          .then(section.find.bind(section, q))
+          .finally(section.unload.bind(section))
+      )
+    ).then((results) => Promise.resolve([].concat.apply([], results)))
+  }
+
+  function search(text) {
+    book.ready.then(() => {
+      doSearch(text).then((results) =>{
+        console.log(results);
+      })
+    })
   }
 
   function setLatedPage() {
@@ -319,8 +365,16 @@ export function useEpub() {
     rendition.display(currentLocation.start.cfi)
   }
 
+  /**用于hack epubjs源码^^
+   * 或是一些临时的测试函数
+   */
+  function test() {
+    search("small")
+  }
+
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText
+    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, parseBook,
+    search
   }
 }
