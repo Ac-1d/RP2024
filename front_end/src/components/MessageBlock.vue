@@ -1,15 +1,13 @@
 <template>
   <div id="messages">
     <!-- 用户信息 -->
-    <div id="info">
+    <div class="side-nav">
       <p>用户名：{{ myname }}</p>
       <p>ID-{{ myid }}</p>
-      <nav>
-        <a href="#" @click="page=0">写信</a><br/>
-        <a href="#" @click="page=1">收信</a><br/>
-        <a href="#" @click="page=2">已发送</a><br/>
-        <a href="#" @click="page=3">草稿箱</a><br/>
-      </nav>
+      <div class="side-nav-item"><a href="#" @click="page=0">写信</a></div>
+      <div class="side-nav-item"><a href="#" @click="page=1">收信</a></div>
+      <div class="side-nav-item"><a href="#" @click="page=2">已发送</a></div>
+      <div class="side-nav-item"><a href="#" @click="page=3">草稿箱</a></div>
     </div>
     <!-- 消息列表 -->
     <div id="content">
@@ -91,17 +89,41 @@ export default{
 <style scoped>
 #messages{
   margin-bottom: 10px;
-  #info {
-    background-color:rgb(150, 255, 0);
-    height:200px;
-    width:100px;
-    float:left;
+    /* 侧边栏 */
+    .side-nav {
+      color:#EEEEEE;
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px 0 0 10px;
+      padding: 10px;
+      z-index: 1000;
+    }
+    .side-nav-item {
+      a{
+        color: #EEEEEE;
+        text-decoration: none;
+      }
+      text-align: center;
+      color: white;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .side-nav-item:hover {
+      background: #007bff;
+      color: #fff;
+    }
   }
   #content {
     background-color:#EEEEEE;
-    height:200px;
-    width:200px;
+    width: 100%;
+    height: 100%;
     float:left;
   }
-}
 </style>

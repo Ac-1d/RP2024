@@ -12,6 +12,7 @@ import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Comments from "../views/Comments.vue";// 调试用，合并的时候可以删掉
+import Message from "../views/Message.vue";
 
 Vue.use(VueRouter);
 
@@ -76,6 +77,11 @@ const routes = [
     path: "/comments",
     name: "Comments",
     component: Comments
+  },
+  {
+    path: "/message",
+    name: "Message",
+    component: Message
   }
 ];
 
