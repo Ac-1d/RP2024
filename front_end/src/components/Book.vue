@@ -1,6 +1,6 @@
 <template>
-  <div class="book" @mouseover="showDetails" @mouseleave="hideDetails">
-    <img :src="bookImage" :alt="book.title" @click="goToDetailPage" />
+  <div class="book">
+    <img :src="bookImage" :alt="book.title" @click="goToDetailPage" @mouseover="showDetails" @mouseleave="hideDetails" />
     <div class="title">{{ book.title }}</div>
     <div class="author">{{ book.author }}</div>
     <transition name="fade">
