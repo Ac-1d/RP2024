@@ -1,8 +1,7 @@
 <template>
   <div id="ebook">
-    <!-- TODO: 窗口大小溢出，原因未知 -->
     <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
-    <div id="epub_render" @click="checkclick"></div>
+    <div id="epub_render"></div>
     <div id="mask">
       <button id="tableButton" @click="callTable">点我呼出菜单</button>
       <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
@@ -18,16 +17,23 @@
             <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
             <p class="text bookInfo-text">已读：12h</p>
             <p class="text bookInfo-search">全文搜索：</p>
+            <input v-model="textSearch" placeholder="请输入内容" @keyup.enter="doSearch">
           </div>
         </div>
-        <div id="bookInfo-body">
+        <div class="bookInfo-body" v-if="showNavigation">
           <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
             <span @click="setHref(item.href)">
               {{ item.index }}.{{ item.label }}
             </span>
           </div>
         </div>
-        <!-- TODO: 加载parseBook返回的书籍信息，包括目录跳转 -->
+        <div class="bookInfo-body" v-if="!showNavigation">
+          <div v-for="item in searchResult" :key="item.index" class="text">
+            <span @click="setHref(item.cfi)">
+              {{ item.excerpt }}
+            </span>
+          </div>
+        </div>
       </div>
       <div id="setting">
         <h1>这里是设置</h1>
@@ -45,6 +51,7 @@
         <button @click="changeTakeNoteType('underline')">点我做笔记</button>
         <button @click="testIsRemove=!testIsRemove">点我切换查看/删除</button>
         <input type="text" id="note" v-if="isTakeNote" @keyup.enter="hideInput" v-model="noteText">
+        <button @click="showNavigation = !showNavigation">点我切换目录/搜索结果</button>
       </div>
       <div id="progressBar">
         这里是进度条
@@ -73,6 +80,9 @@ export default {
       coverUrl: '',
       metadata: null,
       navigation: [],
+      textSearch: '',
+      showNavigation: true,
+      searchResult: [],
     }
   },
   props: [
@@ -171,23 +181,6 @@ export default {
     changePage(pageNumber) {
       this.epubReader.setPage(pageNumber)
     },
-    getSelectedTextPosition() {
-      var selection = window.getSelection(); // 获取用户选择的文本
-      if (selection.rangeCount > 0) { // 如果存在选中文本
-        var range = selection.getRangeAt(0); // 获取选中文本的范围
-        var startContainer = range.startContainer; // 起始节点
-        var startOffset = range.startOffset; // 起始偏移量
-        var endContainer = range.endContainer; // 结束节点
-        var endOffset = range.endOffset; // 结束偏移量
-
-        console.log("Start Node:", startContainer);
-        console.log("Start Offset:", startOffset);
-        console.log("End Node:", endContainer);
-        console.log("End Offset:", endOffset);
-      } else {
-        console.log("No text selected.");
-      }
-    },
     changeLocation() {
       this.epubReader.setLatedPage()
     },
@@ -198,13 +191,20 @@ export default {
       this.isTakeNote = false
       this.epubReader.setNoteText(this.noteText)
     },
+    doSearch() {
+      console.log("call do search")
+      this.epubReader.getBook().ready.then(() => {
+      this.epubReader.doSearch(this.textSearch).then((results) =>{
+        this.searchResult = results
+        console.log(this.searchResult);
+      })
+      this.showNavigation = false
+    })
+    },
     test() {
       this.epubReader.test();
     },
     emptyFunction() {
-    },
-    checkclick() {
-      console.log("success click the block")
     },
     setHref(href) {
       console.log("set page to", href)
@@ -262,9 +262,6 @@ export default {
           flex-direction: column;
         }
       }
-      #bookInfo-body {
-        margin: 10px 20px;
-      }
     }
     #setting {
       position: fixed;
@@ -291,9 +288,14 @@ export default {
 .bookInfo-text {
   margin: 0%;
   width: 100%;
-  flex-basis: 20%;
+  flex-basis: 17%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.bookInfo-body {
+  margin: 0px 20px;
+  height: 80%;
+  overflow: scroll;
 }
 </style>
