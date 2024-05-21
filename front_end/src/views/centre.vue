@@ -6,8 +6,8 @@
                 <img src="@/assets/Avatar.jpg" alt="Avatar" />
             </div>
             <ul class="info" >
-            <li class='NickName'><strong>昵称：</strong>{{ nickname }}</li>
-                <li class='Level'><strong>等级：</strong>lv{{ level }}</li>
+            <li class='NickName'><strong>昵称：</strong>{{ user.nickname }}</li>
+                <li class='Level'><strong>等级：</strong>lv{{ user.level }}</li>
             </ul>
 
         </div>
@@ -15,43 +15,51 @@
     <header class="down">
     <aside class="sidebar">
       <ul class='infoSide'>
-        <li>性别：{{ sex }}</li>
-        <li>手机号：{{ hiddenTele }}</li>
-        <li>个性签名：{{ signature }}</li>
+        <li><h1>资料卡片:</h1></li>
+        <li><strong>性别：</strong>{{ user.sex }}</li>
+        <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
+        <li><strong>个性签名：<br/></strong>{{ user.signature }}</li>
+        <li><a href="#"><br>修改个人信息&gt;&gt;</a></li>
       </ul>
     </aside>
     <main class="main">
-      <h2>我的书架</h2>
-      <!--
-      <ul>
-        <li v-for="(book, index) in books" :key="index">{{ book.title }}</li>
-      </ul>
-      -->
+      <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
     </main>
     </header>
   </div>
 </template>
 
 <script>
+import Book from "@/components/Book.vue";
+import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+
 export default {
-   /* components: {
-      LoginModal
-   }, */
+   components: {
+      Book,
+   },
   data() {
     return {
-      nickname: "John Doe",
-      signature: "好好学习，天天向上!",
-      level:"7",
-      avatar: "../assets/Avatar.jpg", // 你的头像图片地址
-      sex:'男',
-      tele:'15513107588'
+    books:booksData,
+      user:{
+    "ID": "U88965",
+    "level": 7,
+    "nickname": "pizza_k",
+    "sex": "女",
+    "signature": "远方，就是我站立的地方",
+    "tele":"15513107588"
+  },
     };
   },
+
   computed:{
     hiddenTele(){
-        const prefix = this.tele.substring(0, 3);
-        const suffix = this.tele.substring(this.tele.length - 2);
+        const prefix = this.user.tele.substring(0, 3);
+        const suffix = this.user.tele.substring(this.user.tele.length - 2);
         return `${prefix}****${suffix}`;
+    },
+    paginatedBooks() {
+    // 假设你有一个分页逻辑，这里简单返回全部书籍作为示例
+    return this.books;
     },
   },
 };
@@ -59,16 +67,14 @@ export default {
 
 
 <style scoped>
-:root {
-  my_top: 500px;
-}
 .center {
   display: flex;
   align-items: center;
+
 }
 
 .header {
-
+  background-image: url('../assets/center_back.jpg');
   position:absolute;
   top:65px;
   left:50px;
@@ -77,16 +83,15 @@ export default {
 
   background-size: cover;
   background-position: top;
-  align-items: center;
-  justify-content: center;
-  background-color: #f5f5f5;
+
+  color: #333; /* 设置字体颜色 */
 }
 .down {
   position:absolute;
   top:265px;
   left:50px;
   right:50px;
-  height:450px;
+  height:430px;
 }
 
 .header-content {
@@ -118,25 +123,39 @@ export default {
 }
 .sidebar {
   position:absolute;
-  top:0px;
+  top:2px;
   left:0px;
   width:200px;
   height:100%;
   background-color: #f5f5f5;
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 增加阴影效果 */
+  font-size: 14px; /* 设置字体大小 */
+  color: #333; /* 设置字体颜色 */
+  border-radius: 5px; /* 增加圆角 */
+  font-family: 'Arial', sans-serif; /* 设置字体 */
+  text-align: left; /* 左对齐文本 */
 }
 .infoSide{
+  color: #555; /* 设置字体颜色 */
   list-style-type: none;
   position:absolute;
-  top:10px;
-
+  top:20px;
+  left:0px;
+  right:30px;
+  text-align: left; /* 设置左对齐 */
+  line-height: 30px; /* 设置行距为15px */
 }
 .main {
   position:absolute;
-  top:0px;
-  left:200px;
+  top:2px;
+  left:205px;
   right:0px;
   height:100%;
-  background-color: yellow;
+  background-color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* 左对齐 */
 }
 
 .info {
@@ -144,9 +163,11 @@ export default {
   position:absolute;
   bottom:10px;
   left:210px;
+  color: #555; /* 设置字体颜色 */
+  font-weight: bold;
 }
 
-li {
-  margin-bottom: 10px;
+strong{
+color: #333; /* 设置加粗字体颜色 */
 }
 </style>
