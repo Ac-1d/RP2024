@@ -11,13 +11,18 @@
     </div>
     <!-- 消息列表 -->
     <div id="content">
-      <div v-if="page==0">
+      <div id="send" v-if="page==0">
         <h1>写信</h1>
-        <p>收件人：</p>
-        <input v-model="sendto" @input="sendto=sendto.substring(0,127)"/>
-        <p>内容：</p>
-        <textarea v-model="content" @input="content=content.substring(0,32768)"/>
-        <button type="submit" @clicked="submitMessage">发送</button>
+        <SendMail/>
+        <!-- <div id="div1">
+          <button class="button" type="submit" @clicked="submitMessage">发送</button>
+          <input class="input" v-model="sendto" placeholder="收件人"
+          @input="sendto=sendto.substring(0,127)">
+        </div>
+        <div id="div2">
+          <textarea class="input" v-model="content" placeholder="内容"
+          @input="content=content.substring(0,32768)"></textarea>
+        </div> -->
         <!-- 邮箱一般没有字数限制但是我不会写，就先加上 -->
         <!-- <p>内容是{{ content }}</p>调试用 -->
       </div><!-- 写信 -->
@@ -42,17 +47,15 @@
 
 <script>
 import MyTable from "@/components/MyTable.vue";
+import SendMail from "@/components/SendMail.vue";
 
 export default{
   name: "MessageBlock",
   components: {
-    MyTable
+    MyTable,
+    SendMail
   },
   props: {
-    maxText: {
-      type: Number, 
-      default: 2000
-    },
     myname: {
       type: String,
       default: '匿名'
@@ -73,7 +76,7 @@ export default{
         {to: 'Alice',  title:'Assignment',date:"2024-02-15 16:00:00"}
       ], 
       drafts: [], 
-      page: 1, 
+      page: 0, 
       sendto: '',
       content: ''
     }
@@ -87,43 +90,105 @@ export default{
 </script>
 
 <style scoped>
+.input {
+  margin: 0 0 1% 1%;
+  float: left;
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  color: black;
+  width: 83%;
+  height: 1%;
+  padding: 1% 1%;
+  text-align: left;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 1000;
+  box-shadow: 1px;
+}
+.button {
+  margin: 0 0 1% 1%;
+  float: left;
+  background-color: grey;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  width: 5%;
+  height: 1%;
+  padding: 1% 1%;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 1000;
+  box-shadow: 1px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.button:hover {
+  background: #007bff;
+  color: #fff;
+}
 #messages{
   margin-bottom: 10px;
-    /* 侧边栏 */
-    .side-nav {
-      color:#EEEEEE;
-      position: fixed;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 10px 0 0 10px;
-      padding: 10px;
-      z-index: 1000;
-    }
-    .side-nav-item {
-      a{
-        color: #EEEEEE;
-        text-decoration: none;
-      }
-      text-align: center;
-      color: white;
-      padding: 10px;
-      margin: 5px 0;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .side-nav-item:hover {
-      background: #007bff;
-      color: #fff;
-    }
+  /* 侧边栏 */
+  .side-nav {
+    font-weight: bold;
+    color:#EEEEEE;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px 0 0 10px;
+    padding: 10px;
+    z-index: 1000;
   }
-  #content {
-    background-color:#EEEEEE;
+  .side-nav-item {
+    a{
+      color: #EEEEEE;
+      text-decoration: none;
+    }
+    text-align: center;
+    color: white;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .side-nav-item:hover {
+    background: #007bff;
+    color: #fff;
+  }
+}
+#content {
+  background-color:#EEEEEE;
+  width: 100%;
+  height: 100%;
+  float:left; 
+  table {
     width: 100%;
-    height: 100%;
-    float:left;
+  };
+  th {
+    width: 40%;
+  };
+  table, th, td {
+    border: 1px black solid;
+    border-collapse: collapse;
   }
+  #send {
+    #div1 {
+      input {
+        width: 80%
+      }
+    }
+    #div2 {
+      textarea {
+        width: 86%;
+        height: 390px;
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+    }
+  }
+}
 </style>

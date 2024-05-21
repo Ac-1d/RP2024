@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MessageBlock/>
+    <MessageBlock />
   </div>
 </template>
 <script>
