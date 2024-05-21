@@ -17,7 +17,7 @@ export default {
   name: "TopNavBar",
   data() {
     return {
-      showNavBar: false
+      showNavBar: true
     }
   }
 };
