@@ -140,7 +140,7 @@ export default {
         })
         console.log("parse navigation")
       })
-      //缩小渲染尺寸，否则会出现页面大小溢出的问题，（算是一个临时的解决方案吧） 0.99依然会溢出^^'
+      //缩小渲染尺寸，否则会出现页面大小溢出的问题 0.99依然会溢出^^'
       const x = 0.98
       this.epubReader.render("epub_render", {
         width: (window.innerWidth * x),
