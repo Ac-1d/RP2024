@@ -14,15 +14,6 @@
       <div id="send" v-if="page==0">
         <h1>写信</h1>
         <SendMail/>
-        <!-- <div id="div1">
-          <button class="button" type="submit" @clicked="submitMessage">发送</button>
-          <input class="input" v-model="sendto" placeholder="收件人"
-          @input="sendto=sendto.substring(0,127)">
-        </div>
-        <div id="div2">
-          <textarea class="input" v-model="content" placeholder="内容"
-          @input="content=content.substring(0,32768)"></textarea>
-        </div> -->
         <!-- 邮箱一般没有字数限制但是我不会写，就先加上 -->
         <!-- <p>内容是{{ content }}</p>调试用 -->
       </div><!-- 写信 -->

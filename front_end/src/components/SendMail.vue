@@ -1,7 +1,7 @@
 <template>
   <div id="send">
     <div id="div1">
-      <button class="button" @clicked="submitMessage" type="submit">发送</button>
+      <button class="button" @click="submitMessage" type="submit">发送</button>
       <input class="input" v-model="sendto" placeholder="收件人"
       @input="sendto=sendto.substring(0,127)">
     </div>
