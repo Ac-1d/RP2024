@@ -4,6 +4,7 @@
     <div class="info">
       <p>用户名：{{ myname }}</p>
       <p>ID-{{ myid }}</p>
+      <Comment/>
     </div>
     <!-- 评论显示 -->
     <div v-for="(comment, index) in comments" :key="index" class="comment">
@@ -42,9 +43,13 @@
 
 <script>
 import {currentTime} from "../js/Time.js";
+import Comment from '@/components/Comment.vue';
 
 export default {
   name: "CommentBlock",
+  components: {
+    Comment,
+  },
   props: {
     myname: {
       type: String,
