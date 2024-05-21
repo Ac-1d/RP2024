@@ -26,7 +26,6 @@ export function useEpub() {
   ]
   let fillColorIndex = 0
   let takeNoteAvailable = false
-  let navigation = []
   let noteList = []
   let themeList = [
     {
@@ -304,34 +303,6 @@ export function useEpub() {
     return {startCfi, endCfi}
   }
 
-  function parseBook() {
-    let url
-    let metadata
-    book.loaded.cover.then((cover) =>{
-      if(cover){
-        book.archive.createUrl(cover).then((_url) =>{
-          url = _url
-          console.log("parse url:", url)
-        })
-      }
-      else{//TODO: 无封面加载一个默认封面
-        
-      }
-    })
-    book.loaded.metadata.then((_metadata) =>{
-      metadata = _metadata
-      console.log("parse metadata:", metadata)
-    })
-    book.loaded.navigation.then((nav) =>{
-      console.log("nav.toc:", nav.toc)
-      nav.toc.forEach((toc) =>{
-        navigation.push({'id': toc.id, 'href': toc.href, 'label': toc.label})
-      })
-      console.log("parse navigation")
-    })
-    return {url, metadata, navigation}
-  }
-
   /**toc{0:}
    * 0{label,parent,subitems}
    * subitems
@@ -374,7 +345,7 @@ export function useEpub() {
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, parseBook,
+    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
     search
   }
 }

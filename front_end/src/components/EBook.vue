@@ -9,7 +9,23 @@
     </div>
     <div id="table" v-if="showTable">
       <div id="bookInfo">
-        <h1>这里是书籍信息</h1>
+        <div id="bookInfo-header">
+          <img :src="coverUrl" id="bookInfo-cover">
+          <div id="bookInfo-text">
+            <!-- 文本无法垂直方向居中 -->
+            <p id="title" class="text bookInfo-text">{{ metadata.title }}</p>
+            <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
+            <p class="text bookInfo-text">已读：12h</p>
+            <p class="text bookInfo-search">全文搜索：</p>
+          </div>
+        </div>
+        <div id="bookInfo-body">
+          <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
+            <span @click="setHref(item.href)">
+              {{ item.index }}.{{ item.label }}
+            </span>
+          </div>
+        </div>
         <!-- TODO: 加载parseBook返回的书籍信息，包括目录跳转 -->
       </div>
       <div id="setting">
@@ -45,14 +61,17 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: false,
+      showTable: true,
       fontSize: '',
       pageNumber: '',
       testPageNumber:'',
       testIsRemove: false,
       takeNoteType: 'underline',
       isTakeNote: false,
-      noteText: ''
+      noteText: '',
+      coverUrl: '',
+      metadata: null,
+      navigation: [],
     }
   },
   props: [
@@ -97,8 +116,29 @@ export default {
   },
   methods: {
     loadEpub() {
-      this.epubReader.createBook("books_tmp/moby-dick.epub");
-      this.epubReader.parseBook()
+      const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
+      book.loaded.cover.then((cover) => {
+        if (cover) {
+          book.archive.createUrl(cover).then((_url) => {
+            this.coverUrl = _url
+            console.log("parse url:", this.coverUrl)
+          })
+        }
+        else {//TODO: 无封面加载一个默认封面
+
+        }
+      })
+      book.loaded.metadata.then((_metadata) => {
+        this.metadata = _metadata
+        console.log("parse metadata:", this.metadata)
+      })
+      book.loaded.navigation.then((nav) => {
+        let index = 0
+        nav.toc.forEach((toc) => {
+          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index})
+        })
+        console.log("parse navigation")
+      })
       this.epubReader.render("epub_render", {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -162,6 +202,10 @@ export default {
     },
     checkclick() {
       console.log("success click the block")
+    },
+    setHref(href) {
+      console.log("set page to", href)
+      this.epubReader.getRendition().display(href)
     }
   },
   beforeDestroy() {
@@ -173,12 +217,6 @@ export default {
 <style lang="scss" scoped>
 #ebook {
   position: relative;
-  // #epub_render {
-  //   width: 100%;
-  //   height: 100vh;
-  //   justify-content: center;
-  //   align-content: center;
-  // }
   #mask {
     #tableButton {
       position: fixed;
@@ -202,15 +240,31 @@ export default {
       position: fixed;
       top: 0;
       left: 0;
-      width: 200px;
+      width: 20%;
       height: 100%;
-      background-color: grey;
+      background-color: white;
+      border: 1px solid black;
+      #bookInfo-header {
+        width: auto;
+        height: 20%;
+        display: flex;
+        #bookInfo-cover {
+          height: 100%;
+          object-fit: contain;
+        }
+        #bookInfo-text {
+          height: 100%;
+          width: 60%;
+          display: flex;
+          flex-direction: column;
+        }
+      }
     }
     #setting {
       position: fixed;
       top: 0;
       right: 0;
-      width: 200px;
+      width: 20%;
       height: 100%;
       background-color: grey;
     }
@@ -224,5 +278,16 @@ export default {
       height: 100px;
     }
   }
+}
+.text {
+  text-align: left;
+}
+.bookInfo-text {
+  margin: 0%;
+  width: 100%;
+  flex-basis: 20%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
