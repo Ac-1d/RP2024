@@ -1,6 +1,7 @@
 <template>
   <div id="ebook">
     <!-- TODO: 窗口大小溢出，原因未知 -->
+    <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
     <div id="epub_render" @click="checkclick"></div>
     <div id="mask">
       <button id="tableButton" @click="callTable">点我呼出菜单</button>
@@ -139,9 +140,11 @@ export default {
         })
         console.log("parse navigation")
       })
+      //缩小渲染尺寸，否则会出现页面大小溢出的问题，（算是一个临时的解决方案吧） 0.99依然会溢出^^'
+      const x = 0.98
       this.epubReader.render("epub_render", {
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: (window.innerWidth * x),
+        height: (window.innerHeight * x),
         // flow: "scrolled-doc",
         allowScriptedContent: true
       });
@@ -240,7 +243,7 @@ export default {
       position: fixed;
       top: 0;
       left: 0;
-      width: 20%;
+      width: 400px;
       height: 100%;
       background-color: white;
       border: 1px solid black;
@@ -259,12 +262,15 @@ export default {
           flex-direction: column;
         }
       }
+      #bookInfo-body {
+        margin: 10px 20px;
+      }
     }
     #setting {
       position: fixed;
       top: 0;
       right: 0;
-      width: 20%;
+      width: 400px;
       height: 100%;
       background-color: grey;
     }
