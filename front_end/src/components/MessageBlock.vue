@@ -167,10 +167,10 @@ export default{
   height: 100%;
   float:left; 
   table {
-    width: 100%;
+    width: 80%;
   };
   th {
-    width: 40%;
+    width: 30%;
   };
   table, th, td {
     border: 1px black solid;
