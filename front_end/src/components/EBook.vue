@@ -27,7 +27,7 @@
             </span>
           </div>
         </div>
-        <div class="bookInfo-body" v-if="!showNavigation">
+        <div class="bookInfo-body" v-if="!showNavigation"><!-- 与上面同级div块不同时渲染 -->
           <div v-for="item in searchResult" :key="item.index" class="text">
             <span @click="setHref(item.cfi)">
               {{ item.excerpt }}
