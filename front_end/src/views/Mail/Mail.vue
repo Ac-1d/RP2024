@@ -2,11 +2,19 @@
   <div class="side-nav">
     <div class="side-nav-item">
       <router-link to="/mail/send"
-      style="color:white;text-decoration:none;">发送</router-link>
+      style="color:white;text-decoration:none;">写信</router-link>
     </div>
     <div class="side-nav-item">
       <router-link to="/mail/recv"
-      style="color:white;text-decoration:none;">接收</router-link>
+      style="color:white;text-decoration:none;">收信</router-link>
+    </div>
+    <div class="side-nav-item">
+      <router-link to="/mail/recv"
+      style="color:white;text-decoration:none;">草稿箱</router-link>
+    </div>
+    <div class="side-nav-item">
+      <router-link to="/mail/recv"
+      style="color:white;text-decoration:none;">联系人</router-link>
     </div>
   </div>
 </template>
@@ -21,10 +29,10 @@ export default{
   color:#EEEEEE;
   position: fixed;
   top: 50%;
-  right: 0;
+  left: 0;
   transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 10px 0 0 10px;
+  border-radius: 0 10px 10px 0;
   padding: 10px;
   z-index: 1;
 }

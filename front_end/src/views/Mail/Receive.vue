@@ -2,6 +2,8 @@
   <div>
     <Mail/>
     <p>receive</p>
+    <el-input 
+      type="textarea" :autosize="{ minRows: 20, maxRows: 25}"></el-input>
   </div>
 </template>
 <script>
@@ -10,6 +12,6 @@ export default{
   name: 'Receive',
   components: {
     Mail
-  }
+  },
 }
 </script>
