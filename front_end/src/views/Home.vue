@@ -1,7 +1,7 @@
 <template>
   <div class="home">
 <!--    &lt;!&ndash; 顶级导航栏 &ndash;&gt;-->
-<!--    <TopNavBar />-->
+    <TopNavBar />
 
     <!-- 中间导航栏 -->
     <MiddleNavBar />
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-// import TopNavBar from "@/components/TopNavBar.vue";
+import TopNavBar from "@/components/TopNavBar.vue";
 import MiddleNavBar from "@/components/MiddleNavBar.vue";
 import Book from "@/components/Book.vue";
 import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
@@ -55,7 +55,7 @@ import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 export default {
   name: "Home",
   components: {
-    // TopNavBar,
+    TopNavBar,
     MiddleNavBar,
     Book
   },
@@ -104,7 +104,7 @@ export default {
     },
     search() {
       if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
+        this.$router.push({name: 'Search', query: {q: this.query, c:0}});
       }
     }
   }
