@@ -6,6 +6,7 @@
     :before-close="logdialogclose"
     :destroy-on-close="true"
   >
+  <Menu></Menu>
     <el-form :model="loginForm" ref="loginFormRef" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
       <el-form-item label="用户名">
@@ -22,11 +23,14 @@
 </template>
 
 <script>
+import Menu from "@/components/Menu.vue"
 export default {
+
   name: "Login_window",
   props: {
     dialogflag: Boolean,
   },
+  components: { Menu },
   emits: ['closedia'],
   data() {
     return {
