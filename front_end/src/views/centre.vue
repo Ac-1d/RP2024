@@ -19,35 +19,44 @@
         <li><strong>性别：</strong>{{ user.sex }}</li>
         <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
         <li><strong>个性签名：<br/></strong>{{ user.signature }}</li>
-        <li><a href="#"><br>修改个人信息&gt;&gt;</a></li>
+        <br>
+        <li>
+        <el-button @click="showModi = true" type="primary" plain >
+            修改个人信息
+        </el-button>
+        </li>
       </ul>
     </aside>
     <main class="main">
       <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
     </main>
     </header>
+    <Modify_info :drawer="showModi" @closedia="showModi = false"></Modify_info>
   </div>
 </template>
 
 <script>
 import Book from "@/components/Book.vue";
 import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+import Modify_info from "@/components/Modify_information.vue";
 
 export default {
    components: {
       Book,
+      Modify_info,
    },
   data() {
     return {
-    books:booksData,
+      books:booksData,
       user:{
-    "ID": "U88965",
-    "level": 7,
-    "nickname": "pizza_k",
-    "sex": "女",
-    "signature": "远方，就是我站立的地方",
-    "tele":"15513107588"
-  },
+         "ID": "U88965",
+         "level": 7,
+         "nickname": "pizza_k",
+         "sex": "女",
+         "signature": "远方，就是我站立的地方",
+         "tele":"15513107588"
+      },
+      showModi: false,
     };
   },
 
