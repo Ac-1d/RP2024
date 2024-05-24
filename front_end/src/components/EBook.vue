@@ -17,11 +17,12 @@
             <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
             <p class="text bookInfo-text">已读：12h</p>
             <p class="text bookInfo-search">全文搜索：</p>
-            <input v-model="textSearch" placeholder="请输入内容" @keyup.enter="doSearch">
+            <input v-model="searchText" placeholder="请输入内容" @keyup.enter="doSearch">
           </div>
         </div>
         <div class="bookInfo-body" v-if="showNavigation">
           <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
+            <hr v-if="item.index!=1" class="parting-line">
             <span @click="setHref(item.href)">
               {{ item.index }}.{{ item.label }}
             </span>
@@ -29,9 +30,8 @@
         </div>
         <div class="bookInfo-body" v-if="!showNavigation"><!-- 与上面同级div块不同时渲染 -->
           <div v-for="item in searchResult" :key="item.index" class="text">
-            <span @click="setHref(item.cfi)">
-              {{ item.excerpt }}
-            </span>
+            <hr v-if="item.index!=1" class="parting-line">
+            <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default {
       coverUrl: '',
       metadata: null,
       navigation: [],
-      textSearch: '',
+      searchText: '',
       showNavigation: true,
       searchResult: [],
     }
@@ -194,9 +194,23 @@ export default {
     doSearch() {
       console.log("call do search")
       this.epubReader.getBook().ready.then(() => {
-      this.epubReader.doSearch(this.textSearch).then((results) =>{
+      if(!this.searchText){
+        console.log("empty input")
+        return
+      }
+      this.epubReader.doSearch(this.searchText).then((results) =>{
         this.searchResult = results
-        console.log(this.searchResult);
+        this.searchResult.map((item) =>{
+          console.log(item.excerpt, "|||", this.searchText)
+          let regexPattern = new RegExp(this.searchText, "gi")
+          let tmp = item.excerpt.match(regexPattern)[0]
+          let targetString = `<span style="color: red;">` + tmp + `</span>`
+          item.excerpt = item.excerpt.replace(
+            regexPattern,
+            targetString
+          )
+          return item
+        })
       })
       this.showNavigation = false
     })
@@ -294,8 +308,13 @@ export default {
   text-overflow: ellipsis;
 }
 .bookInfo-body {
-  margin: 0px 20px;
-  height: 80%;
+  margin: 5% 20px;
+  height: 75%;
   overflow: scroll;
+}
+.parting-line {
+  height:1px;
+  border:none;
+  border-top:1px dashed grey;
 }
 </style>
