@@ -20,18 +20,23 @@
 </template>
 
 <script>
+// import booksData from "@/assets/book.json";
+// import booksData2 from "@/assets/bookSelf.json";
+
 import booksData from "@/assets/book.json";
 import booksData2 from "@/assets/bookSelf.json";
 
 export default {
-  data() {
+data() {
     return {
       results: [],
       currentBooksData: booksData, // 默认数据集
     };
   },
   watch: {
+
     '$route': 'handleRouteChange', // 监听路由变化
+
   },
   methods: {
     handleRouteChange(to) {
@@ -51,10 +56,47 @@ export default {
       );
     },
   },
+
   mounted() {
     this.handleRouteChange(this.$route); // 页面初次加载时处理路由参数
   },
+
 };
+
+
+// export default {
+//   data() {
+//     return {
+//       results: [],
+//       currentBooksData: booksData, // 默认数据集
+//     };
+//   },
+//   watch: {
+//     '$route': 'handleRouteChange', // 监听路由变化
+//   },
+//   methods: {
+//     handleRouteChange(to) {
+//       const createParam = parseInt(to.query.c, 10);
+//       this.currentBooksData = createParam === 0 ? booksData2 : booksData; // 根据create参数切换数据集
+//       if (to.query.q) {
+//         this.handleSearch(to.query.q);
+//       } else {
+//         this.results = []; // 如果没有查询参数，清空搜索结果
+//       }
+//     },
+//     handleSearch(query) {
+//       this.results = this.currentBooksData.filter(book =>
+//         book.title.includes(query) ||
+//         book.author.includes(query) ||
+//         book.isbn.includes(query)
+//       );
+//     },
+//   },
+//   mounted() {
+//     this.handleRouteChange(this.$route); // 页面初次加载时处理路由参数
+//   },
+// };
+
 </script>
 
 <style scoped>
