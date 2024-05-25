@@ -2,13 +2,14 @@
   <div id="ebook">
     <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
     <div id="epub_render"></div>
-    <div id="mask">
+    <!-- TODO: 陆续被替换的设计 -->
+    <div id="buttons">
       <button id="tableButton" @click="callTable">点我呼出菜单</button>
       <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
       <button id="prevPageButton" @click="prevPage">点我向前翻页</button>
     </div>
     <div id="table" v-if="showTable">
-      <div id="bookInfo">
+      <div id="bookInfo" class="side-bar">
         <div id="bookInfo-header">
           <img :src="coverUrl" id="bookInfo-cover">
           <div id="bookInfo-text">
@@ -35,14 +36,13 @@
           </div>
         </div>
       </div>
-      <div id="setting">
+      <div id="setting" class="side-bar">
+
         <h1>这里是设置</h1>
         <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
         调整字体大小：
         <input type="text" v-model="fontSize">
-        <div>{{ fontSize }}</div>
         <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
-        <button @click="test">点我调用test()</button>
         <button @click="changeTheme(0)">点我切换浅色模式</button>
         <button @click="changeTheme(1)">点我切换深色模式</button>
         <button @click="changeLocation">点我修改至储存location位置</button>
@@ -50,13 +50,20 @@
         <button @click="changeTakeNoteType('highlight')">点我标记高亮</button>
         <button @click="changeTakeNoteType('underline')">点我做笔记</button>
         <button @click="testIsRemove=!testIsRemove">点我切换查看/删除</button>
-        <input type="text" id="note" v-if="isTakeNote" @keyup.enter="hideInput" v-model="noteText">
         <button @click="showNavigation = !showNavigation">点我切换目录/搜索结果</button>
       </div>
       <div id="progressBar">
         这里是进度条
         <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
         <input type="range" v-model="pageNumber">
+      </div>
+    </div>
+    <div id="take-note-component" v-if="showNoteInput">
+      <div id="mask"></div>
+      <div id="note-input">
+        <p>笔记记录：</p>
+        <textarea id="input" v-model="noteText"></textarea><br>
+        <button @click="finishTakeNote">确认</button>
       </div>
     </div>
   </div>
@@ -69,19 +76,19 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: true,
+      showTable: false,
+      showNavigation: true,
+      showNoteInput: false,
       fontSize: '',
       pageNumber: '',
       testPageNumber:'',
       testIsRemove: false,
       takeNoteType: 'underline',
-      isTakeNote: false,
       noteText: '',
       coverUrl: '',
       metadata: null,
       navigation: [],
       searchText: '',
-      showNavigation: true,
       searchResult: [],
     }
   },
@@ -98,8 +105,10 @@ export default {
     })
     rendition.on("mouseup", ()=> {
       console.log("listener detectes mouseup")
-      if(this.takeNoteType == 'underline')
-        this.isTakeNote = true
+      if(this.epubReader.checkIsTakingNote()){
+        if(this.takeNoteType == 'underline')
+          this.showNoteInput = true
+      }
       this.epubReader.takeNote(this.takeNoteType)
     })
     rendition.on("markClicked", (cfiRange)=> {
@@ -150,7 +159,7 @@ export default {
         })
         console.log("parse navigation")
       })
-      //缩小渲染尺寸，否则会出现页面大小溢出的问题 0.99依然会溢出^^'
+      /**缩小渲染尺寸，否则会出现页面大小溢出的问题 0.99依然会溢出^^'*/
       const x = 0.98
       this.epubReader.render("epub_render", {
         width: (window.innerWidth * x),
@@ -187,10 +196,6 @@ export default {
     changeTakeNoteType(takeNoteType) {
       this.takeNoteType = takeNoteType
     },
-    hideInput() {
-      this.isTakeNote = false
-      this.epubReader.setNoteText(this.noteText)
-    },
     doSearch() {
       console.log("call do search")
       this.epubReader.getBook().ready.then(() => {
@@ -215,6 +220,11 @@ export default {
       this.showNavigation = false
     })
     },
+    finishTakeNote() {
+      this.epubReader.setNoteText(this.noteText)
+      this.noteText = null
+      this.showNoteInput = false
+    },
     test() {
       this.epubReader.test();
     },
@@ -234,7 +244,7 @@ export default {
 <style lang="scss" scoped>
 #ebook {
   position: relative;
-  #mask {
+  #buttons {
     #tableButton {
       position: fixed;
       left: 50%;
@@ -270,7 +280,8 @@ export default {
           object-fit: contain;
         }
         #bookInfo-text {
-          height: 100%;
+          margin-top: 5%;
+          height: 95%;
           width: 60%;
           display: flex;
           flex-direction: column;
@@ -283,7 +294,6 @@ export default {
       right: 0;
       width: 400px;
       height: 100%;
-      background-color: grey;
     }
     #progressBar {
       position: fixed;
@@ -293,6 +303,34 @@ export default {
       bottom: 0;
       width: 300px;
       height: 100px;
+    }
+  }
+  #take-note-component{
+    #note-input {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10%;
+      height: 300px;
+      width: 500px;
+      background: white;
+      border: 1px dashed black;
+      z-index: 9999;
+      #input{
+        height: 150px;
+        width: 250px;
+        resize: none;
+      }
+    }
+    #mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.25);
+      /* 半透明黑色背景 */
+      z-index: 9998;
     }
   }
 }
@@ -316,5 +354,9 @@ export default {
   height:1px;
   border:none;
   border-top:1px dashed grey;
+}
+.side-bar {
+  background-color: white;
+  border: 1px solid black;
 }
 </style>
