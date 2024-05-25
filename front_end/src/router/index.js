@@ -11,7 +11,8 @@ import About from "../views/About.vue";
 import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
-import Comments from "../views/Comments.vue";// 调试用，合并的时候可以删掉
+import Comments from "../views/Comments.vue"; // 调试用，合并的时候可以删掉
+import CategoriesDetail from "../views/CategoriesDetail.vue"; // 引入新的详细分类页面组件
 
 Vue.use(VueRouter);
 
@@ -72,19 +73,24 @@ const routes = [
     name: "Register",
     component: Register
   },
-  {// 调试用，合并的时候可以删掉
+  {
     path: "/comments",
     name: "Comments",
     component: Comments
   },
   {
-    path: "/Center",
+    path: "/center",
     name: "Center",
     // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
+    // this generates a separate chunk (center.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-       import(/* webpackChunkName: "center" */ "../views/centre.vue")
+      import(/* webpackChunkName: "center" */ "../views/centre.vue")
+  },
+  {
+    path: "/categories-detail",
+    name: "CategoriesDetail",
+    component: CategoriesDetail
   }
 ];
 
