@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "我看见的世界",
+    "title": "愤怒的葡萄",
     "author": "[美] 李飞飞",
     "category": "文学",
     "image": "image1.jpg",
@@ -24,7 +24,7 @@
   },
   {
     "id": 2,
-    "title": "我今天遇到...",
+    "title": "白鹿原",
     "author": "[英] 索菲·伯罗斯",
     "category": "小说",
     "image": "image2.jpg",
@@ -47,7 +47,7 @@
   },
   {
     "id": 3,
-    "title": "小镇做题家",
+    "title": "妻妾成群",
     "author": "谢爱磊",
     "category": "社会纪实",
     "image": "image3.jpg",
@@ -70,7 +70,7 @@
   },
   {
     "id": 4,
-    "title": "报道肖尼迪之死",
+    "title": "三寸金莲",
     "author": "[美] 芭比·泽利泽",
     "category": "历史文化",
     "image": "image4.jpg",
@@ -93,7 +93,7 @@
   },
   {
     "id": 5,
-    "title": "拉夫尔",
+    "title": "局外人",
     "author": "[俄] 叶夫根尼·沃季诺",
     "category": "艺术设计",
     "image": "image5.jpg",
@@ -116,7 +116,7 @@
   },
   {
     "id": 6,
-    "title": "游戏志：透过...",
+    "title": "亚洲铜",
     "author": "孙静",
     "category": "科学新知",
     "image": "image6.jpg",
@@ -139,7 +139,7 @@
   },
   {
     "id": 7,
-    "title": "未来之物",
+    "title": "绿皮书",
     "author": "[波兰] 马尔钦·维查",
     "category": "文学",
     "image": "image7.jpg",
@@ -162,7 +162,7 @@
   },
   {
     "id": 8,
-    "title": "十二字节：过...",
+    "title": "黄金时代",
     "author": "[英] 珍妮特·温特森",
     "category": "商业经管",
     "image": "image8.jpg",

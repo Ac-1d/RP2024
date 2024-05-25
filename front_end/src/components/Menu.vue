@@ -1,0 +1,33 @@
+<template>
+<div>
+<el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+  <div v-for="(item, index) in strings" :key="index">
+        <el-menu-item :index="index">{{ item }}</el-menu-item>
+  </div>
+
+</el-menu>
+</div>
+</template>
+
+<script>
+  export default {
+  name: "Menu",
+  props: {
+    strings: {
+        type:Array,
+        default:()=>[],
+    },
+  },
+
+  data() {
+    return {
+      activeIndex: '1',
+    };
+  },
+    methods: {
+      handleSelect(key, keyPath) {
+        console.log(key, keyPath);
+      }
+    }
+  }
+</script>
