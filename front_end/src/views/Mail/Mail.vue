@@ -9,11 +9,11 @@
       style="color:white;text-decoration:none;">收信</router-link>
     </div>
     <div class="side-nav-item">
-      <router-link to="/mail/recv"
+      <router-link to="/mail/draft"
       style="color:white;text-decoration:none;">草稿箱</router-link>
     </div>
     <div class="side-nav-item">
-      <router-link to="/mail/recv"
+      <router-link to="/mail/contacts"
       style="color:white;text-decoration:none;">联系人</router-link>
     </div>
   </div>
