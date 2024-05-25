@@ -37,7 +37,16 @@
         </div>
       </div>
       <div id="setting" class="side-bar">
-
+        <div id="header">
+          <el-row>
+            <el-col :span="12">
+              <div class="grid-content bg-purple"></div>
+            </el-col>
+            <el-col :span="12">
+              <div class="grid-content bg-purple-light"></div>
+            </el-col>
+          </el-row>
+        </div>
         <h1>这里是设置</h1>
         <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
         调整字体大小：
@@ -76,7 +85,7 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: false,
+      showTable: true,
       showNavigation: true,
       showNoteInput: false,
       fontSize: '',
@@ -269,8 +278,6 @@ export default {
       left: 0;
       width: 400px;
       height: 100%;
-      background-color: white;
-      border: 1px solid black;
       #bookInfo-header {
         width: auto;
         height: 20%;
@@ -294,6 +301,25 @@ export default {
       right: 0;
       width: 400px;
       height: 100%;
+      #header {
+        width: 100%;
+        height: 30%;
+        #view {
+          background-color: #fff;
+        }
+        #theme {
+          background-color: #000;
+        }
+        #highlight-color {
+          background-color: #fff;
+        }
+        #takeNote {
+          background-color: #000;
+        }
+        #remove {
+          background-color: #fff;
+        }
+      }
     }
     #progressBar {
       position: fixed;
@@ -358,5 +384,35 @@ export default {
 .side-bar {
   background-color: white;
   border: 1px solid black;
+  border-radius: 4px;
 }
+.settings {
+  height: 20%;
+}
+.el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .el-col {
+    border-radius: 4px;
+  }
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
+  .bg-purple {
+    background: #d3dce6;
+  }
+  .bg-purple-light {
+    background: #e5e9f2;
+  }
+  .grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+  }
+  .row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+  }
 </style>
