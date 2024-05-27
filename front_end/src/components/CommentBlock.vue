@@ -1,19 +1,20 @@
 <template>
-  <div class="comments">
+  <el-container>
     <!-- 用户信息 -->
-    <div class="info">
+    <el-header style="position: left">
       <p>用户名：{{ myname }}</p>
       <p>ID-{{ myid }}</p>
-    </div>
+    </el-header>
     <!-- 评论显示 -->
     <el-main>
-      <div v-for="(comment, index) in comments" :key="index" class="comment">
+      <div v-for="(comment, index) in comments" :key="index">
         <!-- 循环显示的每条评论 -->
         <div>
-          <el-row>
-            <el-col :span="20">
+          <el-row style="border-top: 1px solid grey;">
+            <el-col :span="20" >
               <el-link class="text-larger" style="float: left;" type="primary">{{ comment.author }}</el-link>
-              <el-rate class="text-larger" style="float: left;" v-model="value" disabled text-color="#ff9900"></el-rate>
+              <el-rate class="text-larger" style="float: left;" v-model="comment.rank_value" 
+              disabled text-color="#ff9900"></el-rate>
               <el-link class="text-larger" style="float: left;" type="primary">{{ comment.time }}</el-link>
             </el-col>
             <el-col :span="16">
@@ -44,10 +45,21 @@
           </el-row>
         </div>
       </div>
+      <div class="block">
+        <span class="demonstration">页面</span>
+        <el-pagination
+          layout="prev, pager, next"
+          :total="2 * comments.length">
+        </el-pagination>
+      </div>
     </el-main>
     <!-- 评论、回复框 -->
-    <div class="comment-box">
-      <el-form >
+    <el-footer>
+      <el-form>
+        <el-form-item>
+          <el-rate v-model="value" :colors="colors">
+          </el-rate>
+        </el-form-item>
         <el-form-item>
           <el-input type="textarea" v-model="content" maxlength="10000" show-word-limit/>
         </el-form-item>
@@ -57,13 +69,13 @@
           <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p><!-- 显示正在回复给某人 -->
         </el-form-item>
       </el-form>
-    </div>
-  </div>
+    </el-footer>
+  </el-container>
 </template>
 
 <script>
 import {currentTime} from "../js/Time.js";
-
+import '@/css/text.css';
 export default {
   name: "CommentBlock",
   components: {
@@ -81,15 +93,13 @@ export default {
   },
   data() {
     return {
-      form: {
-          to: '',
-          
-        },
-      value: 4,
+      page: 0, // 当前是第几页
+      value: 0, // 当前用户选择的评分
       comments: [],// 已有评论
       content: '',// 输入内容
       replying: false,// 正在回复
       replyIndex: 0,// 回复的评论号
+      colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
     };
   },
   methods: {
@@ -105,6 +115,7 @@ export default {
         }
         else {
           const newComment = { 
+            rank_value: this.value,
             text: this.content, 
             author: this.myname, 
             showReply: false,
@@ -139,23 +150,3 @@ export default {
   }
 };  
 </script>
-
-<style scoped>
-.text-larger {
-  font-family: 
-  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
-  font-size: larger;
-}
-.text-medium {
-  font-family: 
-  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
-  font-size: medium
-}
-.auto-wrap {
-  width: 200px; /* 定义容器宽度 */
-  border: none; /* 为了清楚地看到效果，加上边框 */
-  word-wrap: break-word; /* 允许在长单词内部换行 */
-  word-break: break-all; /* 允许在任意位置换行 */
-  text-align: left;
-}
-</style>
