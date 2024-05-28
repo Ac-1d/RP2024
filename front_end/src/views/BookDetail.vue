@@ -42,7 +42,7 @@
     </div>
     <div class="extra-actions">
       <a href="#"><span class="icon">🖊️</span> 写笔记</a>
-      <a :href="'/comments/'+bid"><span class="icon">🖊️</span> 写书评</a>
+      <a href="#" @click="linktoComments"><span class="icon">🖊️</span> 写书评</a>
       <!-- 链接到评论页面 -->
       <a href="#"><span class="icon">¥</span> 加入购物单</a>
       <a href="#"><span class="icon">+</span> 添加到书单</a>
@@ -75,7 +75,6 @@ export default {
   name: "BookDetail",
   data() {
     return {
-      bid: this.$route.params.bookId,
       book: {
         title: "",
         author: "",
@@ -110,6 +109,10 @@ export default {
     this.book = this.getBookById(bookId);
   },
   methods: {
+    linktoComments() {
+      console.log('linking ...')
+      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
+    },
     getBookById(id) {
       const booksData = require("@/assets/book.json");
       return booksData.find(book => book.id === id);

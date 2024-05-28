@@ -2,6 +2,8 @@
   <el-container>
     <!-- 用户信息 -->
     <el-header style="position: left">
+      <el-button class="text-larger" style="float: left;" type="primary"
+      icon="el-icon-caret-left" @click="goback()"></el-button>
       <p>用户名：{{ myname }}</p>
       <p>ID-{{ myid }}</p>
     </el-header>
@@ -93,6 +95,7 @@ export default {
   },
   data() {
     return {
+      bookId: 1,
       page: 0, // 当前是第几页
       value: 0, // 当前用户选择的评分
       comments: [],// 已有评论
@@ -108,9 +111,12 @@ export default {
     this.comments = this.getCommentsByBookId(bookId);
   },
   methods: {
+    goback() {
+      this.$router.push({ name: 'BookDetail', params: {bookId: this.bookId}  });
+    },
     getCommentsByBookId(id) {
       const commentsData = require("@/assets/comments.json");
-      return commentsData.find(comment => comment.id == id).comments;
+      return commentsData.find(comment => comment.id === id).comments;
     },
     addComment() {
       if (this.content) {
