@@ -1,6 +1,7 @@
 <template>
   <el-container>
-    <el-tabs tab-position="top" type="card" style="width: 100%;">
+    <el-tabs tab-position="top" type="card" 
+    style="width: 100%; background-color: aliceblue;">
       <el-tab-pane label="写信"><Send/></el-tab-pane>
       <el-tab-pane label="收信"><Receive/></el-tab-pane>
       <el-tab-pane label="草稿箱">草稿箱</el-tab-pane>

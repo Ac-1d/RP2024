@@ -13,6 +13,7 @@ import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Comments from "../views/Comments.vue";
 import Mail from "../views/Mail/Mail.vue";
+import Creation from "../views/Creation/Creation.vue";
 
 Vue.use(VueRouter);
 
@@ -82,6 +83,11 @@ const routes = [
     path:'/comments',
     name: 'Comments',
     component: Comments
+  },// lzy
+  {// 创作
+    path:'/creation',
+    name: 'Creation',
+    component: Creation
   },// lzy
   {
     path: "/Center",
