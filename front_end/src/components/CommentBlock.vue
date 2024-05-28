@@ -4,6 +4,7 @@
     <div class="info">
       <p>用户名：{{ myname }}</p>
       <p>ID-{{ myid }}</p>
+      <Comment/>
     </div>
     <!-- 评论显示 -->
     <div v-for="(comment, index) in comments" :key="index" class="comment">
@@ -34,6 +35,7 @@
         <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p>
         <!-- 退出回复，返回评论 -->
         <button v-if="replying" @click="endReply()">返回评论</button>
+        <button type="submit">发送</button>
       </form>
     </div>
   </div>
@@ -41,9 +43,13 @@
 
 <script>
 import {currentTime} from "../js/Time.js";
+import Comment from '@/components/Comment.vue';
 
 export default {
   name: "CommentBlock",
+  components: {
+    Comment,
+  },
   props: {
     myname: {
       type: String,
@@ -72,10 +78,10 @@ export default {
       this.comments = inData;
     },// 试图让这个函数来在外部加上已有评论，但是暂不起作用
     addComment() {
-      if (this.newCommentText) {
+      if (this.content) {
         if (this.replying) {
           const newReply = {
-            text: this.newCommentText, 
+            text: this.content, 
             author: this.myname
           };
           this.comments[this.replyIndex].replies.push(newReply);
@@ -83,7 +89,7 @@ export default {
         }
         else {
           const newComment = { 
-            text: this.newCommentText, 
+            text: this.content, 
             author: this.myname, 
             showReply: false,
             likes: 0, 
@@ -93,7 +99,7 @@ export default {
           };
           this.comments.push(newComment);
         }
-        this.newCommentText = '';
+        this.content = '';
       }
     },
     likeComment(index) {

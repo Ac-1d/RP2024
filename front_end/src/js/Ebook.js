@@ -323,13 +323,14 @@ export function useEpub() {
     ).then((results) => Promise.resolve([].concat.apply([], results)))
   }
 
-  function search(text) {
-    book.ready.then(() => {
-      doSearch(text).then((results) =>{
-        console.log(results);
-      })
-    })
-  }
+  // function search(text) {
+  //   book.ready.then(() => {
+  //     doSearch(text).then((results) =>{
+  //       // console.log(results);
+  //       return results
+  //     })
+  //   })
+  // }
 
   function setLatedPage() {
     console.log("set page to currentLocation")
@@ -340,12 +341,12 @@ export function useEpub() {
    * 或是一些临时的测试函数
    */
   function test() {
-    search("small")
+    
   }
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
     setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
-    search
+    doSearch
   }
 }

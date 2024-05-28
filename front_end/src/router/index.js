@@ -11,8 +11,11 @@ import About from "../views/About.vue";
 import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
-import Comments from "../views/Comments.vue"; // 调试用，合并的时候可以删掉
-import CategoriesDetail from "../views/CategoriesDetail.vue"; // 引入新的详细分类页面组件
+import Comments from "../views/Comments.vue";
+import Message from "../views/Message.vue";
+import Mail from '../views/Mail/Mail.vue';
+import Send from '../views/Mail/Send.vue';
+import Receive from '../views/Mail/Receive.vue';
 
 Vue.use(VueRouter);
 
@@ -73,24 +76,42 @@ const routes = [
     name: "Register",
     component: Register
   },
-  {
+  {// 调试用，合并的时候可以删掉
     path: "/comments",
     name: "Comments",
     component: Comments
   },
   {
-    path: "/center",
-    name: "Center",
-    // route level code-splitting
-    // this generates a separate chunk (center.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "center" */ "../views/centre.vue")
+    path: "/message",
+    name: "Message",
+    component: Message
+  },
+  // Mail
+  {
+    path:'/mail',
+    name:'Mail',
+    component: Mail
+  },
+  // Mail-send
+  {
+    path:'/mail/send',
+    name:'Send',
+    component: Send
+  },
+  // Mail-recv
+  {
+    path:'/mail/recv',
+    name:'Receive',
+    component: Receive
   },
   {
-    path: "/categories-detail",
-    name: "CategoriesDetail",
-    component: CategoriesDetail
+    path: "/Center",
+    name: "Center",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+       import(/* webpackChunkName: "center" */ "../views/centre.vue")
   }
 ];
 
