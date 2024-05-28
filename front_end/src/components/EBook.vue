@@ -4,9 +4,14 @@
     <div id="epub_render"></div>
     <!-- TODO: 陆续被替换的设计 -->
     <div id="buttons">
-      <button id="tableButton" @click="callTable">点我呼出菜单</button>
-      <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
-      <button id="prevPageButton" @click="prevPage">点我向前翻页</button>
+      <!-- <button id="tableButton" @click="callTable">点我呼出菜单</button> -->
+      <div id="tableButton">
+        <el-button type="info" icon="el-icon-d-arrow-left" @click="prevPage" circle></el-button>
+        <el-button type="info" icon="el-icon-setting" @click="callTable"  circle></el-button>
+        <el-button type="info" icon="el-icon-d-arrow-right" @click="nextPage" circle></el-button>
+        <!-- <button id="nextPageButton" @click="nextPage">点我向后翻页</button> -->
+      </div>
+      <!-- <button id="prevPageButton" @click="prevPage">点我向前翻页</button> -->
     </div>
     <div id="table" v-if="showTable">
       <div id="bookInfo" class="side-bar">
@@ -74,6 +79,7 @@
         <button @click="changeTakeNoteType('underline')">点我做笔记</button>
         <button @click="testIsRemove = !testIsRemove">点我切换查看/删除</button>
         <button @click="showNavigation = !showNavigation">点我切换目录/搜索结果</button>
+        <router-link to="/BookDetail">点我推出</router-link>
         <el-input change="doSearch" v-model="searchText"></el-input>
       </div>
       <div id="progressBar">
