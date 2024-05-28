@@ -102,7 +102,15 @@ export default {
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
     };
   },
+  created() {
+    // const bookId = this.$route.params.bookId;
+    this.comments = this.getCommentsByBookId(2);
+  },
   methods: {
+    getCommentsByBookId(id) {
+      const commentsData = require("@/assets/comments.json");
+      return commentsData.find(comment => comment.id === id).comments;
+    },
     addComment() {
       if (this.content) {
         if (this.replying) {
