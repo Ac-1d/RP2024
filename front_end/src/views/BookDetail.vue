@@ -42,7 +42,7 @@
     </div>
     <div class="extra-actions">
       <a href="#"><span class="icon">🖊️</span> 写笔记</a>
-      <a href="#"><span class="icon">🖊️</span> 写书评</a>
+      <a href="#" @click.prevent="writeReview"><span class="icon">🖊️</span> 写书评</a>
       <a href="#"><span class="icon">¥</span> 加入购物单</a>
       <a href="#"><span class="icon">+</span> 添加到书单</a>
       <a href="#">分享</a>
@@ -66,10 +66,22 @@
         <li v-for="(item, index) in book.table_of_contents" :key="index">{{ item }}</li>
       </ul>
     </div>
+    <div class="reviews">
+      <h2>书评</h2>
+      <ul>
+        <li v-for="review in reviews" :key="review.id">
+          {{ review.content }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
+
+
 <script>
+import { EventBus } from '@/utils/eventBus'; // 引入事件总线
+
 export default {
   name: "BookDetail",
   data() {
@@ -92,7 +104,8 @@ export default {
         rating_distribution: {},
         professional_reviews: "",
         table_of_contents: []
-      }
+      },
+      reviews: []
     };
   },
   computed: {
@@ -106,15 +119,36 @@ export default {
   created() {
     const bookId = this.$route.params.bookId;
     this.book = this.getBookById(bookId);
+    this.reviews = this.getReviewsByBookId(bookId);
+
+    EventBus.$on('newReview', this.addReview); // 监听新评论事件
+  },
+  beforeDestroy() {
+    EventBus.$off('newReview', this.addReview); // 组件销毁前取消监听
   },
   methods: {
     getBookById(id) {
       const booksData = require("@/assets/book.json");
       return booksData.find(book => book.id === id);
+    },
+    getReviewsByBookId(bookId) {
+      const reviewsData = require("@/assets/reviews.json");
+      return reviewsData.filter(review => review.bookId === bookId);
+    },
+    writeReview() {
+      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
+    },
+    addReview(review) {
+      if (review.bookId === this.book.id) {
+        this.reviews.push(review);
+      }
     }
   }
 };
 </script>
+
+
+
 
 <style scoped>
 .book-detail {
@@ -237,11 +271,11 @@ export default {
   color: #3c763d;
 }
 
-.description, .author-info, .professional-reviews, .table-of-contents {
+.description, .author-info, .professional-reviews, .table-of-contents, .reviews {
   margin-bottom: 20px;
 }
 
-.description h2, .author-info h2, .professional-reviews h2, .table-of-contents h2 {
+.description h2, .author-info h2, .professional-reviews h2, .table-of-contents h2, .reviews h2 {
   margin-bottom: 10px;
 }
 
