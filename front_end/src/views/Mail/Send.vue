@@ -1,15 +1,6 @@
 <template>
   <div :style="{ width: windowWidth + 'px' }">
     <Mail/>
-    <!-- <div :style="{ width: windowWidth * 0.9 + 'px' }">
-      <div style="float: right; 
-      background-color: gainsboro; 
-      height: 70px; width: auto;">
-        <el-button style="float: left; font-family: 'Arial', sans-serif;
-        width: 100px; margin: 15px 0px 0px 15px;" 
-        @click="submitMessage">发送</el-button>
-      </div>
-    </div> -->
     <div style="float: right; 
     background-color: gainsboro; 
     height: 70px; width: 1200px;">
@@ -28,14 +19,6 @@
       v-model.trim="content" :maxlength="100000"
       placeholder="内容"></el-input>
     </div>
-    <el-button @click="show=true">
-      显示
-    </el-button>
-    <div v-if="show">
-      <p>LYR
-      </p>
-    </div>
-
   </div>
 </template>
 <script>
