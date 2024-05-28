@@ -80,7 +80,7 @@ const routes = [
     component: Mail
   },// lzy
   {// comments评论页面
-    path:'/book/:bookId/comments',
+    path:'/comments/:bookId',
     name: 'Comments',
     component: Comments
   },// lzy

@@ -103,13 +103,14 @@ export default {
     };
   },
   created() {
-    // const bookId = this.$route.params.bookId;
-    this.comments = this.getCommentsByBookId(2);
+    const bookId = this.$route.params.bookId;
+    console.log('id is : '+bookId);
+    this.comments = this.getCommentsByBookId(bookId);
   },
   methods: {
     getCommentsByBookId(id) {
       const commentsData = require("@/assets/comments.json");
-      return commentsData.find(comment => comment.id === id).comments;
+      return commentsData.find(comment => comment.id == id).comments;
     },
     addComment() {
       if (this.content) {
