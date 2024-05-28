@@ -21,7 +21,7 @@
             <li :class="{ active: selectedCategory === '艺术设计' }" @click="filterBooks('艺术设计')">艺术设计</li>
             <li :class="{ active: selectedCategory === '商业经管' }" @click="filterBooks('商业经管')">商业经管</li>
             <li :class="{ active: selectedCategory === '绘本漫画' }" @click="filterBooks('绘本漫画')">绘本漫画</li>
-            <li><a href="#">更多&gt;&gt;</a></li>
+            <li><a href="#" @click.prevent="goToCategoriesDetail">更多&gt;&gt;</a></li>
           </ul>
         </div>
         <div class="separator"></div>
@@ -59,7 +59,7 @@ export default {
     return {
       books: booksData, // 使用本地的 books.json 数据
       currentPage: 1, // 当前页码
-      booksPerPage: 10, // 每页显示的书籍数量
+      booksPerPage: 12, // 每页显示的书籍数量
       selectedCategory: "全部", // 当前选中的分类
       query: "" // 搜索查询
     };
@@ -100,8 +100,11 @@ export default {
     },
     search() {
       if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
+        this.$router.push({name: 'Search', query: {q: this.query}});
       }
+    },
+    goToCategoriesDetail() {
+      this.$router.push({ name: 'CategoriesDetail' });
     }
   }
 };

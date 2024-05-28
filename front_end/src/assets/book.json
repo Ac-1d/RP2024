@@ -228,5 +228,237 @@
       "2": 3.0,
       "1": 2.0
     }
+  },
+  {
+    "id": 11,
+    "title": "坐一望三：寻访全国的三省交界",
+    "author": "阿坚",
+    "category": "历史文化",
+    "image": "image11.jpg",
+    "publisher": "中国科技技术出版社",
+    "publish_date": "2024-04-01",
+    "pages": 265,
+    "price": "58.00元",
+    "isbn": "9787523602157",
+    "rating": 7.1,
+    "rating_count": 71,
+    "description": "作者以白描文字和素笔手绘，记录了20余年间行走数万里...",
+    "author_intro": "阿坚，著名散文家和作家，祖籍山东临沂。",
+    "rating_distribution": {
+      "5": 59.7,
+      "4": 9.7,
+      "3": 11.1,
+      "2": 13.9,
+      "1": 5.6
+    }
+  },
+  {
+    "id": 12,
+    "title": "亲密关系的核心是友谊",
+    "author": "汪民安",
+    "category": "文学",
+    "image": "image12.jpg",
+    "publisher": "上海文艺出版社",
+    "publish_date": "2024-05-01",
+    "pages": 368,
+    "price": "68.00元",
+    "isbn": "9787532164600",
+    "rating": 8.0,
+    "rating_count": 277,
+    "description": "本书探讨了亲密关系中的友谊与爱情之间的关系...",
+    "author_intro": "汪民安，著名作家和学者，现任上海文艺出版社副总编。",
+    "rating_distribution": {
+      "5": 60.0,
+      "4": 20.0,
+      "3": 10.0,
+      "2": 5.0,
+      "1": 5.0
+    }
+  },
+  {
+    "id": 13,
+    "title": "高启：诗人的穷途",
+    "author": "[美] 年复礼",
+    "category": "历史文化",
+    "image": "image13.jpg",
+    "publisher": "上海古籍出版社",
+    "publish_date": "2024-04-04",
+    "pages": 300,
+    "price": "58.00元",
+    "isbn": "9787532164570",
+    "rating": 9.1,
+    "rating_count": 55,
+    "description": "本书详细介绍了明代诗人高启的生平与作品...",
+    "author_intro": "[美] 年复礼，知名历史学家，专注于中国明清时期的历史研究。",
+    "rating_distribution": {
+      "5": 70.0,
+      "4": 20.0,
+      "3": 5.0,
+      "2": 3.0,
+      "1": 2.0
+    }
+  },
+  {
+    "id": 14,
+    "title": "不理想的妻子",
+    "author": "王欣",
+    "category": "小说",
+    "image": "image14.jpg",
+    "publisher": "人民文学出版社",
+    "publish_date": "2024-04-01",
+    "pages": 240,
+    "price": "46.93元",
+    "isbn": "9787020156493",
+    "rating": 8.1,
+    "rating_count": 530,
+    "description": "这是一部描写现代婚姻生活的小说...",
+    "author_intro": "王欣，著名小说家，现居北京。",
+    "rating_distribution": {
+      "5": 60.0,
+      "4": 25.0,
+      "3": 10.0,
+      "2": 3.0,
+      "1": 2.0
+    }
+  },
+  {
+    "id": 15,
+    "title": "柏拉图与亚里士多德：西方哲学文化的源与流",
+    "author": "[美] 阿瑟·赫尔曼",
+    "category": "历史文化",
+    "image": "image15.jpg",
+    "publisher": "商务印书馆",
+    "publish_date": "2024-05-01",
+    "pages": 198,
+    "price": "143.00元",
+    "isbn": "9787100166603",
+    "rating": 8.5,
+    "rating_count": 200,
+    "description": "本书探讨了西方哲学的两大支柱柏拉图与亚里士多德的思想...",
+    "author_intro": "[美] 阿瑟·赫尔曼，著名哲学家，现任哈佛大学教授。",
+    "rating_distribution": {
+      "5": 65.0,
+      "4": 20.0,
+      "3": 10.0,
+      "2": 3.0,
+      "1": 2.0
+    }
+  },
+  {
+    "id": 16,
+    "title": "先跳了再说：仓本聪的工作与生活哲学",
+    "author": "[日] 仓本聪",
+    "category": "文学",
+    "image": "image16.jpg",
+    "publisher": "中信出版社",
+    "publish_date": "2024-01-01",
+    "pages": 300,
+    "price": "56.00元",
+    "isbn": "9787508654327",
+    "rating": 7.6,
+    "rating_count": 83,
+    "description": "一本探讨仓本聪工作与生活哲学的书籍，充满了智慧和洞见。",
+    "author_intro": "[日] 仓本聪，日本知名编剧和作家。",
+    "rating_distribution": {
+      "5": 50.0,
+      "4": 30.0,
+      "3": 10.0,
+      "2": 5.0,
+      "1": 5.0
+    }
+  },
+  {
+    "id": 17,
+    "title": "我在岛屿读书",
+    "author": "[我在岛屿读书] 节目组",
+    "category": "社会纪实",
+    "image": "image17.jpg",
+    "publisher": "江苏凤凰文艺出版社",
+    "publish_date": "2024-05-21",
+    "pages": 350,
+    "price": "68.00元",
+    "isbn": "9787532164603",
+    "rating": 8.7,
+    "rating_count": 536,
+    "description": "通过记录岛屿生活，探讨人与自然的关系。",
+    "author_intro": "[我在岛屿读书] 节目组，由多位知名作家和记者组成。",
+    "rating_distribution": {
+      "5": 55.0,
+      "4": 25.0,
+      "3": 10.0,
+      "2": 5.0,
+      "1": 5.0
+    }
+  },
+  {
+    "id": 18,
+    "title": "我不想保持正确：拉图尔对寒尔的五次访谈",
+    "author": "[法] 米歇尔·寒尔",
+    "category": "历史文化",
+    "image": "image18.jpg",
+    "publisher": "上海人民出版社",
+    "publish_date": "2024-04-04",
+    "pages": 68,
+    "price": "55.90元",
+    "isbn": "9787532164570",
+    "rating": 9.2,
+    "rating_count": 31,
+    "description": "通过对话深入探讨哲学和社会问题。",
+    "author_intro": "[法] 米歇尔·寒尔，著名哲学家和社会学家。",
+    "rating_distribution": {
+      "5": 70.0,
+      "4": 20.0,
+      "3": 5.0,
+      "2": 3.0,
+      "1": 2.0
+    }
+  },
+  {
+    "id": 19,
+    "title": "试探黑夜：胡安·赫尔曼诗选",
+    "author": "[阿根廷] 胡安·赫尔曼",
+    "category": "文学",
+    "image": "image19.jpg",
+    "publisher": "北京联合出版公司",
+    "publish_date": "2024-04-04",
+    "pages": 320,
+    "price": "31.00元",
+    "isbn": "9787532164570",
+    "rating": 8.8,
+    "rating_count": 130,
+    "description": "胡安·赫尔曼的诗歌集，充满了深刻的情感和哲理。",
+    "author_intro": "[阿根廷] 胡安·赫尔曼，阿根廷著名诗人。",
+    "rating_distribution": {
+      "5": 60.0,
+      "4": 25.0,
+      "3": 10.0,
+      "2": 3.0,
+      "1": 2.0
+    }
+  },
+  {
+    "id": 20,
+    "title": "我们活着的理由：弗兰克尔的生命的意义",
+    "author": "[奥地利] 维克多·弗兰克尔",
+    "category": "科学新知",
+    "image": "image20.jpg",
+    "publisher": "上海译文出版社",
+    "publish_date": "2024-04-04",
+    "pages": 200,
+    "price": "48.90元",
+    "isbn": "9787532164570",
+    "rating": 9.0,
+    "rating_count": 234,
+    "description": "探讨了生命的意义和生存的价值。",
+    "author_intro": "[奥地利] 维克多·弗兰克尔，知名心理学家和精神病学家。",
+    "rating_distribution": {
+      "5": 70.0,
+      "4": 20.0,
+      "3": 5.0,
+      "2": 3.0,
+      "1": 2.0
+    }
   }
 ]
+
+
