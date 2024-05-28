@@ -18,22 +18,36 @@
             <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
             <p class="text bookInfo-text">已读：12h</p>
             <p class="text bookInfo-search">全文搜索：</p>
-            <input v-model="searchText" placeholder="请输入内容" @keyup.enter="doSearch">
+            <div id="block">
+              <el-input class="search-input" @change="doSearch" v-model="searchText" placeholder="请输入内容"
+                size="mini"></el-input>
+              <el-button id="search-hide" icon="el-icon-close" circle
+                @click="showNavigation = true; searchText = null"></el-button>
+            </div>
           </div>
         </div>
         <div class="bookInfo-body" v-if="showNavigation">
           <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
-            <hr v-if="item.index!=1" class="parting-line">
+            <hr v-if="item.index != 1" class="parting-line">
             <span @click="setHref(item.href)">
               {{ item.index }}.{{ item.label }}
             </span>
           </div>
         </div>
         <div class="bookInfo-body" v-if="!showNavigation"><!-- 与上面同级div块不同时渲染 -->
-          <div v-for="item in searchResult" :key="item.index" class="text">
-            <hr v-if="item.index!=1" class="parting-line">
-            <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
+          <div v-if="!searchResult || searchResult.length === 0">
+            <p class="bookInfo-text">搜索内容不存在</p>
           </div>
+          <div v-else>
+            <div v-for="item in searchResult" :key="item.index" class="text">
+              <hr v-if="item.index != 1" class="parting-line">
+              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
+            </div>
+          </div>
+          <!-- <div v-for="item in searchResult" :key="item.index" class="text">
+              <hr v-if="item.index != 1" class="parting-line">
+              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
+          </div> -->
         </div>
       </div>
       <div id="setting" class="side-bar">
@@ -58,12 +72,14 @@
         <input type="text" v-model="testPageNumber">
         <button @click="changeTakeNoteType('highlight')">点我标记高亮</button>
         <button @click="changeTakeNoteType('underline')">点我做笔记</button>
-        <button @click="testIsRemove=!testIsRemove">点我切换查看/删除</button>
+        <button @click="testIsRemove = !testIsRemove">点我切换查看/删除</button>
         <button @click="showNavigation = !showNavigation">点我切换目录/搜索结果</button>
+        <el-input change="doSearch" v-model="searchText"></el-input>
       </div>
       <div id="progressBar">
         这里是进度条
         <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
+        <!-- 有点想去掉进度条了😑 -->
         <input type="range" v-model="pageNumber">
       </div>
     </div>
@@ -79,7 +95,7 @@
 </template>
 
 <script>
-import {useEpub} from "../js/Ebook.js";
+import { useEpub } from "../js/Ebook.js";
 
 export default {
   name: "EBook",
@@ -90,7 +106,7 @@ export default {
       showNoteInput: false,
       fontSize: '',
       pageNumber: '',
-      testPageNumber:'',
+      testPageNumber: '',
       testIsRemove: false,
       takeNoteType: 'underline',
       noteText: '',
@@ -98,7 +114,7 @@ export default {
       metadata: null,
       navigation: [],
       searchText: '',
-      searchResult: [],
+      searchResult: [1],
     }
   },
   props: [
@@ -108,25 +124,25 @@ export default {
     this.epubReader = useEpub();
     this.loadEpub();
     let rendition = this.epubReader.getRendition()
-    rendition.on("selected", (cfiRange, contents) =>{
+    rendition.on("selected", (cfiRange, contents) => {
       console.log("listener detectes text selected:", cfiRange, contents)
       this.epubReader.setForNote(cfiRange, contents)
     })
-    rendition.on("mouseup", ()=> {
+    rendition.on("mouseup", () => {
       console.log("listener detectes mouseup")
-      if(this.epubReader.checkIsTakingNote()){
-        if(this.takeNoteType == 'underline')
+      if (this.epubReader.checkIsTakingNote()) {
+        if (this.takeNoteType == 'underline')
           this.showNoteInput = true
       }
       this.epubReader.takeNote(this.takeNoteType)
     })
-    rendition.on("markClicked", (cfiRange)=> {
+    rendition.on("markClicked", (cfiRange) => {
       console.log("listener detectes 'markClicked'")
       console.log(cfiRange)
-      if(this.testIsRemove)
+      if (this.testIsRemove)
         this.epubReader.removeMark(cfiRange)
       else {
-        console.log(this.epubReader.getNoteText(cfiRange)) 
+        console.log(this.epubReader.getNoteText(cfiRange))
       }
     })
   },
@@ -164,7 +180,7 @@ export default {
       book.loaded.navigation.then((nav) => {
         let index = 0
         nav.toc.forEach((toc) => {
-          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index})
+          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
         })
         console.log("parse navigation")
       })
@@ -208,26 +224,26 @@ export default {
     doSearch() {
       console.log("call do search")
       this.epubReader.getBook().ready.then(() => {
-      if(!this.searchText){
-        console.log("empty input")
-        return
-      }
-      this.epubReader.doSearch(this.searchText).then((results) =>{
-        this.searchResult = results
-        this.searchResult.map((item) =>{
-          console.log(item.excerpt, "|||", this.searchText)
-          let regexPattern = new RegExp(this.searchText, "gi")
-          let tmp = item.excerpt.match(regexPattern)[0]
-          let targetString = `<span style="color: red;">` + tmp + `</span>`
-          item.excerpt = item.excerpt.replace(
-            regexPattern,
-            targetString
-          )
-          return item
+        if (!this.searchText) {
+          console.log("empty input")
+          return
+        }
+        this.epubReader.doSearch(this.searchText).then((results) => {
+          this.searchResult = results
+          this.searchResult.map((item) => {
+            console.log(item.excerpt, "|||", this.searchText)
+            let regexPattern = new RegExp(this.searchText, "gi")
+            let tmp = item.excerpt.match(regexPattern)[0]
+            let targetString = `<span style="color: red;">` + tmp + `</span>`
+            item.excerpt = item.excerpt.replace(
+              regexPattern,
+              targetString
+            )
+            return item
+          })
         })
+        this.showNavigation = false
       })
-      this.showNavigation = false
-    })
     },
     finishTakeNote() {
       this.epubReader.setNoteText(this.noteText)
@@ -253,6 +269,7 @@ export default {
 <style lang="scss" scoped>
 #ebook {
   position: relative;
+
   #buttons {
     #tableButton {
       position: fixed;
@@ -260,17 +277,20 @@ export default {
       transform: translateX(-50%);
       top: 0;
     }
+
     #nextPageButton {
       position: fixed;
       right: 0;
       bottom: 0;
     }
+
     #prevPageButton {
       position: fixed;
       left: 0;
       bottom: 0;
     }
   }
+
   #table {
     #bookInfo {
       position: fixed;
@@ -278,49 +298,65 @@ export default {
       left: 0;
       width: 400px;
       height: 100%;
+
       #bookInfo-header {
         width: auto;
         height: 20%;
         display: flex;
+
         #bookInfo-cover {
           height: 100%;
           object-fit: contain;
         }
+
         #bookInfo-text {
           margin-top: 5%;
           height: 95%;
           width: 60%;
           display: flex;
           flex-direction: column;
+
+          #block {
+            width: 100%;
+
+          }
         }
       }
     }
+
     #setting {
       position: fixed;
       top: 0;
       right: 0;
       width: 400px;
       height: 100%;
+
       #header {
         width: 100%;
         height: 30%;
+
         #view {
           background-color: #fff;
         }
+
         #theme {
           background-color: #000;
         }
+
         #highlight-color {
           background-color: #fff;
         }
+
         #takeNote {
           background-color: #000;
         }
+
         #remove {
           background-color: #fff;
         }
       }
     }
+
     #progressBar {
       position: fixed;
       align-content: center;
@@ -331,7 +367,8 @@ export default {
       height: 100px;
     }
   }
-  #take-note-component{
+
+  #take-note-component {
     #note-input {
       position: fixed;
       left: 50%;
@@ -342,12 +379,14 @@ export default {
       background: white;
       border: 1px dashed black;
       z-index: 9999;
-      #input{
+
+      #input {
         height: 150px;
         width: 250px;
         resize: none;
       }
     }
+
     #mask {
       position: fixed;
       top: 0;
@@ -360,59 +399,78 @@ export default {
     }
   }
 }
+
+.search-input {
+  width: 75%;
+  margin-right: 5%;
+}
+
 .text {
   text-align: left;
 }
+
 .bookInfo-text {
   margin: 0%;
   width: 100%;
-  flex-basis: 17%;
+  flex-basis: 20%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .bookInfo-body {
   margin: 5% 20px;
   height: 75%;
   overflow: scroll;
 }
+
 .parting-line {
-  height:1px;
-  border:none;
-  border-top:1px dashed grey;
+  height: 1px;
+  border: none;
+  border-top: 1px dashed grey;
 }
+
 .side-bar {
   background-color: white;
   border: 1px solid black;
   border-radius: 4px;
 }
+
 .settings {
   height: 20%;
 }
+
 .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
   }
-  .el-col {
-    border-radius: 4px;
-  }
-  .bg-purple-dark {
-    background: #99a9bf;
-  }
-  .bg-purple {
-    background: #d3dce6;
-  }
-  .bg-purple-light {
-    background: #e5e9f2;
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: 36px;
-  }
-  .row-bg {
-    padding: 10px 0;
-    background-color: #f9fafc;
-  }
+}
+
+.el-col {
+  border-radius: 4px;
+}
+
+.bg-purple-dark {
+  background: #99a9bf;
+}
+
+.bg-purple {
+  background: #d3dce6;
+}
+
+.bg-purple-light {
+  background: #e5e9f2;
+}
+
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
+}
+
+.row-bg {
+  padding: 10px 0;
+  background-color: #f9fafc;
+}
 </style>
