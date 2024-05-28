@@ -1,0 +1,16 @@
+.text-larger {
+  font-family: 
+  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: larger;
+}
+.text-medium {
+  font-family: 
+  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: medium
+}
+.auto-wrap {
+  width: 100px; /* 定义容器宽度 */
+  word-wrap: break-word; /* 允许在长单词内部换行 */
+  word-break: break-all; /* 允许在任意位置换行 */
+  text-align: left;
+}
