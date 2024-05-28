@@ -3,5 +3,5 @@ from django.apps import AppConfig
 
 class ApptConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'books'
+    name = 'apps.books'
 
