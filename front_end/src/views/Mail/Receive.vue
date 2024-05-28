@@ -1,8 +1,9 @@
 <template>
   <el-container>
-    <el-table
+    <el-table 
       :data="rows"
-      style="width: 100%">
+      style="width: 100%;
+      ">
       <el-table-column
         label="写信人"
         prop="from"
