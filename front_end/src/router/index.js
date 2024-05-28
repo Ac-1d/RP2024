@@ -12,8 +12,7 @@ import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Comments from "../views/Comments.vue";
-import Send from '../views/Mail/Send.vue';
-import Receive from '../views/Mail/Receive.vue';
+import Mail from "../views/Mail/Mail.vue";
 
 Vue.use(VueRouter);
 
@@ -74,23 +73,16 @@ const routes = [
     name: "Register",
     component: Register
   },
-  {
-    path: "/comments",
-    name: "Comments",
+  {// mail站内信页面
+    path:'/mail',
+    name:'Mail',
+    component: Mail
+  },// lzy
+  {// comments评论页面
+    path:'/comments',
+    name: 'Comments',
     component: Comments
-  },
-  // Mail-send
-  {
-    path:'/mail/send',
-    name:'Send',
-    component: Send
-  },
-  // Mail-recv
-  {
-    path:'/mail/recv',
-    name:'Receive',
-    component: Receive
-  },
+  },// lzy
   {
     path: "/Center",
     name: "Center",

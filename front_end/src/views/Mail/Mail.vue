@@ -1,52 +1,23 @@
 <template>
-  <div class="side-nav">
-    <div class="side-nav-item">
-      <router-link to="/mail/send"
-      style="color:white;text-decoration:none;">写信</router-link>
-    </div>
-    <div class="side-nav-item">
-      <router-link to="/mail/recv"
-      style="color:white;text-decoration:none;">收信</router-link>
-    </div>
-    <div class="side-nav-item">
-      <router-link to="/mail/draft"
-      style="color:white;text-decoration:none;">草稿箱</router-link>
-    </div>
-    <div class="side-nav-item">
-      <router-link to="/mail/contacts"
-      style="color:white;text-decoration:none;">联系人</router-link>
-    </div>
-  </div>
+  <el-container>
+    <el-tabs tab-position="top" type="card" style="width: 100%;">
+      <el-tab-pane label="写信"><Send/></el-tab-pane>
+      <el-tab-pane label="收信"><Receive/></el-tab-pane>
+      <el-tab-pane label="草稿箱">草稿箱</el-tab-pane>
+      <el-tab-pane label="联系人">联系人</el-tab-pane>
+    </el-tabs>
+  </el-container>
 </template>
+
 <script>
+import Receive from '@/views/Mail/Receive.vue';
+import Send from '@/views/Mail/Send.vue';
+
 export default{
   name:'Mail',
+  components: {
+    Receive,
+    Send,
+  }
 }
 </script>
-<style>
-.side-nav {
-  font-weight: bold;
-  color:#EEEEEE;
-  position: fixed;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 0 10px 10px 0;
-  padding: 10px;
-  z-index: 1;
-}
-.side-nav-item {
-  text-align: center;
-  color: white;
-  padding: 10px;
-  margin: 5px 0px;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-}
-.side-nav-item:hover {
-  background: #007bff;
-  color: white;
-}
-</style>
