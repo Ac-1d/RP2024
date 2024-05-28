@@ -104,7 +104,7 @@ export default {
     },
     search() {
       if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:0}});
+        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
       }
     }
   }
