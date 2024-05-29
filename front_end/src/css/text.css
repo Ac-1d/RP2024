@@ -14,3 +14,11 @@
   word-break: break-all; /* 允许在任意位置换行 */
   text-align: left;
 }
+.full-page {
+  width: 100vw;        /* 宽度为视窗宽度 */
+  height: 100vh;       /* 高度为视窗高度 */
+  margin: 0;           /* 移除默认边距 */
+  padding: 0;          /* 移除默认填充 */
+  box-sizing: border-box; /* 防止宽度和高度包含边框和内边距 */
+  overflow: auto;      /* 内容过多时可滚动 */
+}

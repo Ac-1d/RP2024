@@ -1,45 +1,22 @@
 <template>
   <el-container>
-    <el-table 
-      :data="rows"
-      style="width: 100%;
-      ">
-      <el-table-column
-        label="写信人"
-        prop="from"
-        width="180">
+    <el-table :data="rows" style="width: 100%;">
+      <el-table-column label="写信人" prop="from" width="180"></el-table-column>
+      <el-table-column prop="title" label="主题" width="180"></el-table-column>
+      <el-table-column prop="date" label="时间">
       </el-table-column>
-      <el-table-column
-        prop="title"
-        label="主题"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="date"
-        label="时间">
-      </el-table-column>
-      <el-table-column
-        fixed="right"
-        width="120">
+      <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button
-            @click.native.prevent="linkto(scope.$index, mails)"
-            type="text"
-            size="small">
-            查看
+          <el-button @click.native.prevent="linkto(scope.$index, mails)"
+            type="text" size="small">查看
           </el-button>
         </template>
       </el-table-column>
 
-      <el-table-column
-        fixed="right"
-        width="120">
+      <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button
-            @click.native.prevent="deleteRow(scope.$index, rows)"
-            type="text"
-            size="small">
-            移除
+          <el-button @click.native.prevent="deleteRow(scope.$index, rows)"
+            type="text" size="small">移除
           </el-button>
         </template>
       </el-table-column>
