@@ -108,7 +108,7 @@ export default {
   created() {
     const bookId = this.$route.params.bookId;
     this.bookId = bookId;
-    console.log('id is : '+bookId);
+    // console.log('id is : '+bookId);
     this.comments = this.getCommentsByBookId(bookId);
   },
   methods: {
