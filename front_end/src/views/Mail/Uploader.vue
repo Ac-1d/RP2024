@@ -11,3 +11,9 @@
     </el-upload>
   </el-container>
 </template>
+
+<script>
+export default{
+  name: 'Uploader',
+}
+</script>
