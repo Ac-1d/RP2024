@@ -11,7 +11,7 @@ import About from "../views/About.vue";
 import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
-import Comments from "../views/Comments.vue";
+import Comments from "../views/Comments1.vue";
 import Mail from "../views/Mail/Mail.vue";
 import Creation from "../views/Creation/Creation.vue";
 
@@ -80,7 +80,7 @@ const routes = [
     component: Mail
   },// lzy
   {// comments评论页面
-    path:'/comments',
+    path:'/book/:bookId/comments',
     name: 'Comments',
     component: Comments
   },// lzy
