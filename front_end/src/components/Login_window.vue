@@ -1,12 +1,12 @@
 <template>
   <el-dialog
+    title="登录"
     :visible="dialogflag"
     :color=pick
     :close-on-click-modal="false"
     :before-close="logdialogclose"
     :destroy-on-close="true"
   >
-  <Menu></Menu>
     <el-form :model="loginForm" ref="loginFormRef" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
       <el-form-item label="电话">
@@ -31,14 +31,14 @@
 </template>
 
 <script>
-import Menu from "@/components/Menu.vue"
+
 export default {
 
   name: "Login_window",
   props: {
     dialogflag: Boolean,
   },
-  components: { Menu },
+
   emits: ['closedia'],
   data() {
     return {
@@ -48,7 +48,7 @@ export default {
         password: '',
         password2: '',
       },
-      isRegister: true,
+
     };
   },
   methods: {

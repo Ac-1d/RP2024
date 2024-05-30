@@ -7,6 +7,7 @@
   :direction="rtl"
   :before-close="handleClose">
   <div class="modify">
+
   <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
 
   <el-form-item label="ID" prop="ID">
@@ -67,8 +68,14 @@
 
   <el-form-item label="确认密码" prop="password_k2" style="width: 150%;">
     <el-input type="password" v-model="ruleForm1.password_k2" autocomplete="off" style="width: 50%;"></el-input>
-    <el-button class="borderless-btn"  @click="submitPass('ruleForm1')" style="margin-right: auto;">确认修改</el-button>
+    <!--<el-button class="borderless-btn"  @click="submitPass('ruleForm1')" style="margin-right: auto;">确认修改</el-button>-->
   </el-form-item>
+
+  <el-form-item class="borderless-btn">
+    <el-button type="primary" @click="submitPass('ruleForm1')">确认修改</el-button>
+    <el-button @click="resetPass('ruleForm1')">放弃修改</el-button>
+  </el-form-item>
+
 
   </el-form>
 
@@ -168,6 +175,7 @@
       handleClose() {
         this.$confirm('确认关闭？')
           .then(() => {
+            this.resetForm("ruleForm");
             this.$emit('closedia');
           })
           .catch(() => {});
@@ -197,6 +205,7 @@
           if (valid) {
             alert('修改密码成功');
             this.setFalse();
+            this.ruleForm.password = this.ruleForm1.password_k;
             this.ruleForm1.password_check='';
             this.ruleForm1.password_k='';
             this.ruleForm1.password_k2='';
@@ -210,8 +219,15 @@
 
       resetForm(formName) {
         this.$refs[formName].resetFields();
+      },
+
+      resetPass(formName) {
+        this.$refs[formName].resetFields();
+        this.setFalse();
       }
+
     },
+
 };
 </script>
 
