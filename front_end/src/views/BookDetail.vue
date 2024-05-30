@@ -69,15 +69,15 @@
     <div class="reviews">
       <h2>书评</h2>
       <ul>
-        <li v-for="review in reviews" :key="review.id">
-          {{ review.content }}
+        <li v-for="review in reviews" :key="review.time">
+          <p><strong>{{ review.author }}</strong> ({{ review.rank_value }}星)</p>
+          <p>{{ review.text }}</p>
+          <p>{{ review.time }}</p>
         </li>
       </ul>
     </div>
   </div>
 </template>
-
-
 
 <script>
 import { EventBus } from '@/utils/eventBus'; // 引入事件总线
@@ -117,7 +117,7 @@ export default {
     }
   },
   created() {
-    const bookId = this.$route.params.bookId;
+    const bookId = parseInt(this.$route.params.bookId);
     this.book = this.getBookById(bookId);
     this.reviews = this.getReviewsByBookId(bookId);
 
@@ -133,7 +133,8 @@ export default {
     },
     getReviewsByBookId(bookId) {
       const reviewsData = require("@/assets/reviews.json");
-      return reviewsData.filter(review => review.bookId === bookId);
+      const book = reviewsData.find(book => book.id === bookId);
+      return book ? book.comments : [];
     },
     writeReview() {
       this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
@@ -146,7 +147,6 @@ export default {
   }
 };
 </script>
-
 
 
 
