@@ -4,9 +4,14 @@
     <div id="epub_render"></div>
     <!-- TODO: 陆续被替换的设计 -->
     <div id="buttons">
-      <button id="tableButton" @click="callTable">点我呼出菜单</button>
-      <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
-      <button id="prevPageButton" @click="prevPage">点我向前翻页</button>
+      <!-- <button id="tableButton" @click="callTable">点我呼出菜单</button> -->
+      <div id="tableButton">
+        <el-button type="info" icon="el-icon-d-arrow-left" @click="prevPage" circle></el-button>
+        <el-button type="info" icon="el-icon-setting" @click="callTable" circle></el-button>
+        <el-button type="info" icon="el-icon-d-arrow-right" @click="nextPage" circle></el-button>
+        <!-- <button id="nextPageButton" @click="nextPage">点我向后翻页</button> -->
+      </div>
+      <!-- <button id="prevPageButton" @click="prevPage">点我向前翻页</button> -->
     </div>
     <div id="table" v-if="showTable">
       <div id="bookInfo" class="side-bar">
@@ -52,35 +57,29 @@
       </div>
       <div id="setting" class="side-bar">
         <div id="header">
-          <el-row>
-            <el-col :span="12">
-              <div class="grid-content bg-purple"></div>
-            </el-col>
-            <el-col :span="12">
-              <div class="grid-content bg-purple-light"></div>
-            </el-col>
-          </el-row>
+          <el-form ref="settings" :model="settings" label-width="80px">
+            <el-form-item label="深色模式">
+              <el-switch v-model="settings.nightTheme"></el-switch>
+            </el-form-item>
+            <el-form-item label="笔记模式">
+              <el-switch v-model="settings.isTakingNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="笔记方式" v-if="settings.isTakingNote">
+              <el-radio-group v-model="settings.noteType" size="medium">
+                <el-radio border label="underline">记笔记</el-radio>
+                <el-radio border label="highlight">高亮标注</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
+              <el-switch v-model="settings.isRemovingNote"></el-switch>
+            </el-form-item>
+          </el-form>
         </div>
         <h1>这里是设置</h1>
         <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
         调整字体大小：
         <input type="text" v-model="fontSize">
-        <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
-        <button @click="changeTheme(0)">点我切换浅色模式</button>
-        <button @click="changeTheme(1)">点我切换深色模式</button>
-        <button @click="changeLocation">点我修改至储存location位置</button>
-        <input type="text" v-model="testPageNumber">
-        <button @click="changeTakeNoteType('highlight')">点我标记高亮</button>
-        <button @click="changeTakeNoteType('underline')">点我做笔记</button>
-        <button @click="testIsRemove = !testIsRemove">点我切换查看/删除</button>
-        <button @click="showNavigation = !showNavigation">点我切换目录/搜索结果</button>
-        <el-input change="doSearch" v-model="searchText"></el-input>
-      </div>
-      <div id="progressBar">
-        这里是进度条
-        <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
-        <!-- 有点想去掉进度条了😑 -->
-        <input type="range" v-model="pageNumber">
+        <router-link to="/BookDetail">点我退出</router-link>
       </div>
     </div>
     <div id="take-note-component" v-if="showNoteInput">
@@ -105,16 +104,18 @@ export default {
       showNavigation: true,
       showNoteInput: false,
       fontSize: '',
-      pageNumber: '',
-      testPageNumber: '',
-      testIsRemove: false,
-      takeNoteType: 'underline',
       noteText: '',
       coverUrl: '',
       metadata: null,
       navigation: [],
       searchText: '',
-      searchResult: [1],
+      searchResult: [],
+      settings: {
+        nightTheme: false,
+        isTakingNote: false,
+        isRemovingNote: false,
+        noteType: '',
+      },
     }
   },
   props: [
@@ -130,16 +131,16 @@ export default {
     })
     rendition.on("mouseup", () => {
       console.log("listener detectes mouseup")
-      if (this.epubReader.checkIsTakingNote()) {
-        if (this.takeNoteType == 'underline')
+      if (this.epubReader.checkIsTakingNote() && this.settings.isTakingNote) {
+        if (this.settings.noteType == 'underline')
           this.showNoteInput = true
+        this.epubReader.takeNote(this.settings.noteType)
       }
-      this.epubReader.takeNote(this.takeNoteType)
     })
     rendition.on("markClicked", (cfiRange) => {
       console.log("listener detectes 'markClicked'")
       console.log(cfiRange)
-      if (this.testIsRemove)
+      if (this.settings.isRemovingNote)
         this.epubReader.removeMark(cfiRange)
       else {
         console.log(this.epubReader.getNoteText(cfiRange))
@@ -151,13 +152,13 @@ export default {
       console.log("call fontSize in watch");
       this.changeFontSize(newValue);
     },
-    pageNumber(newValue) {
-      // console.log("pageNumber changed", newValue)
-      this.changePage(newValue)
+    'settings.nightTheme': function(nightTheme) {
+      console.log("call set night theme",nightTheme)
+      if(nightTheme)//true为深色模式
+        this.epubReader.setTheme(1)
+      else
+        this.epubReader.setTheme(0)
     },
-    testPageNumber(newValue) {
-      this.epubReader.test(newValue)
-    }
   },
   methods: {
     loadEpub() {
@@ -184,12 +185,9 @@ export default {
         })
         console.log("parse navigation")
       })
-      /**缩小渲染尺寸，否则会出现页面大小溢出的问题 0.99依然会溢出^^'*/
-      const x = 0.98
       this.epubReader.render("epub_render", {
-        width: (window.innerWidth * x),
-        height: (window.innerHeight * x),
-        // flow: "scrolled-doc",
+        width: window.innerWidth,
+        height: window.innerHeight,
         allowScriptedContent: true
       });
     },
@@ -205,21 +203,6 @@ export default {
     changeFontSize(fontSize) {
       console.log("call setFontSize");
       this.epubReader.setFontSize(fontSize);
-    },
-    changeViewStyle() {
-      this.epubReader.setViewStyle();
-    },
-    changeTheme(index) {
-      this.epubReader.setTheme(index);
-    },
-    changePage(pageNumber) {
-      this.epubReader.setPage(pageNumber)
-    },
-    changeLocation() {
-      this.epubReader.setLatedPage()
-    },
-    changeTakeNoteType(takeNoteType) {
-      this.takeNoteType = takeNoteType
     },
     doSearch() {
       console.log("call do search")
@@ -296,8 +279,7 @@ export default {
       position: fixed;
       top: 0;
       left: 0;
-      width: 400px;
-      height: 100%;
+
 
       #bookInfo-header {
         width: auto;
@@ -318,7 +300,6 @@ export default {
 
           #block {
             width: 100%;
-
           }
         }
       }
@@ -328,32 +309,10 @@ export default {
       position: fixed;
       top: 0;
       right: 0;
-      width: 400px;
-      height: 100%;
 
       #header {
         width: 100%;
-        height: 30%;
-
-        #view {
-          background-color: #fff;
-        }
-
-        #theme {
-          background-color: #000;
-        }
-
-        #highlight-color {
-          background-color: #fff;
-        }
-
-        #takeNote {
-          background-color: #000;
-        }
-
-        #remove {
-          background-color: #fff;
-        }
+        height: 164px;
       }
     }
 
@@ -434,6 +393,8 @@ export default {
   background-color: white;
   border: 1px solid black;
   border-radius: 4px;
+  width: 350px;
+  height: 100%;
 }
 
 .settings {
@@ -466,7 +427,7 @@ export default {
 
 .grid-content {
   border-radius: 4px;
-  min-height: 36px;
+  min-height: 60px;
 }
 
 .row-bg {
