@@ -40,7 +40,7 @@ export function useEpub() {
       name: 'Dark',
       style: {
         body: {
-          'color': '#FFF',
+          'color': '#808080',
           'background': '#000'
         }
       }
@@ -297,15 +297,6 @@ export function useEpub() {
   function checkIsTakingNote() {
     return cfiRange && checkCFIRangeLegal(cfiRange)
   }
-
-  /**toc{0:}
-   * 0{label,parent,subitems}
-   * subitems
-   * 其实大多数电子书没有子目录，这个解析子目录的方法从长计议
-   */
-  // function tocTree2List(toc) {
-
-  // }
 
   function doSearch(q) {
     return Promise.all(
