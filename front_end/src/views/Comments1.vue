@@ -10,7 +10,7 @@
 import { EventBus } from '@/utils/eventBus'; // 引入事件总线
 
 export default {
-  name: "Comments",
+  name: "Comments1",
   data() {
     return {
       reviewContent: ''

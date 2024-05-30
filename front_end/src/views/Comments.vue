@@ -132,7 +132,7 @@ export default {
     },
     getCommentsByBookId(id) {
       const commentsData = require("@/assets/comments.json");
-      return commentsData.find(comment => comment.id === id).comments;
+      return commentsData.find(comment => comment.id == id).comments;
     },
     addComment() {
       if (this.content) {

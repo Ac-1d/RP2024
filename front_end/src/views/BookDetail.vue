@@ -115,7 +115,7 @@ export default {
     },
     getBookById(id) {
       const booksData = require("@/assets/book.json");
-      return booksData.find(book => book.id === id);
+      return booksData.find(book => book.id == id);
     }
   }
 };
