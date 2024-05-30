@@ -2,214 +2,171 @@
   {
     "id": 1,
     "comments":[
-      {}
+      {
+        "rank_value": 5,
+        "text": "这本书很好", 
+        "author": "lzy", 
+        "showReply": false,
+        "likes": 10, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-28"
+      },
+      {
+        "rank_value": 4,
+        "text": "科学部分可以读读，但本书所传递的价值观我完全不认同。", 
+        "author": "Andy_Henry", 
+        "showReply": false,
+        "likes": 9, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-28"
+      }
     ]
   },
   {
     "id": 2,
-    "title": "白鹿原",
-    "author": "[英] 索菲·伯罗斯",
-    "category": "小说",
-    "image": "image2.jpg",
-    "publisher": "企鹅出版社",
-    "publish_date": "2022-05-21",
-    "pages": 256,
-    "price": "60.00元",
-    "isbn": "9780241438321",
-    "rating": 8.5,
-    "rating_count": 85,
-    "description": "这是一部描述人与人之间相遇和互动的小说，充满了温情和感动。",
-    "author_intro": "[英] 索菲·伯罗斯，英国作家，以细腻的文笔和感人的故事著称。",
-    "rating_distribution": {
-      "5": 45.0,
-      "4": 35.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 4,
+        "text": "这两年crush很火，很chill，是citywalk的标配。我还是觉得见过对crush最经典的解释和比喻，是十多年前刘瑜《送你一颗子弹》里写的，大概意思是crush只是一场感冒，乍见之欢席卷你，病来如山倒；但真爱是一场癌症，无药可救。", 
+        "author": "魔理沙", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-12"
+      },
+      {
+        "rank_value": 5,
+        "text": "021;“我曾经短暂地、热烈地、羞涩地喜欢过你，如夏夜晚风，似璀璨烟火”。纸质书的魔力--以能触摸，感知的实体，给予人一个专注的空间和时间段。", 
+        "author": "May", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 3,
-    "title": "妻妾成群",
-    "author": "谢爱磊",
-    "category": "社会纪实",
-    "image": "image3.jpg",
-    "publisher": "人民文学出版社",
-    "publish_date": "2023-03-10",
-    "pages": 280,
-    "price": "55.00元",
-    "isbn": "9787020156462",
-    "rating": 8.8,
-    "rating_count": 95,
-    "description": "通过真实的案例，揭示了中国教育体制下的学术竞争和压力。",
-    "author_intro": "谢爱磊，知名记者和作家，专注于社会热点问题的报道和写作。",
-    "rating_distribution": {
-      "5": 48.0,
-      "4": 32.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 5,
+        "text": "一开始听说这本书，以为是映照当下社会热点问题的，心想现在作家写书都这么紧跟时事吗。抱着这样的心态去豆瓣搜了搜，原来是本言情小说。 不知道是不是因为太久没看言情小说，之前也没有接触过作者的语言风格，看书过程中心情跌宕起伏。", 
+        "author": "小说里的故事要有心跳声", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 4,
-    "title": "三寸金莲",
-    "author": "[美] 芭比·泽利泽",
-    "category": "历史文化",
-    "image": "image4.jpg",
-    "publisher": "牛津大学出版社",
-    "publish_date": "2021-11-05",
-    "pages": 350,
-    "price": "70.00元",
-    "isbn": "9780190938311",
-    "rating": 9.0,
-    "rating_count": 110,
-    "description": "深入分析了历史事件的报道方式及其对社会的影响。",
-    "author_intro": "[美] 芭比·泽利泽，宾夕法尼亚大学教授，著有多部关于媒体和新闻的书籍。",
-    "rating_distribution": {
-      "5": 49.0,
-      "4": 31.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 5,
+        "text": "！！！很有意思，被书名吸引进来的，内容没有太过娱乐化，而是从专业角度讨论了肯尼迪被刺杀的前前后后，很深刻也很有趣。", 
+        "author": "May", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 5,
-    "title": "局外人",
-    "author": "[俄] 叶夫根尼·沃季诺",
-    "category": "艺术设计",
-    "image": "image5.jpg",
-    "publisher": "圣彼得堡出版社",
-    "publish_date": "2020-08-18",
-    "pages": 400,
-    "price": "80.00元",
-    "isbn": "9785932123456",
-    "rating": 8.7,
-    "rating_count": 98,
-    "description": "探讨了拉夫尔的艺术风格和创作背景，适合艺术爱好者。",
-    "author_intro": "[俄] 叶夫根尼·沃季诺，俄罗斯知名艺术评论家和作家。",
-    "rating_distribution": {
-      "5": 47.0,
-      "4": 33.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 5,
+        "text": "开卷有益", 
+        "author": "不出", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 6,
-    "title": "亚洲铜",
-    "author": "孙静",
-    "category": "科学新知",
-    "image": "image6.jpg",
-    "publisher": "清华大学出版社",
-    "publish_date": "2022-09-15",
-    "pages": 290,
-    "price": "50.00元",
-    "isbn": "9787302501234",
-    "rating": 8.9,
-    "rating_count": 105,
-    "description": "通过游戏设计的视角，探索科学和技术的前沿领域。",
-    "author_intro": "孙静，清华大学教授，专注于计算机科学和游戏设计。",
-    "rating_distribution": {
-      "5": 48.0,
-      "4": 32.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 5,
+        "text": "此书通过游戏设计的视角，探索科学和技术的前沿领域。", 
+        "author": "Shrimp", 
+        "showReply": false,
+        "likes": 19, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 7,
-    "title": "绿皮书",
-    "author": "[波兰] 马尔钦·维查",
-    "category": "文学",
-    "image": "image7.jpg",
-    "publisher": "华东师范大学出版社",
-    "publish_date": "2023-02-20",
-    "pages": 340,
-    "price": "65.00元",
-    "isbn": "9787576001234",
-    "rating": 9.3,
-    "rating_count": 130,
-    "description": "一本充满想象力的文学作品，描绘了未来世界的奇幻景象。",
-    "author_intro": "[波兰] 马尔钦·维查，波兰著名作家，以其独特的写作风格闻名。",
-    "rating_distribution": {
-      "5": 50.0,
-      "4": 30.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 4,
+        "text": "很有想象力", 
+        "author": "May", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 8,
-    "title": "黄金时代",
-    "author": "[英] 珍妮特·温特森",
-    "category": "商业经管",
-    "image": "image8.jpg",
-    "publisher": "机械工业出版社",
-    "publish_date": "2023-07-25",
-    "pages": 380,
-    "price": "72.00元",
-    "isbn": "9787111623456",
-    "rating": 8.6,
-    "rating_count": 88,
-    "description": "探讨了商业管理和科技创新的关系，提出了新的管理理念。",
-    "author_intro": "[英] 珍妮特·温特森，英国商学院教授，专注于管理学和创新研究。",
-    "rating_distribution": {
-      "5": 46.0,
-      "4": 34.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 5,
+        "text": "很实用的商学书籍", 
+        "author": "May", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   },
   {
     "id": 9,
-    "title": "金色沼泽：柏...",
-    "author": "[英] 巴尼·怀特·斯宾纳",
-    "category": "社会纪实",
-    "image": "image9.jpg",
-    "publisher": "上海人民出版社",
-    "publish_date": "2022-11-30",
-    "pages": 310,
-    "price": "68.00元",
-    "isbn": "9787208151234",
-    "rating": 8.4,
-    "rating_count": 76,
-    "description": "记录了柏林墙倒塌前后的历史事件，对社会产生了深远影响。",
-    "author_intro": "[英] 巴尼·怀特·斯宾纳，英国记者，专注于欧洲历史和社会问题。",
-    "rating_distribution": {
-      "5": 44.0,
-      "4": 36.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 3,
+        "text": "柏林墙倒下的往事", 
+        "author": "May", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-08"
+      }
+    ]
   },
   {
     "id": 10,
-    "title": "汗水的奖赏：...",
-    "author": "[美] 比尔·海斯",
-    "category": "历史文化",
-    "image": "image10.jpg",
-    "publisher": "哈佛大学出版社",
-    "publish_date": "2021-06-12",
-    "pages": 370,
-    "price": "75.00元",
-    "isbn": "9780674065678",
-    "rating": 9.0,
-    "rating_count": 100,
-    "description": "探讨了劳动与社会价值的关系，展示了各个历史时期的劳动成果。",
-    "author_intro": "[美] 比尔·海斯，历史学家，哈佛大学教授，著有多部关于劳动和社会的书籍。",
-    "rating_distribution": {
-      "5": 48.0,
-      "4": 32.0,
-      "3": 15.0,
-      "2": 3.0,
-      "1": 2.0
-    }
+    "comments":[
+      {
+        "rank_value": 4,
+        "text": "探讨劳动与社会价值著作", 
+        "author": "lzy", 
+        "showReply": false,
+        "likes": 12, 
+        "replyText": "",
+        "replies": [],
+        "time": "24-05-18"
+      }
+    ]
   }
 ]

@@ -25,7 +25,6 @@ export function useEpub() {
     'yellow', 'green', 'pink', 'red'
   ]
   let fillColorIndex = 0
-  let takeNoteAvailable = false
   let noteList = []
   let themeList = [
     {
@@ -41,7 +40,7 @@ export function useEpub() {
       name: 'Dark',
       style: {
         body: {
-          'color': '#FFF',
+          'color': '#808080',
           'background': '#000'
         }
       }
@@ -170,19 +169,13 @@ export function useEpub() {
     cfiRange = _cfiRange
     contents = _contents
     console.log(cfiRange, contents)
-    console.log(takeNoteAvailable)
-    //解决获取选中文字Location异步的问题
-    //完全没有解决，暂时弃用，这个问题会导致快速选取文字无法立即高亮/下划线
-    if (takeNoteAvailable){
-      takeNote()
-    }
   }
 
   /**epubjs中编辑样式是使用svg来实现的 */
   //TODO: 几乎解决了自定义样式的问题，但下划线颜色无法编辑
   function takeNote(takeNoteType) {
     console.log("try to take note")
-    if (cfiRange) {
+    if (cfiRange) {//
       if(checkCFIRangeLegal(cfiRange)){
         switch (takeNoteType) {
           case 'highlight':
@@ -201,7 +194,7 @@ export function useEpub() {
             console.error("unkown operation")
             break;
         }
-        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType})//TODO: 填入note部分
+        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType})
         console.log("push cfiRange to noteList")
       }
       contents.window.getSelection().removeAllRanges();
@@ -211,9 +204,7 @@ export function useEpub() {
       console.warn("cfiRange is undefined")
   }
 
-  function setTakeNoteAvailable() {
-    takeNoteAvailable = true
-  }
+
 
   function setFillColor(index) {
     fillColorIndex = index
@@ -303,14 +294,9 @@ export function useEpub() {
     return {startCfi, endCfi}
   }
 
-  /**toc{0:}
-   * 0{label,parent,subitems}
-   * subitems
-   * 其实大多数电子书没有子目录，这个解析子目录的方法从长计议
-   */
-  // function tocTree2List(toc) {
-
-  // }
+  function checkIsTakingNote() {
+    return cfiRange && checkCFIRangeLegal(cfiRange)
+  }
 
   function doSearch(q) {
     return Promise.all(
@@ -346,7 +332,7 @@ export function useEpub() {
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
-    doSearch
+    setForNote, takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
+    doSearch, checkIsTakingNote
   }
 }
