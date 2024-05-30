@@ -103,8 +103,13 @@ export default{
   data() {
     return {
       works:[
-        {"title": "我看见的世界", "tips": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
-       "date": "23-12-21", "progress": "12"},
+        {
+          "bookId": "1", 
+          "title": "我看见的世界", 
+          "tips": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
+          "date": "23-12-21", 
+          "progress": "12"
+        },
       ],
       options: [
         {value: '全部', label: '全部'},
