@@ -22,12 +22,21 @@
       </el-input>
     </el-main>
     <el-main>
-      <Uploader/>
+      <el-container>
+        <el-upload
+          class="upload-demo"
+          drag
+          action="#"
+          multiple>
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">上传文件不超过500kb</div>
+        </el-upload>
+      </el-container>
     </el-main>
   </el-container>
 </template>
 <script>
-import Uploader from '@/views/Mail/Uploader.vue';
 
 export default{
   name: 'Send',
@@ -39,7 +48,6 @@ export default{
     }
   },
   components: {
-    Uploader,
   },
   methods: {
     submitMessage(){
