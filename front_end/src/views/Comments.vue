@@ -9,7 +9,7 @@
     </el-header>
     <!-- 评论显示 -->
     <el-main>
-      <div v-for="(comment, index) in comments" :key="index">
+      <div v-for="(comment, index) in paginatedComments" :key="index">
         <!-- 循环显示的每条评论 -->
         <div>
           <el-row style="border-top: 1px solid grey;">
@@ -47,12 +47,12 @@
           </el-row>
         </div>
       </div>
-      <div class="block">
-        <span class="demonstration">页面</span>
-        <el-pagination
-          layout="prev, pager, next"
-          :total="2 * comments.length">
-        </el-pagination>
+      <!-- 翻页栏 -->
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
+        <span v-for="page in totalPages" :key="page" 
+        :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
       </div>
     </el-main>
     <!-- 评论、回复框 -->
@@ -77,6 +77,7 @@
 
 <script>
 import {currentTime} from "../js/Time.js";
+import bookComments from '@/assets/comments.json';
 import '@/css/text.css';
 export default {
   name: "CommentBlock",
@@ -96,9 +97,10 @@ export default {
   data() {
     return {
       bookId: 1,
-      page: 0, // 当前是第几页
+      currentPage: 1, // 当前是第几页
+      commentsPerPage: 5,
       value: 0, // 当前用户选择的评分
-      comments: [],// 已有评论
+      comments: bookComments,// 已有评论
       content: '',// 输入内容
       replying: false,// 正在回复
       replyIndex: 0,// 回复的评论号
@@ -112,6 +114,19 @@ export default {
     this.comments = this.getCommentsByBookId(bookId);
   },
   methods: {
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page;
+    },
     goback() {
       this.$router.push({ name: 'BookDetail', params: {bookId: this.bookId}  });
     },
@@ -163,6 +178,54 @@ export default {
       this.replyIndex=0;
       this.replying=false;
     }
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.comments.length / this.commentsPerPage);
+    },
+    paginatedComments() {
+      const start = (this.currentPage - 1) * this.commentsPerPage;
+      const end = start + this.commentsPerPage;
+      return this.comments.slice(start, end);
+    }
   }
 };  
 </script>
+
+<style>
+/* 翻页栏样式 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  position: fixed; /* 固定位置 */
+  bottom: 20px; /* 距离底部 */
+  left: 50%; /* 水平居中 */
+  transform: translateX(-50%);
+  background: white;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.pagination button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.pagination .page-dot {
+  width: 10px;
+  height: 10px;
+  background-color: lightgray;
+  border-radius: 50%;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.pagination .page-dot.active {
+  background-color: gray;
+}
+</style>
