@@ -1,5 +1,6 @@
 <template>
   <el-container>
+    
     <el-table :data="rows" style="width: 100%;">
       <el-table-column label="写信人" prop="from" width="180"></el-table-column>
       <el-table-column prop="title" label="主题" width="180"></el-table-column>
@@ -7,8 +8,8 @@
       </el-table-column>
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button @click.native.prevent="linkto(scope.$index, mails)"
-            type="text" size="small">查看
+          <el-button @click="linkto({title: scope.$index, content: mails[scope.$index]})"
+            type="text">查看
           </el-button>
         </template>
       </el-table-column>
@@ -16,7 +17,7 @@
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
           <el-button @click.native.prevent="deleteRow(scope.$index, rows)"
-            type="text" size="small">移除
+            type="text">移除
           </el-button>
         </template>
       </el-table-column>
@@ -24,6 +25,7 @@
     <div class="auto-wrap">
       <p class="text-medium">{{ current }} </p>
     </div>
+    <button @click="$emit('custom-event', {title: 1, content: mails[1]})"></button>
   </el-container>
 </template>
 <script>
@@ -34,8 +36,9 @@ export default{
     deleteRow(index, rows) {
       rows.splice(index, 1);
     },
-    linkto(index, mail) {
-      this.current = mail[index];
+    linkto(data) {
+      console.log(data);
+      this.$emit('custom-event', data); 
     }
   },
   data(){
