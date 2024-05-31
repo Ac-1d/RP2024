@@ -11,7 +11,8 @@
         :key="item.name"
         :label="item.title"
         :name="item.name" lazy>
-        {{item.content}}
+        
+        <MailDetail :mailItem="item.content"/>
       </el-tab-pane>
     </el-tabs>
     <!-- <ParentComponent/> -->
@@ -23,6 +24,7 @@ import Receive from '@/views/Mail/Receive.vue';
 import Send from '@/views/Mail/Send.vue';
 import Drafts from '@/views/Mail/Drafts.vue';
 import Contact from '@/views/Mail/Contact.vue';
+import MailDetail from '@/views/Mail/MailDetail'
 // import ParentComponent from '@/views/Mail/ParentComponent.vue';
 
 export default{
@@ -32,6 +34,7 @@ export default{
     Send,
     Drafts,
     Contact,
+    MailDetail,
     // ParentComponent,
   },
   data() {
