@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="layout-round-middle">
     <!-- 用户信息 -->
     <el-header style="position: left">
       <el-button class="text-larger" style="float: left;" type="primary"
@@ -56,22 +56,19 @@
       </div>
     </el-main>
     <!-- 评论、回复框 -->
-    <el-footer>
-      <el-form>
-        <el-form-item>
-          <el-rate v-model="value" :colors="colors">
-          </el-rate>
+    <el-main>
+      <el-form :inline="true">
+        <el-form-item style="width: 20vw;">
+          <div><el-rate v-model="value" :colors="colors"></el-rate>
+          <el-button v-if="replying" @click="endReply" style="float: left;">返回评论</el-button><!-- 退出回复，返回评论 -->
+          <el-button @click="addComment" style="float: left;">发送</el-button></div>
         </el-form-item>
         <el-form-item>
-          <el-input type="textarea" v-model="content" maxlength="10000" show-word-limit/>
-        </el-form-item>
-        <el-form-item>
-          <el-button v-if="replying" @click="endReply()">返回评论</el-button><!-- 退出回复，返回评论 -->
-          <el-button @click="addComment">发送</el-button>
-          <p v-if="replying">正在回复 {{ comments[replyIndex].author }}</p><!-- 显示正在回复给某人 -->
+          <el-input :placeholder="replying?('正在回复'+comments[replyIndex].author):('输入评论')"
+          type="textarea" v-model="content" maxlength="10000" show-word-limit style="width: 50vw; display: flex;"/>
         </el-form-item>
       </el-form>
-    </el-footer>
+    </el-main>
   </el-container>
 </template>
 
@@ -79,6 +76,7 @@
 import {currentTime} from "../js/Time.js";
 import bookComments from '@/assets/comments.json';
 import '@/css/text.css';
+import '@/css/layout.css';
 export default {
   name: "CommentBlock",
   components: {
