@@ -8,7 +8,7 @@
       </el-table-column>
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button @click="linkto({title: scope.$index, content: mails[scope.$index]})"
+          <el-button @click="linkto({title: rows[scope.$index].title, content: mails[scope.$index]})"
             type="text">查看
           </el-button>
         </template>
@@ -25,7 +25,6 @@
     <div class="auto-wrap">
       <p class="text-medium">{{ current }} </p>
     </div>
-    <button @click="$emit('custom-event', {title: 1, content: mails[1]})"></button>
   </el-container>
 </template>
 <script>

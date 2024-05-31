@@ -14,6 +14,7 @@
         {{item.content}}
       </el-tab-pane>
     </el-tabs>
+    <!-- <ParentComponent/> -->
   </el-container>
 </template>
 
@@ -44,9 +45,12 @@ export default{
     addTab(data) {
       console.log('adding...');
       let tabname = data.title;
-      let tablabel = data.content;
-      let NewTabName = tabname + '-' + this.tabid++;
-      let item = {name: NewTabName, title: NewTabName, content:tablabel};
+      let tablabel = data.title;
+      let tabcontent = data.content;
+
+      let NewTabName = tabname + '-' + this.tabid++;// 防止重名；不过这里tablabel是可以重名的
+
+      let item = {name: NewTabName, title: tablabel, content:tabcontent};
       this.editableTabs.push(item);
       this.page = NewTabName;
     },
