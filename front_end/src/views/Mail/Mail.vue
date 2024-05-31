@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="layout-middle">
     <el-tabs type="card" closable @tab-remove="removeTab" v-model="page"
     style="width: 100%; background-color: aliceblue;">
       <el-tab-pane label="写信" name="send"><Send/></el-tab-pane>
@@ -73,6 +73,9 @@ export default{
       
       this.page = activeName;
       this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+      if (this.editableTabs.length == 0) {
+        this.page="send";
+      }
     }
   }
 }

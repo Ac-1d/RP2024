@@ -1,5 +1,5 @@
 <template>
-  <el-container style="margin-left: 5vw;">
+  <el-container class="layout-middle">
     <el-table :data="rows" style="width: 100%;">
       <el-table-column label="写信人" prop="from" width="180"></el-table-column>
       <el-table-column prop="title" label="主题" width="180"></el-table-column>

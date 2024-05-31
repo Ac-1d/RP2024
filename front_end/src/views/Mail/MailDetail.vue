@@ -3,8 +3,10 @@
     <h1 class="text-header-left">{{ mailItem.title }}</h1>
     <p class="text-medium-left">发件人: {{ mailItem.from }}</p>
     <p class="text-medium-left">时间: {{ mailItem.date }}</p>
-    <div class="auto-wrap">
-      <p class="text-medium">{{ mailItem.content }} </p>
+    <div class="layout-round">
+      <div class="auto-wrap">
+        <p class="text-medium">{{ mailItem.content }} </p>
+      </div>
     </div>
   </div>
 </template>

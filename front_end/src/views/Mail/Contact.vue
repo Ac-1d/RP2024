@@ -1,5 +1,5 @@
 <template>
-  <el-container style="margin-left: 5vw;">
+  <el-container class="layout-middle">
     <el-table :data="contacts" style="width: 100%">
       <el-table-column label="联系人昵称" prop="name" width="180"></el-table-column>
       <el-table-column label="联系人账户" prop="userid" width="180"></el-table-column>

@@ -1,8 +1,8 @@
 <template>
-  <el-container>
+  <el-container class="layout-middle">
     <el-header>
       <el-container>
-        <el-aside style="width: auto; " >
+        <el-aside style="width: auto;">
           <el-button style="float: left; display: flex; margin-top: 20px;"
           @click="submitMessage" show-word-limit>发送</el-button>
         </el-aside>
