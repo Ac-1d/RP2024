@@ -34,7 +34,10 @@ export default{
   methods:{
     sendto(index, contacts){
       console.log('sending to '+contacts[index].name);
-      let data = contacts[index].userid
+      let data = {
+        title: '发送给'+contacts[index].name, 
+        content: contacts[index].name.userid, 
+        type: 'Send'};
       this.$emit('send', data); 
     },
     deleteRow(index, contacts){

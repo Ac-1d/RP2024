@@ -7,7 +7,7 @@
       </el-table-column>
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button @click="linkto({title: rows[scope.$index].title, content: rows[scope.$index]})"
+          <el-button @click="linkto({title: rows[scope.$index].title, content: rows[scope.$index], type:'MailDetail'})"
             type="text">查看
           </el-button>
         </template>

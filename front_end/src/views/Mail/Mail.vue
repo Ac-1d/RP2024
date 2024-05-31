@@ -53,7 +53,7 @@ export default{
 
       let NewTabName = tabname + '-' + this.tabid++;// 防止重名；不过这里tablabel是可以重名的
 
-      let item = {name: NewTabName, title: tablabel, content:tabcontent};
+      let item = {name: NewTabName, title: tablabel, content:tabcontent, type: data.type};
       this.editableTabs.push(item);
       this.page = NewTabName;
     },
