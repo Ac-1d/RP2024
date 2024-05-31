@@ -56,7 +56,7 @@
       </div>
     </el-main>
     <!-- 评论、回复框 -->
-    <el-main>
+    <el-footer style="min-height: 10vh;">
       <el-form :inline="true">
         <el-form-item style="width: 20vw;">
           <div><el-rate v-model="value" :colors="colors"></el-rate>
@@ -65,10 +65,11 @@
         </el-form-item>
         <el-form-item>
           <el-input :placeholder="replying?('正在回复'+comments[replyIndex].author):('输入评论')"
-          type="textarea" v-model="content" maxlength="10000" show-word-limit style="width: 50vw; display: flex;"/>
+          type="textarea" v-model="content" maxlength="10000" show-word-limit 
+          style="width: 60vw; display: flex; min-height: 10vh;"/>
         </el-form-item>
       </el-form>
-    </el-main>
+    </el-footer>
   </el-container>
 </template>
 

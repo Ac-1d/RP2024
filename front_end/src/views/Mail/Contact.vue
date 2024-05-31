@@ -28,12 +28,14 @@ export default{
   name: 'Contact',
   data() {
     return {
-      contacts: [],
+      contacts: [{name:'lzy', userid:101}, {name:'aaa', userid:102}],
     }
   },
   methods:{
     sendto(index, contacts){
       console.log('sending to '+contacts[index].name);
+      let data = contacts[index].userid
+      this.$emit('send', data); 
     },
     deleteRow(index, contacts){
       contacts.splice(index, 1);
