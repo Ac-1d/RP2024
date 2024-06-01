@@ -2,16 +2,12 @@
   <div id="ebook">
     <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
     <div id="epub_render"></div>
-    <!-- TODO: 陆续被替换的设计 -->
     <div id="buttons">
-      <!-- <button id="tableButton" @click="callTable">点我呼出菜单</button> -->
       <div id="tableButton">
         <el-button type="info" icon="el-icon-d-arrow-left" @click="prevPage" circle></el-button>
         <el-button type="info" icon="el-icon-setting" @click="callTable" circle></el-button>
         <el-button type="info" icon="el-icon-d-arrow-right" @click="nextPage" circle></el-button>
-        <!-- <button id="nextPageButton" @click="nextPage">点我向后翻页</button> -->
       </div>
-      <!-- <button id="prevPageButton" @click="prevPage">点我向前翻页</button> -->
     </div>
     <div id="table" v-if="showTable">
       <div id="bookInfo" class="side-bar">
@@ -33,7 +29,7 @@
         </div>
         <div class="bookInfo-body" v-if="showNavigation">
           <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
-            <hr v-if="item.index != 1" class="parting-line">
+            <hr class="parting-line">
             <span @click="setHref(item.href)">
               {{ item.index }}.{{ item.label }}
             </span>
@@ -45,7 +41,7 @@
           </div>
           <div v-else>
             <div v-for="item in searchResult" :key="item.index" class="text">
-              <hr v-if="item.index != 1" class="parting-line">
+              <hr class="parting-line">
               <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
             </div>
           </div>
@@ -57,7 +53,7 @@
       </div>
       <div id="setting" class="side-bar">
         <div id="header">
-          <el-form ref="settings" :model="settings" label-width="80px">
+          <el-form ref="settings" :model="settings" label-width="100px">
             <el-form-item label="深色模式">
               <el-switch v-model="settings.nightTheme"></el-switch>
             </el-form-item>
@@ -65,13 +61,19 @@
               <el-switch v-model="settings.isTakingNote"></el-switch>
             </el-form-item>
             <el-form-item label="笔记方式" v-if="settings.isTakingNote">
-              <el-radio-group v-model="settings.noteType" size="medium">
+              <el-radio-group v-model="settings.noteType" size="small">
                 <el-radio border label="underline">记笔记</el-radio>
                 <el-radio border label="highlight">高亮</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="显示他人笔记">
+              <el-switch v-model="settings.showOthersNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="显示个人笔记">
+              <el-switch v-model="settings.showPersonalNote"></el-switch>
             </el-form-item>
             <el-form-item label="字体大小" :rules="[
               { type: 'number', message: '字体大小必须为数字值' }
@@ -83,6 +85,23 @@
               <el-button @click="defaultFontSize">默认大小</el-button>
             </el-form-item>
           </el-form>
+        </div>
+        <el-form>
+          <el-form-item>
+            <el-button @click="showPersonalNote = true; showOthersNote = false">我的笔记</el-button>
+            <el-button @click="showPersonalNote = false; showOthersNote = true">他的笔记</el-button>
+          </el-form-item>
+        </el-form>
+        <div id="body">
+          <div v-if="showPersonalNote" class="contents">
+            <div v-for="item in personalNoteList" :key="item.index" class="text bookInfo-text">
+              <hr class="parting-line">
+              <span v-if="item.note && item.isPublic">{{ item.note }}</span>
+            </div>
+          </div>
+          <div v-if="showOthersNote" class="contents">
+            
+          </div>
         </div>
       </div>
     </div>
@@ -107,6 +126,9 @@ export default {
       showTable: true,
       showNavigation: true,
       showNoteInput: false,
+      showPersonalNote: true,
+      showOthersNote: false,
+      isNotePublic: false,
       noteText: '',
       coverUrl: '',
       metadata: null,
@@ -117,14 +139,15 @@ export default {
         nightTheme: false,
         isTakingNote: false,
         isRemovingNote: false,
+        showPersonalNote: true,
+        showOthersNote: false,
         noteType: '',
         fontSize: '',
       },
+      personalNoteList: [],
+      othersNoteList: [],
     }
   },
-  props: [
-    'showNav'
-  ],
   mounted() {
     this.epubReader = useEpub();
     this.loadEpub();
@@ -139,6 +162,7 @@ export default {
         if (this.settings.noteType == 'underline')
           this.showNoteInput = true
         this.epubReader.takeNote(this.settings.noteType)
+        console.log(this.noteList)
       }
     })
     rendition.on("markClicked", (cfiRange) => {
@@ -159,6 +183,7 @@ export default {
       else
         this.epubReader.setTheme(0)
     },
+
   },
   methods: {
     loadEpub() {
@@ -233,12 +258,16 @@ export default {
       })
     },
     finishTakeNote() {
-      this.epubReader.setNoteText(this.noteText)
+      this.epubReader.setNoteText(this.noteText, this.isNotePublic)
+      this.isNotePublic = false
       this.noteText = null
       this.showNoteInput = false
     },
+    parseNoteList() {
+
+    },
     test() {
-      this.epubReader.test();
+
     },
     emptyFunction() {
     },
@@ -316,8 +345,13 @@ export default {
 
       #header {
         width: 90%;
-        height: 164px;
         margin: 5% 5%;
+      }
+      #body {
+        width: 90%;
+        margin: 5% 5%;
+        height: calc(90% - 452px);
+        overflow: scroll;
       }
     }
 
