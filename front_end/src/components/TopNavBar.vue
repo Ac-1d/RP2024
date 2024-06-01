@@ -5,6 +5,7 @@
       <router-link to="/about">About</router-link>
       <router-link to="/reader">Reader</router-link>
       <router-link to="/creation">创作中心</router-link>
+      <router-link to="/mail">站内信</router-link>
     </div>
     <div class="right-links">
       <router-link to="/login">登录</router-link>
@@ -18,7 +19,7 @@ export default {
   name: "TopNavBar",
   data() {
     return {
-      showNavBar: false
+      showNavBar: true
     }
   }
 };

@@ -8,6 +8,19 @@
   "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
   font-size: medium
 }
+.text-medium-left {
+  font-family: 
+  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: medium;
+  text-align: left;
+}
+.text-header-left {
+  font-family: 
+  "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-size: larger;
+  text-align: left;
+  font-weight: bolder;
+}
 .auto-wrap {
   width: auto; /* 定义容器宽度 */
   word-wrap: break-word; /* 允许在长单词内部换行 */
