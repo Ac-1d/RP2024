@@ -82,12 +82,12 @@ export default{
       this.$refs.DraftsRef.addRow(draft);
       this.$alert('添加草稿 收信人：'+draft.sendto, '提示', {
         confirmButtonText: '确定',
-        // callback: action => {
-        //   this.$message({
-        //     type: 'info',
-        //     message: `action: ${ action }`
-        //   });
-        // }
+        callback: action => {
+          this.$message({
+            type: 'info',
+            message: `action: ${ action }`
+          });
+        }
       });
     },
   }
