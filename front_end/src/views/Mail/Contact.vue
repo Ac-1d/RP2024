@@ -5,16 +5,14 @@
       <el-table-column label="联系人账户" prop="userid" width="180"></el-table-column>
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button @click.native.prevent="sendto(scope.$index, contacts)"
-            type="text" size="small">发送消息
+          <el-button @click.native.prevent="sendto(scope.$index, contacts)" type="text">发送消息
           </el-button>
         </template>
       </el-table-column>
 
       <el-table-column fixed="right" width="120">
         <template slot-scope="scope">
-          <el-button @click.native.prevent="deleteRow(scope.$index, contacts)"
-            type="text" size="small">移除
+          <el-button @click.native.prevent="deleteRow(scope.$index, contacts)" type="text">移除
           </el-button>
         </template>
       </el-table-column>
@@ -36,7 +34,7 @@ export default{
       console.log('sending to '+contacts[index].name);
       let data = {
         title: '发送给'+contacts[index].name, 
-        content: contacts[index].name.userid, 
+        content: contacts[index].userid, 
         type: 'Send'};
       this.$emit('send', data); 
     },
