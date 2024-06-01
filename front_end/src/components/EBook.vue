@@ -100,7 +100,7 @@
             </div>
           </div>
           <div v-if="showOthersNote" class="contents">
-            
+
           </div>
         </div>
       </div>
@@ -108,16 +108,30 @@
     <div id="take-note-component" v-if="showNoteInput">
       <div id="mask"></div>
       <div id="note-input">
-        <p>笔记记录：</p>
-        <textarea id="input" v-model="noteText"></textarea><br>
-        <button @click="finishTakeNote">确认</button>
+        <div id="contents">
+          <el-form label-position="top" label-width="100px">
+            <el-form-item label="笔记记录">
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText" resize="none">
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <el-form>
+            <el-form-item label="是否公开" style="margin: 5% 10%">
+              <el-switch v-model="isNotePublic"></el-switch>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="finishTakeNote(true)">确认</el-button>
+              <el-button @click="finishTakeNote(false)">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { useEpub } from "../js/Ebook.js";
+import { useEpub } from "../js/Ebook.js"; 
 
 export default {
   name: "EBook",
@@ -183,7 +197,6 @@ export default {
       else
         this.epubReader.setTheme(0)
     },
-
   },
   methods: {
     loadEpub() {
@@ -257,8 +270,8 @@ export default {
         this.showNavigation = false
       })
     },
-    finishTakeNote() {
-      this.epubReader.setNoteText(this.noteText, this.isNotePublic)
+    finishTakeNote(isTakeNote) {
+      this.epubReader.setNoteText(this.noteText, this.isNotePublic, isTakeNote)
       this.isNotePublic = false
       this.noteText = null
       this.showNoteInput = false
@@ -377,11 +390,8 @@ export default {
       background: white;
       border: 1px dashed black;
       z-index: 9999;
-
-      #input {
-        height: 150px;
-        width: 250px;
-        resize: none;
+      #contents {
+        margin: 5%;
       }
     }
 

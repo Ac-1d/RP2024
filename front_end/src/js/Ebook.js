@@ -25,7 +25,7 @@ export function useEpub() {
     'yellow', 'green', 'pink', 'red'
   ]
   let fillColorIndex = 0
-  let noteList = [{cfi:"",note:"111",type:""},{cfi:"",note:"222",type:""}]
+  let noteList = []
   let themeList = [
     {
       name: 'Light',
@@ -226,14 +226,20 @@ export function useEpub() {
     rendition.annotations.remove(note.cfiRange, note.type)
     noteList.splice(noteList.indexOf(note))
   }
-
-  function setNoteText(noteText, isNotePublic) {
+  /**TODO: 此处代码有待处理：对笔记进行处理的流程应该重构(有时间的话) */
+  function setNoteText(noteText, isNotePublic, isTakeNote) {
     console.log("set note text")
     let note = noteList.pop()
-    note.note = noteText
-    note.isPublic = isNotePublic
-    console.log(note)
-    noteList.push(note)
+    if(isTakeNote){
+      note.note = noteText
+      note.isPublic = isNotePublic
+      console.log(note)
+      noteList.push(note)
+    }
+    else{
+      noteList.push(note)
+      removeMark(note.cfiRange)
+    }
   }
 
   function getNoteText(cfiRange) {
@@ -251,6 +257,7 @@ export function useEpub() {
 
   /**private function */
   function checkCFIRangeLegal(cfiRange) {
+    console.log("call check cfi range legel, cfiRange:", cfiRange)
     let {startCfi: _startCfi, endCfi: _endCfi} = cfiRange2cfi(cfiRange)
     let EF = new EpubCFI();
     for (let i = 0; i < noteList.length; i++) {
@@ -287,6 +294,7 @@ export function useEpub() {
 
   /**private function */
   function cfiRange2cfi(cfiRange) {
+    console.log("call cfi range 2 cfi, cfiRange: ", cfiRange)
     let cfiParts = cfiRange.split(','); 
     // 起始点
     let startCfi = cfiParts[0] + cfiParts[1] + ')';  
@@ -296,6 +304,7 @@ export function useEpub() {
   }
 
   function checkIsTakingNote() {
+    console.log(cfiRange)
     return cfiRange && checkCFIRangeLegal(cfiRange)
   }
 
