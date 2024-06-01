@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    isLoggedIn: true, // 初始登录状态为false 
+    isLoggedIn: false, // 初始登录状态为false 
     username: 'lzy',
     token: '12345678',
   },
