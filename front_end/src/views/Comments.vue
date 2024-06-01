@@ -2,10 +2,13 @@
   <el-container class="layout-round-middle">
     <!-- 用户信息 -->
     <el-header style="position: left">
+      <el-button type="text" @click="$store.dispatch('login', credentials)">
+        改变当前用户</el-button>
       <el-button class="text-larger" style="float: left;" type="primary"
       icon="el-icon-caret-left" @click="goback()"></el-button>
-      <p>用户名：{{ myname }}</p>
-      <p>ID-{{ myid }}</p>
+      <p>用户名：{{ userInfo.username }}</p>
+      <p>TOKEN-{{ userInfo.token }}</p>
+      
     </el-header>
     <!-- 评论显示 -->
     <el-main>
@@ -93,9 +96,15 @@ export default {
       // 传入用户id
     }
   },
+
   data() {
     return {
       bookId: 1,
+      userInfo: this.$store.state,
+      credentials: {
+        isLoggedIn: true,
+        token: '23456789',
+      },
       currentPage: 1, // 当前是第几页
       commentsPerPage: 5,
       value: 0, // 当前用户选择的评分

@@ -1,10 +1,8 @@
 <template>
 <div>
 <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-  <div v-for="(item, index) in strings" :key="index">
-        <el-menu-item :index="index">{{ item }}</el-menu-item>
-  </div>
-
+  <el-menu-item index="1">登录</el-menu-item>
+  <el-menu-item index="2">注册</el-menu-item>
 </el-menu>
 </div>
 </template>
@@ -13,12 +11,9 @@
   export default {
   name: "Menu",
   props: {
-    strings: {
-        type:Array,
-        default:()=>[],
-    },
-  },
+    Num: Number,
 
+  },
   data() {
     return {
       activeIndex: '1',

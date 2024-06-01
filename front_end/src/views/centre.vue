@@ -17,6 +17,7 @@
       <ul class='infoSide'>
         <li><h1>资料卡片:</h1></li>
         <li><strong>性别：</strong>{{ user.sex }}</li>
+        <li><strong>出生日期：</strong>{{ user.birth }}</li>
         <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
         <li><strong>个性签名：<br/></strong>{{ user.signature }}</li>
         <br>
@@ -53,6 +54,7 @@ export default {
          "level": 7,
          "nickname": "pizza_k",
          "sex": "女",
+         "birth":'2004.07.13',
          "signature": "远方，就是我站立的地方",
          "tele":"15513107588"
       },
