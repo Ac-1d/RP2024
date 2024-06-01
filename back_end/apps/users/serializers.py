@@ -78,19 +78,6 @@ class LoginModelSerializer(ModelSerializer):
         self.token = token
         return attrs
 
-#获取用户信息
-class UserInfoSerializer(ModelSerializer):
-    # lately_data = serializers.CharField()
-    class Meta:
-        model = models.User
-        #fields = ['username','mobile','email','gender','lately_data']
-        fields = ['username', 'email', 'gender', 'lately_data']
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if not data:  # 如果序列化后的数据为空
-            raise serializers.ValidationError("用户信息为空")
-        return data
 
 
 
