@@ -42,6 +42,7 @@ export default {
   emits: ['closedia'],
   data() {
     return {
+      pick: '',
       loginForm: {
         tele:'',
         username: '',
