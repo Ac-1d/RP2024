@@ -67,19 +67,23 @@
             <el-form-item label="笔记方式" v-if="settings.isTakingNote">
               <el-radio-group v-model="settings.noteType" size="medium">
                 <el-radio border label="underline">记笔记</el-radio>
-                <el-radio border label="highlight">高亮标注</el-radio>
+                <el-radio border label="highlight">高亮</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
             </el-form-item>
+            <el-form-item label="字体大小" :rules="[
+              { type: 'number', message: '字体大小必须为数字值' }
+            ]">
+              <el-input v-model.number="settings.fontSize" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="changeFontSize">设置</el-button>
+              <el-button @click="defaultFontSize">默认大小</el-button>
+            </el-form-item>
           </el-form>
         </div>
-        <h1>这里是设置</h1>
-        <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
-        调整字体大小：
-        <input type="text" v-model="fontSize">
-        <router-link to="/BookDetail">点我退出</router-link>
       </div>
     </div>
     <div id="take-note-component" v-if="showNoteInput">
@@ -103,7 +107,6 @@ export default {
       showTable: true,
       showNavigation: true,
       showNoteInput: false,
-      fontSize: '',
       noteText: '',
       coverUrl: '',
       metadata: null,
@@ -115,6 +118,7 @@ export default {
         isTakingNote: false,
         isRemovingNote: false,
         noteType: '',
+        fontSize: '',
       },
     }
   },
@@ -148,10 +152,6 @@ export default {
     })
   },
   watch: {
-    fontSize(newValue) {
-      console.log("call fontSize in watch");
-      this.changeFontSize(newValue);
-    },
     'settings.nightTheme': function(nightTheme) {
       console.log("call set night theme",nightTheme)
       if(nightTheme)//true为深色模式
@@ -200,9 +200,13 @@ export default {
     callTable() {
       this.showTable = !this.showTable;
     },
-    changeFontSize(fontSize) {
+    changeFontSize() {
       console.log("call setFontSize");
-      this.epubReader.setFontSize(fontSize);
+      this.epubReader.setFontSize(this.settings.fontSize);
+    },
+    defaultFontSize() {
+      this.settings.fontSize = null
+      this.epubReader.setFontSize(16)
     },
     doSearch() {
       console.log("call do search")
@@ -241,7 +245,7 @@ export default {
     setHref(href) {
       console.log("set page to", href)
       this.epubReader.getRendition().display(href)
-    }
+    },
   },
   beforeDestroy() {
     // TODO: 销毁监听器
@@ -311,8 +315,9 @@ export default {
       right: 0;
 
       #header {
-        width: 100%;
+        width: 90%;
         height: 164px;
+        margin: 5% 5%;
       }
     }
 
