@@ -1,0 +1,6 @@
+apps/__pycache__/
+apps/novels/__pycache__/
+apps/novels/migrations/__pycache__/
+apps/users/__pycache__/
+apps/users/migrations/__pycache__/
+back_end/__pycache__/
