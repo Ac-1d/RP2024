@@ -11,11 +11,11 @@
     <el-form :model="regisForm" :rules="rules" ref="regisForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
       <el-form-item label="电话" prop="tele">
-        <el-input v-model="regisForm.tele"></el-input>
+        <el-input v-model="regisForm.tele" autocomplete="off"></el-input>
       </el-form-item>
 
       <el-form-item  label="用户名" prop="username">
-        <el-input v-model="regisForm.username"></el-input>
+        <el-input v-model="regisForm.username" autocomplete="off"></el-input>
       </el-form-item>
 
       <el-form-item label="密码" prop="password">
@@ -92,10 +92,26 @@ export default {
           })
           .catch(() => {});
     },
+    logdialogclose() {
+       this.$confirm('确认关闭？')
+           .then(() => {
+               console.log('close');
+               this.regisForm.tele='',
+               this.regisForm.username= '',
+               this.regisForm.password= '',
+               this.regisForm.password2= '',
+               console.log('tele');
+               console.log(this.tele);
+               this.$emit('closedia');
+           })
+           .catch(() => {});
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-            alert('提交成功!');
+            alert('注册成功!');
+            this.$refs[formName].resetFields();
+            this.$emit('closedia');
         }else{
             console.log('错误提交!!');
             return false;
