@@ -25,7 +25,7 @@ export function useEpub() {
     'yellow', 'green', 'pink', 'red'
   ]
   let fillColorIndex = 0
-  let noteList = []
+  let noteList = [{cfi:"",note:"111",type:""},{cfi:"",note:"222",type:""}]
   let themeList = [
     {
       name: 'Light',
@@ -194,7 +194,7 @@ export function useEpub() {
             console.error("unkown operation")
             break;
         }
-        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType})
+        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType, isPublic: false})
         console.log("push cfiRange to noteList")
       }
       contents.window.getSelection().removeAllRanges();
@@ -227,10 +227,11 @@ export function useEpub() {
     noteList.splice(noteList.indexOf(note))
   }
 
-  function setNoteText(noteText) {
+  function setNoteText(noteText, isNotePublic) {
     console.log("set note text")
     let note = noteList.pop()
     note.note = noteText
+    note.isPublic = isNotePublic
     console.log(note)
     noteList.push(note)
   }
@@ -309,6 +310,10 @@ export function useEpub() {
     ).then((results) => Promise.resolve([].concat.apply([], results)))
   }
 
+  function getNoteList() {
+    return noteList
+  }
+
   // function search(text) {
   //   book.ready.then(() => {
   //     doSearch(text).then((results) =>{
@@ -326,13 +331,13 @@ export function useEpub() {
   /**用于hack epubjs源码^^
    * 或是一些临时的测试函数
    */
-  function test() {
-    
+  function test(location) {
+    rendition.display(location)
   }
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
     setForNote, takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
-    doSearch, checkIsTakingNote
+    doSearch, checkIsTakingNote, getNoteList
   }
 }
