@@ -16,6 +16,10 @@ export function login(username, password) {
   else return 'failed!';
 }  
 
+export function novels() {
+  console.log('novels');
+  return axios.get('/novels/novel');
+}
 // export function login2() {
 //   let baseURL = 'http://127.0.0.1:8000';
 //   let ruleForm = {"username":"A", "password":"123"};
