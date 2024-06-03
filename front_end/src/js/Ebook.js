@@ -19,8 +19,6 @@ export function useEpub() {
    */
   let currentLocation
   let isLocationLoadFinished = false
-  let cfiRange
-  let contents
   let fillColorList = [//一些合理的颜色选择
     'yellow', 'green', 'pink', 'red'
   ]
@@ -165,46 +163,32 @@ export function useEpub() {
     rendition.display(location)
   }
 
-  function setForNote(_cfiRange, _contents) {
-    cfiRange = _cfiRange
-    contents = _contents
-    console.log(cfiRange, contents)
-  }
 
   /**epubjs中编辑样式是使用svg来实现的 */
   //TODO: 几乎解决了自定义样式的问题，但下划线颜色无法编辑
-  function takeNote(takeNoteType) {
+  function takeNote(takeNoteType, cfiRange) {
     console.log("try to take note")
-    if (cfiRange) {//
-      if(checkCFIRangeLegal(cfiRange)){
-        switch (takeNoteType) {
-          case 'highlight':
-            rendition.annotations.highlight(cfiRange, {}, () => {}, null, {
-              "fill": fillColorList[fillColorIndex]
-            });
-            break;
-          case 'underline':
-            rendition.annotations.underline(cfiRange, {}, () => {}, null, {
-              "stroke": 'transparent',
-              "stroke-opacity": "0.8",
-              "mix-blend-mode": "normal"
-            })
-            break;
-          default:
-            console.error("unkown operation")
-            break;
-        }
-        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType, isPublic: false})
-        console.log("push cfiRange to noteList")
-      }
-      contents.window.getSelection().removeAllRanges();
-      cfiRange = null
+    switch (takeNoteType) {
+      case 'highlight':
+        rendition.annotations.highlight(cfiRange, {}, () => { }, null, {
+          "fill": fillColorList[fillColorIndex]
+        });
+        break;
+      case 'underline':
+        rendition.annotations.underline(cfiRange, {}, () => { }, null, {
+          "stroke": 'transparent',
+          "stroke-opacity": "0.8",
+          "mix-blend-mode": "normal"
+        })
+        break;
+      default:
+        console.error("unkown operation")
+        break;
     }
-    else
-      console.warn("cfiRange is undefined")
-  }
+    noteList.push({ 'cfiRange': cfiRange, 'note': null, 'type': takeNoteType, isPublic: false })
+    console.log("push cfiRange to noteList")
 
-
+}
 
   function setFillColor(index) {
     fillColorIndex = index
@@ -255,7 +239,7 @@ export function useEpub() {
     return noteText
   }
 
-  /**private function */
+  
   function checkCFIRangeLegal(cfiRange) {
     console.log("call check cfi range legel, cfiRange:", cfiRange)
     let {startCfi: _startCfi, endCfi: _endCfi} = cfiRange2cfi(cfiRange)
@@ -303,11 +287,6 @@ export function useEpub() {
     return {startCfi, endCfi}
   }
 
-  function checkIsTakingNote() {
-    console.log(cfiRange)
-    return cfiRange && checkCFIRangeLegal(cfiRange)
-  }
-
   function doSearch(q) {
     return Promise.all(
       book.spine.spineItems.map((section) => 
@@ -346,7 +325,7 @@ export function useEpub() {
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    setForNote, takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText,
-    doSearch, checkIsTakingNote, getNoteList
+    takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, checkCFIRangeLegal,
+    doSearch, getNoteList
   }
 }
