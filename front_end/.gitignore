@@ -21,4 +21,5 @@ yarn-error.log*
 *.sw?
 
 # Personal notes
-note
+note.md
+tests/private_test/
