@@ -20,12 +20,13 @@
 <script>
 import Login_window from "@/components/Login_window.vue"
 import Register_window from "@/components/Register_window.vue"
+import { mapState } from 'vuex';
 export default {
   name: "TopNavBar",
   components: { Login_window , Register_window},
   data() {
     return {
-      showNavBar: true,
+      // showNavBar: true,
       showLog: false, // Boolean 用于dialog隐藏/显示
       showRegis:false,
     }
@@ -49,7 +50,9 @@ export default {
     },
 
   },
-
+  computed: {
+    ...mapState(['showNavBar'])
+  }
 };
 </script>
 

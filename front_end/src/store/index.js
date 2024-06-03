@@ -8,6 +8,7 @@ export default new Vuex.Store({
     isLoggedIn: true, // 初始登录状态为false 
     username: 'lzy',
     token: '12345678',
+    showNavBar: true,
   },
   mutations: {
     LOGIN(state, payload) {  
@@ -22,7 +23,11 @@ export default new Vuex.Store({
       // 你可以在这里清除其他登录相关的状态  
       // state.username = null  
       // state.token = null  
-    }  
+    },
+    setShowTopBar(state) {
+      console.log("call set show top bar")
+      state.showNavBar = !state.showNavBar
+    }
   },
   actions: {
     login({ commit }, payload) {  
