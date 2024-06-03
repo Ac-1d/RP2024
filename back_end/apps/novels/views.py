@@ -128,13 +128,6 @@ class AddNovelAPIView(APIView):
         return Response({'status':200,'msg':'加入书架成功'})
 
 
-#查询已经购买的小说的章节
-class SelectChapter(APIView):
-    def get(self,request,*args,**kwargs):
-        pass
-
-
-
 #小说最近阅读接口
 class RecentlyNovelAPIView(APIView):
     authentication_classes = [JSONWebTokenAuthentication]
