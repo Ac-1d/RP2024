@@ -19,15 +19,3 @@ new Vue({
   store,
   render: h => h(App),
 }).$mount("#app");
-
-// import axios from 'axios';  
- 
-axios.get('users/login')  
-  .then(response => {  
-    // 处理响应数据  
-    console.log(response.data);  
-  })  
-  .catch(error => {  
-    // 处理错误  
-    console.error(error);  
-  });
