@@ -1,50 +1,77 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import axios from 'axios';  
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    isLoggedIn: true, // 初始登录状态为false 
-    username: 'lzy',
-    token: '12345678',
+    loggedIn: false, // 状态：是否已经登录
+    verify: null, // 用户登录时的身份验证结果
+    userInfo: null,
     showNavBar: true,
   },
   mutations: {
-    LOGIN(state, payload) {  
-      // 假设payload是一个对象，包含了登录后的数据，如用户名、token等  
-      state.isLoggedIn = true;
-      // 你可以在这里设置其他登录后的状态  
-      state.username = payload.username; 
-      state.token = payload.token;
+    LOGIN(state, data) { 
+      // data是登录请求返回数据
+      state.loggedIn = true;
+      state.verify = data;
     },  
     LOGOUT(state) {  
-      state.isLoggedIn = false  ;
-      // 你可以在这里清除其他登录相关的状态  
-      // state.username = null  
-      // state.token = null  
+      state.loggedIn = false;
+      state.verify = null;
+      state.userInfo = null;
     },
     setShowTopBar(state) {
       console.log("call set show top bar")
       state.showNavBar = !state.showNavBar
+    },
+    GetUserInfo(state, userInfo) {
+      state.userInfo = userInfo;
     }
   },
   actions: {
-    login({ commit }, payload) {  
-      // 这里通常是一个异步操作，比如发送一个API请求来验证登录凭据  
-      // 假设验证成功，我们提交一个mutation来改变状态  
-      commit('LOGIN', payload);
+    async login({ commit }, loginData) { 
+      let username = loginData.username;
+      let password = loginData.password;
+      let msg = '登录失败';
+      if (username && password) {
+        await axios.post("/users/login", {  
+          username: username,  
+          password: password,
+        }).then(response => {
+          if (response.data.status == 200 && response.data.msg == '登录成功') {
+            commit('LOGIN', response.data);
+            msg = '登录成功';
+          }
+        }).catch(error => {
+          msg = '验证失败，错误码：' + error.response.status;
+        })
+      }
+      return {msg: msg};
     },  
-    logout({ commit }) {  
-      // 同样，这里可能包含一些清理逻辑，比如删除token等  
-      this.state.token = '';
-      // 然后我们提交一个mutation来改变状态  
+    logout({ commit }) {
       commit('LOGOUT');
-    }  
+    },
+    async getUserInfo({ commit }) {  
+      if (!this.state.loggedIn) return '请先登录';
+      let token = this.state.verify.token;  
+      await axios.get('/users/userinfo', {  
+        headers: {  
+          'Authorization': `Bearer ${token}`  
+        }  
+      }).then (response => {
+        commit('GetUserInfo', response.data.info);
+        return response.data.info;
+      }).catch (error => {  
+        console.error(error);
+        return '出现错误';
+      })
+    }
   },
   getters: {
-    isLoggedIn: state => state.isLoggedIn,  
-    
+    loggedIn: state => state.loggedIn,  
+    showNavBar: state => state.showNavBar,
   },
   modules: {}
 });

@@ -2,15 +2,16 @@
   <div class="top-nav-bar" v-if="showNavBar">
     <div class="left-links">
       <router-link to="/">Home</router-link>
-      <router-link to="/about">About</router-link>
+      <router-link to="/Center">Center</router-link>
       <router-link to="/reader">Reader</router-link>
       <router-link to="/creation">创作中心</router-link>
       <router-link to="/mail">站内信</router-link>
     </div>
     <div class="right-links">
-      <el-button type="text" @click="show_logBox">登录</el-button>
+      <el-button class='button' type="text" @click="show_logBox">登录</el-button>
       <Login_window :dialogflag="showLog" @closedia="closeLog"  ></Login_window>
-      <el-button type="text" @click="show_regBox">注册</el-button>
+
+      <el-button class='button' type="text" @click="show_regBox">注册</el-button>
       <Register_window :dialogflag="showRegis" @closedia="closeRegis"  ></Register_window>
 
     </div>
@@ -74,5 +75,8 @@ export default {
 }
 .right-links {
   margin-left: auto;
+}
+.button{
+    margin-left:5px;
 }
 </style>

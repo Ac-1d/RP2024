@@ -3,10 +3,10 @@
     <header class="header">
         <div class="header-content">
             <div class="avatar">
-                <img src="@/assets/Avatar.jpg" alt="Avatar" />
+                <img :src="user.avatar_path" alt="Avatar" />
             </div>
             <ul class="info" >
-            <li class='NickName'><strong>昵称：</strong>{{ user.nickname }}</li>
+            <li class='NickName'><strong>昵称：</strong>{{ user.nickName }}</li>
                 <li class='Level'><strong>等级：</strong>lv{{ user.level }}</li>
             </ul>
 
@@ -16,10 +16,10 @@
     <aside class="sidebar">
       <ul class='infoSide'>
         <li><h1>资料卡片:</h1></li>
-        <li><strong>性别：</strong>{{ user.sex }}</li>
-        <li><strong>出生日期：</strong>{{ user.birth }}</li>
+        <li><strong>性别：</strong>{{ user.sex || '暂未选择' }}</li>
+        <li><strong>出生日期：</strong>{{ formattedBirth || '暂未填写' }}</li>
         <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
-        <li><strong>个性签名：<br/></strong>{{ user.signature }}</li>
+        <li><strong>个性签名：<br/></strong>{{ user.signature || '暂未填写'}}</li>
         <br>
         <li>
         <el-button @click="showModi = true" type="primary" plain >
@@ -32,7 +32,7 @@
       <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
     </main>
     </header>
-    <Modify_info :drawer="showModi" @closedia="showModi = false"></Modify_info>
+    <Modify_info :drawer="showModi" :ruleForm="user" @closedia="showModi = false" @send = "changeModify"></Modify_info>
   </div>
 </template>
 
@@ -51,22 +51,53 @@ export default {
       books:booksData,
       user:{
          "ID": "U88965",
+         "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
          "level": 7,
-         "nickname": "pizza_k",
+         "nickName": "pizza_k",
          "sex": "女",
-         "birth":'2004.07.13',
-         "signature": "远方，就是我站立的地方",
-         "tele":"15513107588"
+         "birth": new Date('2004-07-13'),
+         "signature": "",
+         "tele":"15513107588",
+         "password":'59jkb2h0',
       },
       showModi: false,
     };
   },
+  methods:{
+      changeModify(newInfo){
+        this.user.nickName = newInfo.nickName;
+        this.user.sex = newInfo.sex;
+        this.user.signature = newInfo.signature;
+        this.user.birth = newInfo.birth;
+        console.log('center'+this.user.nickName);
+
+      }
+  },
 
   computed:{
     hiddenTele(){
+        console.log('TeleBegin');
         const prefix = this.user.tele.substring(0, 3);
         const suffix = this.user.tele.substring(this.user.tele.length - 2);
+        console.log('TeleEnd');
         return `${prefix}****${suffix}`;
+
+    },
+    formatNumber(n) { // 辅助函数，用于补零操作，确保月份和日期始终为两位数
+      n = n.toString();
+      return n[1] ? n : '0' + n;
+    },
+
+    formattedBirth() {
+      let temp;
+      const year = this.user.birth.getFullYear();
+      temp = this.user.birth.getMonth() + 1;// 月份是从0开始的，所以需要+1
+      temp = temp.toString();
+      const month = temp[1] ? temp : '0' +temp ;
+      temp = this.user.birth.getDate() ;
+      temp = temp.toString();
+      const day = temp[1] ? temp : '0' +temp ;
+      return `${year}.${month}.${day}`;
     },
     paginatedBooks() {
     // 假设你有一个分页逻辑，这里简单返回全部书籍作为示例
@@ -80,51 +111,54 @@ export default {
 <style scoped>
 .center {
   display: flex;
+  flex-direction: column ;
   align-items: center;
-
+  height: 100vh;
 }
 
 .header {
+
   background-image: url('../assets/center_back.jpg');
-  position:absolute;
-  top:65px;
-  left:50px;
-  right:50px;
-  height:200px;
+  flex: 0 0 30%; /* 高度固定为30%，不可伸缩 */
+  margin-top: 0.3%;
+  margin-bottom: 0.3%;
+  width: 90%;
 
   background-size: cover;
   background-position: top;
 
   color: #333; /* 设置字体颜色 */
-}
-.down {
-  position:absolute;
-  top:265px;
-  left:50px;
-  right:50px;
-  height:430px;
-}
-
-.header-content {
   text-align: left;
   color: black;
+
+  position: relative;
 }
+.down {
+  flex: 1; /* 剩余空间均分给底部容器 */
+  display: flex; /* 底部容器也需要是Flex布局来安排左右组件 */
+  justify-content: space-between; /* 左右两侧分别靠边，中间自然间隔 */
+  padding: 0 5%; /* 左右边界各留5%的间距 */
+}
+
+
 .avatar {
-  width: 100px;
-  height: 100px;
+  position: absolute;
+  left: 8%;
+  top: 40%;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
 }
 
 .avatar img {
-  position:absolute;
-  bottom:30px;
-  left:100px;
   border-radius: 45%;
-  width: 110px;
-  height: 110px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
+  border: 3px solid rgba(170, 110, 140, 0.3);
+
 }
 .NickName {
     font-size:30px;
@@ -133,13 +167,9 @@ export default {
     font-size:20px;
 }
 .sidebar {
-  position:absolute;
-  top:2px;
-  left:0px;
-  width:200px;
-  height:100%;
+  flex: 0 0 18%;
   background-color: #f5f5f5;
-
+  margin-right: 3%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 增加阴影效果 */
   font-size: 14px; /* 设置字体大小 */
   color: #333; /* 设置字体颜色 */
@@ -150,19 +180,14 @@ export default {
 .infoSide{
   color: #555; /* 设置字体颜色 */
   list-style-type: none;
-  position:absolute;
-  top:20px;
-  left:0px;
-  right:30px;
+  margin-right: 10%;
+  margin-left: 3%;
   text-align: left; /* 设置左对齐 */
   line-height: 30px; /* 设置行距为15px */
+  padding:20px;
 }
 .main {
-  position:absolute;
-  top:2px;
-  left:205px;
-  right:0px;
-  height:100%;
+  flex:1;
   background-color: #fff;
   display: flex;
   flex-wrap: wrap;
@@ -170,10 +195,12 @@ export default {
 }
 
 .info {
+  position: relative; /* 文本相对于其正常流位置定位 */
+  top:90%;
+
+  margin-top: 10%;
+  margin-left: 20%;
   list-style-type: none;
-  position:absolute;
-  bottom:10px;
-  left:210px;
   color: #555; /* 设置字体颜色 */
   font-weight: bold;
 }

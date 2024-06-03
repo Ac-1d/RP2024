@@ -4,7 +4,9 @@
       <div class="title-section">
         <h1>{{ book.title }}</h1>
         <div class="book-info">
-          <img :src="bookImage" :alt="book.title" />
+          <div class="book-cover" @click="startReading">
+            <img :src="bookImage" :alt="book.title" />
+          </div>
           <div class="details">
             <p><strong>作者:</strong> {{ book.author }}</p>
             <p><strong>出版社:</strong> {{ book.publisher }}</p>
@@ -14,6 +16,7 @@
             <p><strong>定价:</strong> {{ book.price }}</p>
             <p><strong>装帧:</strong> {{ book.binding }}</p>
             <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+            <button @click="startReading" class="read-button">阅读</button>
           </div>
         </div>
       </div>
@@ -37,13 +40,20 @@
       <button class="read-status">读过</button>
       <div class="rating">
         <span>评价:</span>
-        <span class="stars">★★★★★</span>
+        <div class="stars" @mouseleave="resetRating">
+          <span v-for="star in 5" :key="star"
+                @mouseover="setRating(star)"
+                @click="rateBook(star)"
+                :class="{'active-star': star <= currentRating, 'inactive-star': star > currentRating}">
+            ★
+          </span>
+        </div>
+        <span>{{ ratingText }}</span>
       </div>
     </div>
     <div class="extra-actions">
       <a href="#"><span class="icon">🖊️</span> 写笔记</a>
       <a href="#" @click="linktoComments"><span class="icon">🖊️</span> 写书评</a>
-      <!-- 链接到评论页面 -->
       <a href="#"><span class="icon">¥</span> 加入购物单</a>
       <a href="#"><span class="icon">+</span> 添加到书单</a>
       <a href="#">分享</a>
@@ -71,6 +81,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: "BookDetail",
   data() {
@@ -93,7 +105,9 @@ export default {
         rating_distribution: {},
         professional_reviews: "",
         table_of_contents: []
-      }
+      },
+      currentRating: 0,
+      finalRating: 0,
     };
   },
   computed: {
@@ -102,20 +116,41 @@ export default {
     },
     ratingDistribution() {
       return this.book.rating_distribution;
+    },
+    ratingText() {
+      const ratings = ['很差', '较差', '还行', '推荐', '力荐'];
+      return ratings[this.currentRating - 1] || '';
     }
   },
   created() {
     const bookId = this.$route.params.bookId;
     this.book = this.getBookById(bookId);
+    this.finalRating = this.book.rating; // 假设book.rating是最终评分
   },
   methods: {
+    ...mapActions(['setCurrentBookId']),
+    startReading() {
+      this.setCurrentBookId(this.book.id);
+      this.$router.push({ name: 'Reader' });
+    },
     linktoComments() {
-      console.log('linking ...')
       this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
     },
     getBookById(id) {
       const booksData = require("@/assets/book.json");
       return booksData.find(book => book.id == id);
+    },
+    setRating(star) {
+      this.currentRating = star;
+    },
+    resetRating() {
+      this.currentRating = this.finalRating;
+    },
+    rateBook(star) {
+      this.finalRating = star;
+      this.currentRating = star;
+      // 这里可以添加逻辑，例如将评分发送到服务器
+      console.log(`评分为: ${star}`);
     }
   }
 };
@@ -151,6 +186,15 @@ export default {
   margin-bottom: 20px;
 }
 
+.book-cover {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.book-cover:hover {
+  transform: scale(1.1);
+}
+
 .book-info img {
   width: 150px;
   height: 200px;
@@ -159,6 +203,21 @@ export default {
 
 .details p {
   margin: 5px 0;
+}
+
+.read-button {
+  display: block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.read-button:hover {
+  background-color: #0056b3;
 }
 
 .rating {
@@ -211,17 +270,25 @@ export default {
   border-radius: 5px;
 }
 
-.rating {
-  display: flex;
-  align-items: center;
-}
-
 .rating span {
   margin-right: 5px;
 }
 
 .stars {
-  color: #ff9900;
+  cursor: pointer;
+}
+
+.stars span {
+  font-size: 24px;
+  color: #ccc;
+}
+
+.stars .active-star {
+  color: orange;
+}
+
+.stars .inactive-star {
+  color: #ccc;
 }
 
 .extra-actions a {

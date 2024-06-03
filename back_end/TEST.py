@@ -1,4 +1,6 @@
 import jwt
+from back_end.settings import MEDIA_ROOT, BASE_DIR
+
 
 def decode_jwt_token(token, secret_key):
     try:
@@ -31,4 +33,4 @@ def main():
         print("解析失败")
 
 if __name__ == "__main__":
-    main()
+    print(MEDIA_ROOT)
