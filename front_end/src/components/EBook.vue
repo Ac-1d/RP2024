@@ -170,13 +170,13 @@ export default {
   mounted() {
     this.$store.commit('setShowTopBar')
     console.log("the book id is ", this.currentBookId)
-    axios.get('http://127.0.0.1:8000/novels/bookrack?user_id=1')
-      .then(response =>{
-        console.log("response: ", response)
-      })
-      .catch(error =>{
-        console.error("error: ", error)
-      })
+    // axios.get('http://127.0.0.1:8000/novels/bookrack?user_id=1')
+    //   .then(response =>{
+    //     console.log("response: ", response)
+    //   })
+    //   .catch(error =>{
+    //     console.error("error: ", error)
+    //   })
     this.epubReader = useEpub();
     this.loadEpub();
     //this.loadMark()
@@ -223,36 +223,45 @@ export default {
   },
   methods: {
     loadEpub() {
-      //文件路径需要请求获取
-      const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
-      console.log(book)
-      book.loaded.cover.then((cover) => {
-        if (cover) {
-          book.archive.createUrl(cover).then((_url) => {
-            this.coverUrl = _url
-            console.log("parse url:", this.coverUrl)
+      const url = "http://127.0.0.1:8000/novels/chapter?id=" + this.currentBookId + "&" + "chapter_id=1"//chapterid等待其他组件传值
+      console.log(url)
+      axios.get(url)
+        .then(response => {//有待拆分
+          console.log("response: ",response)
+          const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
+          console.log(book)
+          book.loaded.cover.then((cover) => {
+            if (cover) {
+              book.archive.createUrl(cover).then((_url) => {
+                this.coverUrl = _url
+                console.log("parse url:", this.coverUrl)
+              })
+            }
+            else {//TODO: 无封面加载一个默认封面
+    
+            }
           })
-        }
-        else {//TODO: 无封面加载一个默认封面
-
-        }
-      })
-      book.loaded.metadata.then((_metadata) => {
-        this.metadata = _metadata
-        console.log("parse metadata:", this.metadata)
-      })
-      book.loaded.navigation.then((nav) => {
-        let index = 0
-        nav.toc.forEach((toc) => {
-          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
+          book.loaded.metadata.then((_metadata) => {
+            this.metadata = _metadata
+            console.log("parse metadata:", this.metadata)
+          })
+          book.loaded.navigation.then((nav) => {
+            let index = 0
+            nav.toc.forEach((toc) => {
+              this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
+            })
+            console.log("parse navigation")
+          })
+          this.epubReader.render("epub_render", {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            allowScriptedContent: true
+          });
         })
-        console.log("parse navigation")
-      })
-      this.epubReader.render("epub_render", {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        allowScriptedContent: true
-      });
+        .catch(error => {
+          console.error("error: ", error)
+        })
+      //文件路径需要请求获取
     },
     prevPage() {
       this.epubReader.prevPage();
