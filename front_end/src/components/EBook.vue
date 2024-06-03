@@ -45,10 +45,6 @@
               <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
             </div>
           </div>
-          <!-- <div v-for="item in searchResult" :key="item.index" class="text">
-              <hr v-if="item.index != 1" class="parting-line">
-              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
-          </div> -->
         </div>
       </div>
       <div id="setting" class="side-bar">
@@ -69,10 +65,6 @@
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
             </el-form-item>
-            <!-- 可能不需要 -->
-            <el-form-item label="显示他人笔记">
-              <el-switch v-model="settings.showOthersNote"></el-switch>
-            </el-form-item>
             <el-form-item label="显示个人笔记">
               <el-switch v-model="settings.showPersonalNote"></el-switch>
             </el-form-item>
@@ -85,8 +77,12 @@
               <el-button type="primary" @click="changeFontSize">设置</el-button>
               <el-button @click="defaultFontSize">默认大小</el-button>
             </el-form-item>
+            <el-form-item>
+              <el-button type="danger" @click="exit">退出阅读</el-button>
+            </el-form-item>
           </el-form>
         </div>
+        <el-divider></el-divider>
         <el-form>
           <el-form-item>
             <el-button @click="showPersonalNote = true; showOthersNote = false">我的笔记</el-button>
@@ -310,6 +306,13 @@ export default {
     loadMark() {
       //请求获取他人笔记与私人笔记
     },
+    exit() {
+      const url = '/book/' + this.currentBookId
+      if(this.currentBookId)
+        this.$router.push(url)
+      else
+        this.$router.push('/home')
+    },
     test() {
 
     },
@@ -369,13 +372,13 @@ export default {
           object-fit: contain;
         }
 
-        #bookInfo-text {
+        #bookInfo-text {//对低高度适配性极差^^'
           margin-top: 5%;
           height: 95%;
           width: 60%;
           display: flex;
           flex-direction: column;
-
+          // overflow: scroll;
           #block {
             width: 100%;
           }
@@ -391,11 +394,13 @@ export default {
       #header {
         width: 90%;
         margin: 5% 5%;
+        max-height: 50%;
+        overflow: scroll;
       }
       #body {
         width: 90%;
         margin: 5% 5%;
-        height: calc(90% - 452px);
+        height: 50%;
         overflow: scroll;
       }
     }
