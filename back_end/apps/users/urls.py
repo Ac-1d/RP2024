@@ -4,6 +4,7 @@ from . import views
 
 
 urlpatterns = [
-    path('login',views.LoginAPIView.as_view()),
-    path('userinfo',views.UserInfoAPIView.as_view()),
+    path('login',views.LoginAPIView.as_view()),#登录接口
+    path('userinfo',views.UserInfoAPIView.as_view()),#用户信息接口
+    path('register',views.RegisterView.as_view())#注册接口
 ]

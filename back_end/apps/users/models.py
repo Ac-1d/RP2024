@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser, Group, Permission
@@ -14,6 +16,7 @@ class User(AbstractUser):
     groups = models.ManyToManyField(Group, related_name='custom_user_set', blank=True, verbose_name='用户组')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set', blank=True,
                                               verbose_name='用户权限')
+    is_author = models.BooleanField(default=False, verbose_name='是否为作者')
 
     @property
     def lately_data(self):

@@ -1,6 +1,8 @@
 import json
 
 from django.shortcuts import render
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -13,6 +15,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 import jwt
 from django.http import HttpRequest
 from rest_framework.exceptions import AuthenticationFailed
+from ..novels.serializers import NovelAllSerializer
 
 # 登录接口
 class LoginAPIView(APIView):
@@ -81,10 +84,19 @@ class UserInfoAPIView(APIView):
             'mobile': user_info.mobile,
             'email': user_info.email,
             'gender': user_info.gender,
-            'lately_data': user_info.lately_data
+            'lately_data': user_info.lately_data,
+            'is_author': user_info.is_author
         }
 
         return Response({'info': response_data})
 
+#注册接口
+class RegisterView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            return Response({'message': '注册成功', 'user_id': user.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
