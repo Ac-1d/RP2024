@@ -3,10 +3,6 @@ import axios from 'axios';
 
 const replyLimitTime = 5000;// 5秒响应时间
 
-// 查询用户信息
-export function userInfo() {
-
-}
 // 查找小说类别
 export function category() {
   console.log('category');
