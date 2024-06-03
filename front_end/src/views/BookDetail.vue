@@ -63,18 +63,23 @@
       <h2>内容简介</h2>
       <p>{{ book.description }}</p>
     </div>
-    <div class="professional-reviews" v-if="book.professional_reviews">
-      <h2>专业评论</h2>
-      <p>{{ book.professional_reviews }}</p>
-    </div>
     <div class="author-info">
       <h2>作者简介</h2>
       <p>{{ book.author_intro }}</p>
     </div>
-    <div class="table-of-contents" v-if="book.table_of_contents">
-      <h2>目录</h2>
+    <div class="book-reviews">
+      <h2>书籍评论</h2>
+      <div v-for="comment in filteredComments" :key="comment.text" class="comment">
+        <p><strong>{{ comment.author }}:</strong> {{ comment.text }}</p>
+        <p>评分: {{ comment.rank_value }} | 点赞: {{ comment.likes }} | 时间: {{ comment.time }}</p>
+      </div>
+    </div>
+    <div class="book-chapters">
+      <h2>章节</h2>
       <ul>
-        <li v-for="(item, index) in book.table_of_contents" :key="index">{{ item }}</li>
+        <li v-for="chapter in chapters" :key="chapter.chapter_id" @click="selectChapter(chapter.chapter_id)">
+          {{ chapter.novel_chapter }}
+        </li>
       </ul>
     </div>
   </div>
@@ -82,6 +87,8 @@
 
 <script>
 import { mapActions } from 'vuex';
+import axios from 'axios';
+import reviews from '@/assets/reviews.json'; // 导入评论数据
 
 export default {
   name: "BookDetail",
@@ -108,6 +115,9 @@ export default {
       },
       currentRating: 0,
       finalRating: 0,
+      reviews: reviews, // 加载评论数据
+      chapters: [], // 章节数据
+      selectedChapter: null, // 选中的章节号
     };
   },
   computed: {
@@ -120,21 +130,26 @@ export default {
     ratingText() {
       const ratings = ['很差', '较差', '还行', '推荐', '力荐'];
       return ratings[this.currentRating - 1] || '';
+    },
+    filteredComments() {
+      return this.reviews.find(review => review.id === this.$route.params.bookId)?.comments || [];
     }
   },
   created() {
     const bookId = this.$route.params.bookId;
     this.book = this.getBookById(bookId);
     this.finalRating = this.book.rating; // 假设book.rating是最终评分
+    this.fetchChapters(bookId); // 获取章节数据
   },
   methods: {
-    ...mapActions(['setCurrentBookId']),
+    ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     startReading() {
       this.setCurrentBookId(this.book.id);
-      this.$router.push({ name: 'Reader' });
+      this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
+      this.$router.push({name: 'Reader'});
     },
     linktoComments() {
-      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
+      this.$router.push({name: 'Comments', params: {bookId: this.book.id}});
     },
     getBookById(id) {
       const booksData = require("@/assets/book.json");
@@ -151,6 +166,19 @@ export default {
       this.currentRating = star;
       // 这里可以添加逻辑，例如将评分发送到服务器
       console.log(`评分为: ${star}`);
+    },
+    fetchChapters(bookId) {
+      // 获取章节数据的API调用示例
+      axios.get(`http://127.0.0.1:8000/novels/chapter_list`, {params: {novel_id: bookId}})
+          .then(response => {
+            this.chapters = response.data.chapter_data.chapter_list;
+          })
+          .catch(error => {
+            console.error("获取章节数据失败:", error);
+          });
+    },
+    selectChapter(chapterId) {
+      this.selectedChapter = chapterId;
     }
   }
 };
@@ -221,6 +249,8 @@ export default {
 }
 
 .rating {
+  display: flex;
+  align-items: center;
   margin-bottom: 20px;
 }
 
@@ -270,17 +300,17 @@ export default {
   border-radius: 5px;
 }
 
+.rating {
+  display: flex;
+  align-items: center;
+}
+
 .rating span {
   margin-right: 5px;
 }
 
 .stars {
   cursor: pointer;
-}
-
-.stars span {
-  font-size: 24px;
-  color: #ccc;
 }
 
 .stars .active-star {
@@ -309,16 +339,23 @@ export default {
   color: #3c763d;
 }
 
-.description, .author-info, .professional-reviews, .table-of-contents {
+.description, .author-info, .professional-reviews, .table-of-contents, .book-reviews, .book-chapters {
   margin-bottom: 20px;
 }
 
-.description h2, .author-info h2, .professional-reviews h2, .table-of-contents h2 {
+.description h2, .author-info h2, .professional-reviews h2, .table-of-contents h2, .book-reviews h2, .book-chapters h2 {
   margin-bottom: 10px;
 }
 
-.table-of-contents ul {
+.table-of-contents ul, .book-chapters ul {
   list-style-type: disc;
   padding-left: 20px;
+}
+
+.comment {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 </style>
