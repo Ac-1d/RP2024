@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+// import { mapActions } from 'vuex';
 
 export default {
   name: "BookDetail",
@@ -128,9 +128,8 @@ export default {
     this.finalRating = this.book.rating; // 假设book.rating是最终评分
   },
   methods: {
-    ...mapActions(['setCurrentBookId']),
     startReading() {
-      this.setCurrentBookId(this.book.id);
+      this.$store.commit('setCurrentBookId', this.book.id)
       this.$router.push({ name: 'Reader' });
     },
     linktoComments() {

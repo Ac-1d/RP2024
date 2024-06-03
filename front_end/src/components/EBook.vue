@@ -132,6 +132,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { useEpub } from "../js/Ebook.js"; 
 
 export default {
@@ -166,8 +167,12 @@ export default {
       othersNoteList: [],
     }
   },
+  computed: {
+    ...mapState(['currentBookId'])
+  },
   mounted() {
     this.$store.commit('setShowTopBar')
+    console.log("the book id is ", this.currentBookId)
     this.epubReader = useEpub();
     this.loadEpub();
     //this.loadMark()
