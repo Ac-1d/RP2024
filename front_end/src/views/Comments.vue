@@ -67,8 +67,10 @@
 </template>
 
 <script>
-import {currentTime} from "../js/Time.js";
-import bookComments from '@/assets/comments.json';
+import {currentTime} from "@/js/Time.js";
+import {addComments} from '@/js/Api.js';
+import {getComments} from '@/js/Api.js';
+// import bookComments from '@/assets/comments.json';
 import '@/css/text.css';
 import '@/css/layout.css';
 export default {
@@ -90,22 +92,23 @@ export default {
   data() {
     return {
       bookId: 1,
+      chapterId: 1,
       userInfo: this.$store.state,
       currentPage: 1, // 当前是第几页
       commentsPerPage: 5,
       value: 0, // 当前用户选择的评分
-      comments: bookComments,// 已有评论
+      comments: null,// 已有评论
       content: '',// 输入内容
       replying: false,// 正在回复
       replyIndex: 0,// 回复的评论号
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
     };
   },
-  created() {
+  async created() {
     const bookId = this.$route.params.bookId;
     this.bookId = bookId;
-    // console.log('id is : '+bookId);
-    this.comments = this.getCommentsByBookId(bookId);
+    // this.comments = this.getCommentsByBookId(bookId);
+    this.comment = await getComments();
   },
   methods: {
     prevPage() {
@@ -128,7 +131,7 @@ export default {
       const commentsData = require("@/assets/comments.json");
       return commentsData.find(comment => comment.id == id).comments;
     },
-    addComment() {
+    async addComment() {
       if (this.content) {
         if (this.replying) {
           const newReply = {
@@ -139,6 +142,12 @@ export default {
           this.endReply();
         }
         else {
+          await addComments(
+            this.bookId, 
+            this.chapterId, 
+            this.content, 
+            this.$store.userInfo.id
+          )
           const newComment = { 
             rank_value: this.value,
             text: this.content, 

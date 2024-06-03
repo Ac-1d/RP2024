@@ -78,8 +78,33 @@ export async function novelContent(novel_id, chapter_id) {
 // 加入书架
 
 // 上传评论
+export async function addComments(novel_id, chapter_id, content, user_id) {
+  try {
+    return await axios.post(`/novels/add_comments`, {
+      "novel": novel_id,
+      "chapter": chapter_id,
+      "user": user_id,
+      "comment_content": content,
+      "up_number": 0
+    });
+  } catch (error) {
+    return error.code;
+  }
+}
 
 // 获取评论
+export async function getComments(novel_id, chapter_id) {
+  try {
+    return await axios.get(`/novels/get_comments`, {
+      params: {
+        novel_id: novel_id,
+        chapter_id: chapter_id
+      }
+    })
+  } catch (error) {
+    return error.code;
+  }
+}
 
 // 提交、更新最近阅读
 
@@ -88,3 +113,27 @@ export async function novelContent(novel_id, chapter_id) {
 // 查询个人书架
 
 // 注册
+/** register
+ * @param
+ * data {
+ *    username:String,
+ *    password:String,
+ *    password:String,
+ *    mobile:String
+ * };
+ * @return
+ * success: user_id
+ * fail: error.code
+ */ 
+export async function register(data) {
+  try {
+    return await axios.post(`/users/register`, {
+      "username": data.username,
+      "password": data.password,
+      "email": data.email,
+      "mobile": data.mobile
+    }).data.user_id;
+  } catch(error) {
+    return error.code;
+  }
+}
