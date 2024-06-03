@@ -6,8 +6,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    loggedIn: false,
-    userinfo: null,
+    loggedIn: false, // 状态：是否已经登录
+    userinfo: null, // 用户信息，登录后设置
   },
   mutations: {
     LOGIN(state, data) { 
@@ -42,7 +42,8 @@ export default new Vuex.Store({
     },  
     logout({ commit }) {
       commit('LOGOUT');
-    }  
+    },
+
   },
   getters: {
     loggedIn: state => state.loggedIn,  

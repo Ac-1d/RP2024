@@ -11,6 +11,7 @@
       <el-input v-model="credit.password"></el-input>
 
       <el-button @click="userlogin">login</el-button>
+      <el-button @click="$store.dispatch('logout')">logout</el-button>
 
       <!-- <el-button type="primary" @click="GetNovels">获取全部小说资源</el-button> -->
     </el-main>
