@@ -14,17 +14,20 @@
       <el-button @click="userlogin">login</el-button>
       <el-button @click="$store.dispatch('logout')">logout</el-button>
       <el-button @click="$store.dispatch('getUserInfo')">'getUserInfo'</el-button>
-      
-      <!-- <el-button type="primary" @click="GetNovels">获取全部小说资源</el-button> -->
     </el-main>
 
     <el-main>
-      
+      <el-button @click="Category">获取全部类别</el-button>
+      <el-button @click="allNovel">全部小说</el-button>
+      <el-button @click="Novel('test')">小说</el-button>
     </el-main>
   </el-container>
 </template>
 
 <script>
+import {category} from '@/js/Api.js';
+import {novels} from '@/js/Api.js';
+import {allNovels} from '@/js/Api.js';
 
 export default {
   data() {
@@ -49,6 +52,15 @@ export default {
         console.error('Error fetching info:', error);  
       }
     },
+    async Category() {
+      console.log(await category());
+    },
+    async Novel(search) {
+      console.log(await novels(search));
+    },
+    async allNovel(search) {
+      console.log(await allNovels(search));
+    }
   }
 }
 </script>
