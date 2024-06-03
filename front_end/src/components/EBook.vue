@@ -130,6 +130,7 @@
 <script>
 import { mapState } from "vuex";
 import { useEpub } from "../js/Ebook.js"; 
+import axios from "axios";
 
 export default {
   name: "EBook",
@@ -169,6 +170,13 @@ export default {
   mounted() {
     this.$store.commit('setShowTopBar')
     console.log("the book id is ", this.currentBookId)
+    axios.get('http://127.0.0.1:8000/novels/bookrack?user_id=1')
+      .then(response =>{
+        console.log("response: ", response)
+      })
+      .catch(error =>{
+        console.error("error: ", error)
+      })
     this.epubReader = useEpub();
     this.loadEpub();
     //this.loadMark()
