@@ -11,6 +11,7 @@ export default new Vuex.Store({
     userInfo: null,
     showNavBar: true,
     currentBookId: null,
+    currentChapterId: null,
   },
   mutations: {
     LOGIN(state, data) { 
@@ -33,6 +34,10 @@ export default new Vuex.Store({
     setCurrentBookId(state, bookId){
       state.currentBookId = bookId
     },
+    setCurrentChapterId(state, chapterId){
+      console.log("set current chapter id to ", chapterId)
+      state.currentChapterId = chapterId
+    }
   },
   actions: {
     async login({ commit }, loginData) { 

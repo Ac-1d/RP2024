@@ -130,7 +130,7 @@
 <script>
 import { mapState } from "vuex";
 import { useEpub } from "../js/Ebook.js"; 
-import axios from "axios";
+import { novelContent } from '../js/Api.js';
 
 export default {
   name: "EBook",
@@ -165,52 +165,15 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentBookId'])
+    ...mapState(['currentChapterId', 'currentBookId', ])
   },
   mounted() {
     this.$store.commit('setShowTopBar')
-    console.log("the book id is ", this.currentBookId)
-    // axios.get('http://127.0.0.1:8000/novels/bookrack?user_id=1')
-    //   .then(response =>{
-    //     console.log("response: ", response)
-    //   })
-    //   .catch(error =>{
-    //     console.error("error: ", error)
-    //   })
+    console.log("the book id is ", this.currentBookId, "the chapter id is ", this.currentChapterId)
     this.epubReader = useEpub();
     this.loadEpub();
     //this.loadMark()
-    let rendition = this.epubReader.getRendition()
-    rendition.on("selected", (cfiRange, contents) => {
-      console.log("listener detectes text selected:", cfiRange, contents)
-      this.noteCfiRange = cfiRange
-      this.noteContents = contents
-      if(this.allowTakeNote){
-        this.takeNote()
-        this.allowTakeNote = false
-      }
-    })
-    rendition.on("mouseup", () => {
-      console.log("listener detectes mouseup")
-      if(this.settings.isTakingNote == false)
-        return
-      if(this.noteCfiRange){
-        this.takeNote()
-      }
-      else{
-        console.warn("cfiRange is undefined")
-        this.allowTakeNote = true
-      }
-    })
-    rendition.on("markClicked", (cfiRange) => {
-      console.log("listener detectes 'markClicked'")
-      console.log(cfiRange)
-      if (this.settings.isRemovingNote)
-        this.epubReader.removeMark(cfiRange)
-      else {
-        console.log(this.epubReader.getNoteText(cfiRange))
-      }
-    })
+    
   },
   watch: {
     'settings.nightTheme': function(nightTheme) {
@@ -223,13 +186,9 @@ export default {
   },
   methods: {
     loadEpub() {
-      const url = "http://127.0.0.1:8000/novels/chapter?id=" + this.currentBookId + "&" + "chapter_id=1"//chapterid等待其他组件传值
-      console.log(url)
-      axios.get(url)
-        .then(response => {//有待拆分
-          console.log("response: ",response)
-          const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
-          console.log(book)
+      novelContent(this.currentBookId, this.currentChapterId)
+        .then(response => {//很有待拆分！😫
+          const book = this.epubReader.createBook(response.data.chapter_data.content);
           book.loaded.cover.then((cover) => {
             if (cover) {
               book.archive.createUrl(cover).then((_url) => {
@@ -257,11 +216,42 @@ export default {
             height: window.innerHeight,
             allowScriptedContent: true
           });
+          let rendition = this.epubReader.getRendition()
+          //以下三个事件依赖于rendition的实例化
+          rendition.on("selected", (cfiRange, contents) => {
+            console.log("listener detectes text selected:", cfiRange, contents)
+            this.noteCfiRange = cfiRange
+            this.noteContents = contents
+            if (this.allowTakeNote) {
+              this.takeNote()
+              this.allowTakeNote = false
+            }
+          })
+          rendition.on("mouseup", () => {
+            console.log("listener detectes mouseup")
+            if (this.settings.isTakingNote == false)
+              return
+            if (this.noteCfiRange) {
+              this.takeNote()
+            }
+            else {
+              console.warn("cfiRange is undefined")
+              this.allowTakeNote = true
+            }
+          })
+          rendition.on("markClicked", (cfiRange) => {
+            console.log("listener detectes 'markClicked'")
+            console.log(cfiRange)
+            if (this.settings.isRemovingNote)
+              this.epubReader.removeMark(cfiRange)
+            else {
+              console.log(this.epubReader.getNoteText(cfiRange))
+            }
+          })
         })
         .catch(error => {
           console.error("error: ", error)
         })
-      //文件路径需要请求获取
     },
     prevPage() {
       this.epubReader.prevPage();
@@ -338,6 +328,7 @@ export default {
     setHref(href) {
       console.log("set page to", href)
       this.epubReader.getRendition().display(href)
+      this.epubReader.highlight(href)
     },
   },
   beforeDestroy() {

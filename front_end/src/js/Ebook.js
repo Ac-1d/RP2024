@@ -302,18 +302,18 @@ export function useEpub() {
     return noteList
   }
 
-  // function search(text) {
-  //   book.ready.then(() => {
-  //     doSearch(text).then((results) =>{
-  //       // console.log(results);
-  //       return results
-  //     })
-  //   })
-  // }
-
   function setLatedPage() {
     console.log("set page to currentLocation")
     rendition.display(currentLocation.start.cfi)
+  }
+
+  function highlight(cfiRange) {
+    rendition.annotations.highlight(cfiRange, {}, () => { }, null, {
+      "fill": 'red'
+    })
+    setTimeout(() => {
+      rendition.annotations.remove(cfiRange, 'highlight')
+    }, 5000);
   }
 
   /**用于hack epubjs源码^^
@@ -325,7 +325,7 @@ export function useEpub() {
 
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, checkCFIRangeLegal,
+    takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, checkCFIRangeLegal, highlight, 
     doSearch, getNoteList
   }
 }
