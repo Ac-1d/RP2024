@@ -17,4 +17,9 @@ urlpatterns = [
     path('novel_delete',views.DeleteNovelAPIView.as_view()),#从书架删除
     path('add_comments', views.AddCommentView.as_view()),#上传评论
     path('get_comments', views.GetCommentsView.as_view()),#获取评论
+    path('author_register',views.RegisterAsAuthorAPIView.as_view()),#注册成为作者
+    path('author_info',views.CheckAuthorAPI.as_view()),#作者信息（面板）
+    path('get_bookmarks',views.BookmarkListAPIView.as_view()),#获取指定书签
+    path('public_get_bookmarks',views.PublicBookmarkAPIView.as_view()),#获取公共书签
+    path('create_bookmarks',views.CreateBookmarkAPIView.as_view())#创建一个新书签
 ]
