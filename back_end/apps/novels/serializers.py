@@ -98,3 +98,52 @@ class GetCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment
         fields = ['comment_time', 'comment_content', 'up_number', 'username']  # 包括评论ID，评论时间，内容，评分和用户名
+
+#作者序列
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Author
+        fields = '__all__'  # 或者你可以指定需要序列化的字段列表
+
+#书签序列器
+class BookmarkSerializer(serializers.ModelSerializer):
+    chapter_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Bookmark
+        fields = '__all__'  # 确保包括所有默认字段以及新添加的 chapter_id
+
+    def get_chapter_id(self, obj):
+        """Retrieve chapter_id from the associated Novel_chapter instance."""
+        return obj.chapter_id if obj.novel_chapter else None
+
+
+#新建书签
+class CreateBookmarkSerializer(serializers.ModelSerializer):
+    chapter_id = serializers.IntegerField(write_only=True)
+    novel_id = serializers.IntegerField(write_only=True)
+    user_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = models.Bookmark
+        fields = ('cfi', 'note', 'user_id', 'novel_id', 'chapter_id', 'is_public')
+
+    def create(self, validated_data):
+        # 获取并移除外键字段的ID值
+        user_id = validated_data.pop('user_id')
+        novel_id = validated_data.pop('novel_id')
+        chapter_id = validated_data.pop('chapter_id')
+
+        # 获取实例
+        user = User.objects.get(id=user_id)
+        novel = models.Novel.objects.get(id=novel_id)
+        novel_chapter = models.Novel_chapter.objects.get(novel=novel, chapter_id=chapter_id)
+
+        # 设置外键实例
+        validated_data['user'] = user
+        validated_data['novel'] = novel
+        validated_data['novel_chapter'] = novel_chapter
+
+        # 创建 Bookmark 实例
+        bookmark = models.Bookmark.objects.create(**validated_data)
+        return bookmark
