@@ -31,7 +31,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async login({ commit }, loginData) {  
+    async login({ commit }, loginData) { 
       let username = loginData.username;
       let password = loginData.password;
       let msg = '登录失败';
