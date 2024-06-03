@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from . import models
-
+from ..users.models import User
 
 
 #获取所有的小说分类
@@ -9,11 +9,14 @@ class CategoryAllSerializer(serializers.ModelSerializer):
         model = models.Novel_category
         fields = ['pk','category_name']
 
+
+
 #小说分类序
 class NovelCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Novel_category
         fields = ['category_name','novel_list']
+
 
 #获取所有小说
 class NovelAllSerializer(serializers.ModelSerializer):
@@ -64,7 +67,7 @@ class ChapterListSerializer(serializers.ModelSerializer):
 class ChapterContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Novel_chapter
-        fields = ['novel_name','author_name','novel_chapter','words','text']
+        fields = ['novel_name','chapter_id','author_name','novel_chapter','words','content']
 
 #小说书架
 class BookrackSerializer(serializers.ModelSerializer):
@@ -77,3 +80,21 @@ class RecentlyNovelListSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.recently_reading
         fields = ['chapter', 'novel_info']
+
+#上传评论
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Comment
+        fields = ['novel', 'chapter', 'user', 'comment_content', 'up_number']
+
+    def create(self, validated_data):
+        return models.Comment.objects.create(**validated_data)
+
+
+#获取评论
+class GetCommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)  # 获取用户的用户名字段
+
+    class Meta:
+        model = models.Comment
+        fields = ['comment_time', 'comment_content', 'up_number', 'username']  # 包括评论ID，评论时间，内容，评分和用户名
