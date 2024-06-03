@@ -69,6 +69,7 @@
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
             </el-form-item>
+            <!-- 可能不需要 -->
             <el-form-item label="显示他人笔记">
               <el-switch v-model="settings.showOthersNote"></el-switch>
             </el-form-item>
@@ -100,7 +101,7 @@
             </div>
           </div>
           <div v-if="showOthersNote" class="contents">
-            
+
           </div>
         </div>
       </div>
@@ -108,16 +109,30 @@
     <div id="take-note-component" v-if="showNoteInput">
       <div id="mask"></div>
       <div id="note-input">
-        <p>笔记记录：</p>
-        <textarea id="input" v-model="noteText"></textarea><br>
-        <button @click="finishTakeNote">确认</button>
+        <div id="contents">
+          <el-form label-position="top" label-width="100px">
+            <el-form-item label="笔记记录">
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText" resize="none">
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <el-form>
+            <el-form-item label="是否公开" style="margin: 5% 10%">
+              <el-switch v-model="isNotePublic"></el-switch>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="finishTakeNote(true)">确认</el-button>
+              <el-button @click="finishTakeNote(false)">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { useEpub } from "../js/Ebook.js";
+import { useEpub } from "../js/Ebook.js"; 
 
 export default {
   name: "EBook",
@@ -135,6 +150,9 @@ export default {
       navigation: [],
       searchText: '',
       searchResult: [],
+      noteCfiRange: '',
+      noteContents: '',
+      allowTakeNote: false,
       settings: {
         nightTheme: false,
         isTakingNote: false,
@@ -149,20 +167,30 @@ export default {
     }
   },
   mounted() {
+    this.$store.commit('setShowTopBar')
     this.epubReader = useEpub();
     this.loadEpub();
+    //this.loadMark()
     let rendition = this.epubReader.getRendition()
     rendition.on("selected", (cfiRange, contents) => {
       console.log("listener detectes text selected:", cfiRange, contents)
-      this.epubReader.setForNote(cfiRange, contents)
+      this.noteCfiRange = cfiRange
+      this.noteContents = contents
+      if(this.allowTakeNote){
+        this.takeNote()
+        this.allowTakeNote = false
+      }
     })
     rendition.on("mouseup", () => {
       console.log("listener detectes mouseup")
-      if (this.epubReader.checkIsTakingNote() && this.settings.isTakingNote) {
-        if (this.settings.noteType == 'underline')
-          this.showNoteInput = true
-        this.epubReader.takeNote(this.settings.noteType)
-        console.log(this.noteList)
+      if(this.settings.isTakingNote == false)
+        return
+      if(this.noteCfiRange){
+        this.takeNote()
+      }
+      else{
+        console.warn("cfiRange is undefined")
+        this.allowTakeNote = true
       }
     })
     rendition.on("markClicked", (cfiRange) => {
@@ -183,11 +211,12 @@ export default {
       else
         this.epubReader.setTheme(0)
     },
-
   },
   methods: {
     loadEpub() {
+      //文件路径需要请求获取
       const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
+      console.log(book)
       book.loaded.cover.then((cover) => {
         if (cover) {
           book.archive.createUrl(cover).then((_url) => {
@@ -257,14 +286,24 @@ export default {
         this.showNavigation = false
       })
     },
-    finishTakeNote() {
-      this.epubReader.setNoteText(this.noteText, this.isNotePublic)
+    takeNote() {
+      if(this.epubReader.checkCFIRangeLegal(this.noteCfiRange)){
+          if (this.settings.noteType == 'underline')
+            this.showNoteInput = true
+          this.epubReader.takeNote(this.settings.noteType, this.noteCfiRange)
+          console.log(this.noteList)
+        }
+        this.noteContents.window.getSelection().removeAllRanges()
+        this.noteCfiRange = null
+    },
+    finishTakeNote(isTakeNote) {
+      this.epubReader.setNoteText(this.noteText, this.isNotePublic, isTakeNote)
       this.isNotePublic = false
       this.noteText = null
       this.showNoteInput = false
     },
-    parseNoteList() {
-
+    loadMark() {
+      //请求获取他人笔记与私人笔记
     },
     test() {
 
@@ -278,6 +317,7 @@ export default {
   },
   beforeDestroy() {
     // TODO: 销毁监听器
+    this.$store.commit('setShowTopBar')
   }
 };
 </script>
@@ -377,11 +417,8 @@ export default {
       background: white;
       border: 1px dashed black;
       z-index: 9999;
-
-      #input {
-        height: 150px;
-        width: 250px;
-        resize: none;
+      #contents {
+        margin: 5%;
       }
     }
 
