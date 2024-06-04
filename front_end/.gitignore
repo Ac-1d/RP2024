@@ -23,4 +23,8 @@ yarn-error.log*
 
 # Personal notes
 note.md
+<<<<<<< HEAD
 tests/private_test
+=======
+tests/private_test/
+>>>>>>> DJL
