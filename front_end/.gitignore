@@ -23,3 +23,5 @@ yarn-error.log*
 
 # Personal notes
 note.md
+
+../back_end/db.sqlite3
