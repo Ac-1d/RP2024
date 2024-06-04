@@ -12,11 +12,9 @@ import Reader from "../views/Reader.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Comments from "../views/Comments.vue";
-import Message from "../views/Message.vue";
-import Mail from '../views/Mail/Mail.vue';
-import Send from '../views/Mail/Send.vue';
-import Receive from '../views/Mail/Receive.vue';
-
+import Mail from "../views/Mail/Mail.vue";
+import Creation from "../views/Creation/Creation.vue";
+import CategoriesDetail from '@/views/CategoriesDetail.vue';
 Vue.use(VueRouter);
 
 const routes = [
@@ -24,6 +22,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home
+  },
+  {
+      path: '/categories-detail',
+      name: 'CategoriesDetail',
+      component: CategoriesDetail
   },
   {
     path: "/about",
@@ -76,34 +79,21 @@ const routes = [
     name: "Register",
     component: Register
   },
-  {// 调试用，合并的时候可以删掉
-    path: "/comments",
-    name: "Comments",
-    component: Comments
-  },
-  {
-    path: "/message",
-    name: "Message",
-    component: Message
-  },
-  // Mail
-  {
+  {// mail站内信页面
     path:'/mail',
     name:'Mail',
     component: Mail
-  },
-  // Mail-send
-  {
-    path:'/mail/send',
-    name:'Send',
-    component: Send
-  },
-  // Mail-recv
-  {
-    path:'/mail/recv',
-    name:'Receive',
-    component: Receive
-  },
+  },// lzy
+  {// comments评论页面
+    path:'/book/:bookId/comments',
+    name: 'Comments',
+    component: Comments
+  },// lzy
+  {// 创作
+    path:'/creation',
+    name: 'Creation',
+    component: Creation
+  },// lzy
   {
     path: "/Center",
     name: "Center",
