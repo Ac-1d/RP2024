@@ -78,33 +78,45 @@ export async function novelContent(novel_id, chapter_id) {
 // 加入书架
 
 // 上传评论
-export async function addComments(novel_id, chapter_id, content, user_id) {
+export async function addComments(comment) {
+  console.log({
+    "novel": comment.novel_id,
+    "chapter": comment.chapter_id,
+    "user": comment.user_id,
+    "comment_content": comment.content,
+    "up_number": comment.up_number,
+  });
   try {
-    return await axios.post(`/novels/add_comments`, {
-      "novel": novel_id,
-      "chapter": chapter_id,
-      "user": user_id,
-      "comment_content": content,
-      "up_number": 0
+    return await axios.post('/novels/add_comments', {
+      "novel": comment.novel_id,
+      "chapter": comment.chapter_id,
+      "user": comment.user_id,
+      "comment_content": comment.content,
+      "up_number": comment.up_number,
     });
   } catch (error) {
     return error.code;
   }
 }
+// lzy: it's used in Comments.vue
 
 // 获取评论
 export async function getComments(novel_id, chapter_id) {
+  console.log({novel_id: novel_id, chapter_id: chapter_id})
   try {
-    return await axios.get(`/novels/get_comments`, {
+    const respond = await axios.get('/novels/get_comments', {
       params: {
         novel_id: novel_id,
         chapter_id: chapter_id
       }
-    })
+    });
+    console.log(respond.data);
+    return respond.data;
   } catch (error) {
-    return error.code;
+    console.log(error);
   }
 }
+// lzy: it's used in Comments.vue
 
 // 提交、更新最近阅读
 

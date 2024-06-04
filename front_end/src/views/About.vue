@@ -21,6 +21,10 @@
       <el-button @click="allNovel">全部小说</el-button>
       <el-button @click="Novel('test')">小说</el-button>
     </el-main>
+
+    <el-footer>
+      <Comments/>
+    </el-footer>
   </el-container>
 </template>
 
@@ -28,12 +32,16 @@
 import {category} from '@/js/Api.js';
 import {novels} from '@/js/Api.js';
 import {allNovels} from '@/js/Api.js';
+import Comments from '@/views/Comments.vue';
 
 export default {
   data() {
     return {
       credit: { username: '', password: '' },
     }
+  },
+  components: {
+    Comments,
   },
   methods: {
     async userlogin() {
