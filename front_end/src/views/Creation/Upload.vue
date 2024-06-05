@@ -98,6 +98,7 @@
 </template>
 
 <script>
+// import axios from 'axios';
 export default{
   name: 'Upload',
   data() {
@@ -130,11 +131,9 @@ export default{
       },
       fileList: [
       ],
-      user_id: 11,
-      novel_id: 101,
-      url: '/novels/addnovel?user_id='+this.user_id+'&novel_id='+this.novel_id,
       imgUpload: '/upload',
       imageUrl: '',
+      url: '',
     }
   },
   methods: {
@@ -143,6 +142,9 @@ export default{
     },
     submitNew(){
       console.log('submit my new work');
+    },
+    addFile() {
+      // 添加文件
     },
     preview(index){
       console.log('preview updates of my work, workid=' + index);
@@ -176,7 +178,7 @@ export default{
         this.$message.error('上传图片大小不能超过 2MB!');
       }
       return isJPG && isLt2M;
-    }
+    },
   }
 }
 </script>

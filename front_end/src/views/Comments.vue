@@ -86,7 +86,6 @@ export default {
     },
     showLogdialog() {
       this.logvisible = true;
-      // 可以在此处添加更多登录逻辑
     },
     closeDialog() {
       this.logvisible = false;
