@@ -140,11 +140,24 @@ export async function getComments(novel_id, chapter_id) {
 export async function register(data) {
   try {
     return await axios.post(`/users/register`, {
-      "username": data.username,
-      "password": data.password,
-      "email": data.email,
-      "mobile": data.mobile
+        "username": data.username,
+        "password": data.password,
+        "email": data.email,
+        "mobile": data.mobile
     }).data.user_id;
+  } catch(error) {
+    return error.code;
+  }
+}
+
+// 注册成为作者
+export async function beAuthor(id) {
+  try {
+    return await axios.get('/novels/author_register', {
+      params: {
+        id: id,
+      }
+    })
   } catch(error) {
     return error.code;
   }

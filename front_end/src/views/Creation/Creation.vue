@@ -22,6 +22,8 @@ export default{
     return {
       logvisible: false,
       beAuthor: false,
+      works: [],
+      category: [],
     }
   },
   components: {
@@ -59,7 +61,13 @@ export default{
     closeDialog(option) {
       if (option == 'login') this.logvisible = false;
       else if (option == 'beAuthor') this.beAuthor = false;
-      this.$router.push({name: 'Home'});
+      if(!this.$store.state.loggedIn) {// 如果没有登录成功
+        this.$router.push({name: 'Home'});
+        // this.$message({
+        //   type: 'error',
+        //   message: `登录失败`
+        // });
+      }
     },
   }
 }
