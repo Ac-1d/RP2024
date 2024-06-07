@@ -69,7 +69,7 @@ export async function novelChapter(novel_id) {
 // 查询某章某节内容
 export async function novelContent(novel_id, chapter_id) {
   try {
-    return await axios.get(`/novels/chapter?id=${novel_id}&chapter_id=${chapter_id}`);
+    return await axios.get(`/novels/chapter?id=${novel_id}&chapter_id=${chapter_id ? chapter_id : 1}`);
   } catch (error) {
     return error.code;
   }

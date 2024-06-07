@@ -10,6 +10,8 @@ export default new Vuex.Store({
     verify: null, // 用户登录时的身份验证结果
     userInfo: null,
     showNavBar: true,
+    currentBookId: null,
+    currentChapterId: null,
   },
   mutations: {
     LOGIN(state, data) { 
@@ -26,8 +28,15 @@ export default new Vuex.Store({
       console.log("call set show top bar")
       state.showNavBar = !state.showNavBar
     },
-    GetUserInfo(state, userInfo) {
+    GetUserInfo(state, userInfo) {//为什么一个get方法是修改userInfo的值？
       state.userInfo = userInfo;
+    },
+    setCurrentBookId(state, bookId){
+      state.currentBookId = bookId
+    },
+    setCurrentChapterId(state, chapterId){
+      console.log("set current chapter id to ", chapterId)
+      state.currentChapterId = chapterId
     }
   },
   actions: {
