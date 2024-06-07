@@ -28,7 +28,7 @@
 
         <!-- 书籍展示区域 -->
         <div class="books">
-          <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
+          <Book v-for="book in paginatedBooks" :key="book.id" :book="book" />
         </div>
 
         <!-- 翻页栏 -->
@@ -46,7 +46,7 @@
 import Book from "@/components/Book.vue";
 import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
 import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+import axios from 'axios'; // 导入 axios
 
 export default {
   name: "Home",
@@ -57,7 +57,7 @@ export default {
   },
   data() {
     return {
-      books: booksData, // 使用本地的 books.json 数据
+      books: [], // 初始为空数组
       currentPage: 1, // 当前页码
       booksPerPage: 12, // 每页显示的书籍数量
       selectedCategory: "全部", // 当前选中的分类
@@ -81,6 +81,14 @@ export default {
     }
   },
   methods: {
+    async fetchBooks() {
+      try {
+        const response = await axios.get('/api/books'); // 假设你的后端API路径是 /api/books
+        this.books = response.data;
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -106,6 +114,9 @@ export default {
     goToCategoriesDetail() {
       this.$router.push({ name: 'CategoriesDetail' });
     }
+  },
+  created() {
+    this.fetchBooks(); // 在组件创建时获取书籍数据
   }
 };
 </script>
