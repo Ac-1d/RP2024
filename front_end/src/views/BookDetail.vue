@@ -169,8 +169,9 @@ export default {
     },
     fetchChapters(bookId) {
       // 获取章节数据的API调用示例
-      axios.get(`http://127.0.0.1:8000/novels/chapter_list`, {params: {novel_id: bookId}})
+      axios.get(`http://127.0.0.1:8000/novels/chapter_list`, {params: {id: bookId}})
           .then(response => {
+            console.log(response);
             this.chapters = response.data.chapter_data.chapter_list;
           })
           .catch(error => {

@@ -153,9 +153,9 @@ export async function register(data) {
 // 注册成为作者
 export async function beAuthor(id) {
   try {
-    return await axios.get('/novels/author_register', {
+    return await axios.post('/novels/author_register', {
       params: {
-        id: id,
+        user_id: id,
       }
     })
   } catch(error) {

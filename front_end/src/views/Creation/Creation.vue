@@ -15,6 +15,7 @@ import Works from '@/views/Creation/Works.vue';
 import Reviews from '@/views/Creation/Reviews.vue';
 import Upload from '@/views/Creation/Upload.vue';
 import Login_window from '@/components/Login_window.vue';
+import {beAuthor} from '@/js/Api.js';
 
 export default{
   name: 'Creation',
@@ -45,12 +46,10 @@ export default{
         confirmButtonText: '确定',
         callback: action => {
           this.$message({
-            type: 'info',
-            message: `action: ${ action }`
+            type: 'success',
+            message: `be author: ${ action }, welcome`
           });
-          if (action == 'confirm'){
-            console.log('welcome');
-          }
+        beAuthor(this.$store.state.userInfo.id);
       }});
       // this.showDialog('login');
     },
