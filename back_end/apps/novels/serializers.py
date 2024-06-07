@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from . import models
 from ..users.models import User
 
@@ -83,11 +85,30 @@ class RecentlyNovelListSerializer(serializers.ModelSerializer):
 
 #上传评论
 class CommentSerializer(serializers.ModelSerializer):
+    chapter_id = serializers.IntegerField(write_only=True)  # 前端只需提交chapter_id
+    novel_id = serializers.IntegerField(write_only=True)  # 前端同时提交novel_id
+
     class Meta:
         model = models.Comment
-        fields = ['novel', 'chapter', 'user', 'comment_content', 'up_number']
+        fields = ['novel_id', 'user', 'comment_content', 'up_number', 'chapter_id', 'novel_id']
 
     def create(self, validated_data):
+        chapter_id = validated_data.pop('chapter_id')
+        novel_id = validated_data.pop('novel_id')
+
+        try:
+            # 根据 novel_id 和 chapter_id 获取 Novel_chapter 实例
+            chapter = models.Novel_chapter.objects.get(novel_id=novel_id, chapter_id=chapter_id)
+        except models.Novel_chapter.DoesNotExist:
+            raise ValidationError({'error': f'No chapter found with chapter_id {chapter_id} for novel_id {novel_id}'})
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
+
+        # 添加chapter实例到validated_data
+        validated_data['chapter'] = chapter
+        validated_data['novel'] = chapter.novel
+
+        # 创建并返回新的评论实例
         return models.Comment.objects.create(**validated_data)
 
 
