@@ -1,6 +1,7 @@
 import os
 from datetime import timezone
 
+from django.db.models import Sum, Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from  rest_framework.filters import OrderingFilter,SearchFilter
@@ -213,8 +214,113 @@ class GetCommentsView(APIView):
         # 使用获取的参数进行查询
         if novel_id is not None and chapter_id is not None:
             comments = models.Comment.objects.filter(novel__id=novel_id, chapter__chapter_id=chapter_id).order_by('-comment_time')
-            print(comments.count())
+            #print(comments.count())
             serializer = serializers.GetCommentSerializer(comments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "缺少必要的参数"}, status=status.HTTP_400_BAD_REQUEST)
+
+class RegisterAsAuthorAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')  # 通过POST请求的body获取用户ID
+
+        # 获取User实例
+        user = get_object_or_404(User, pk=user_id)
+
+        if user.is_author:
+            return Response({'status': 400, 'message': '用户已经是作者'})
+        else:
+            user.is_author=True
+            author = models.Author(
+                author_name=user.username,
+                author_user=user,
+                author_icon=user.user_icon,
+                author_gender=user.gender,
+                #author_detail='这是作者的详细描述'
+            )
+            author.save()
+            return Response({'status': 201, 'message': '用户成功注册为作者'})
+
+#作者信息接口
+class CheckAuthorAPI(APIView):
+    def get(self, request):
+        user_id = request.query_params.get('user_id')
+        # 尝试获取用户实例
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'error': '用户不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 检查用户是否标记为作者
+        if user.is_author:
+            try:
+                # 获取与此用户相关联的 Author 实例
+                author = user.author
+                print(author)
+                # 手动构造返回数据
+                author_data = {
+                    'author_name': author.author_name,
+                    'author_gender': '男' if author.author_gender == 0 else '女',
+                    'author_detail': author.author_detail,
+                    'author_icon': request.build_absolute_uri(author.author_icon.url),
+                    'popularity': author.popularity,
+                    'average_rating': author.average_rating
+                }
+                return Response({'user_name': user.username, 'author_info': author_data}, status=status.HTTP_200_OK)
+            except models.Author.DoesNotExist:
+                return Response({'error': '此用户标记为作者，但没有找到对应的作者信息'},
+                                status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'message': '此用户不是作者'}, status=status.HTTP_404_NOT_FOUND)
+
+
+#获取指定书签
+class BookmarkListAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        novel_id = request.query_params.get('novel_id')
+        chapter_id = request.query_params.get('chapter_id')
+
+        bookmarks = models.Bookmark.objects.filter(
+            user=get_object_or_404(User, pk=user_id),
+            novel=get_object_or_404(models.Novel, pk=novel_id),
+            novel_chapter=get_object_or_404(models.Novel_chapter, novel=novel_id,chapter_id=chapter_id)
+        ).order_by('-id')
+
+        bookmark_list = [serializers.BookmarkSerializer(bookmark).data for bookmark in bookmarks]
+        return Response({'bookmarks': bookmark_list})
+
+#查询公共书签
+class PublicBookmarkAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        novel_id = request.query_params.get('novel_id')
+        chapter_id = request.query_params.get('chapter_id')
+
+        bookmarks = models.Bookmark.objects.filter(
+            # user=get_object_or_404(User, pk=user_id),
+            is_public=True,
+            novel=get_object_or_404(models.Novel, pk=novel_id),
+            novel_chapter=get_object_or_404(models.Novel_chapter, novel=novel_id,chapter_id=chapter_id)
+        ).exclude(user=get_object_or_404(User, pk=user_id)).order_by('-id')  # Assuming you want the latest bookmarks first
+
+        bookmark_list = [serializers.BookmarkSerializer(bookmark).data for bookmark in bookmarks]
+        return Response({'bookmarks': bookmark_list})
+
+#新建书签
+class CreateBookmarkAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        # 使用请求中的JSON数据创建BookmarkSerializer实例
+        serializer = serializers.CreateBookmarkSerializer(data=request.data)
+
+        # 检查数据是否有效
+        if serializer.is_valid():
+            # 如果数据有效，保存新创建的书签到数据库
+            serializer.save()
+            return Response({"message": "Bookmark created successfully"}, status=status.HTTP_201_CREATED)
+        else:
+            # 如果数据无效，返回错误信息
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

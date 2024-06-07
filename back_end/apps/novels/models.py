@@ -74,8 +74,7 @@ class Author(models.Model):
     author_gender = models.IntegerField(choices=((0, '男'), (1, '女')), default=0, verbose_name='作者性别')
     author_detail = models.TextField(verbose_name='作者简介', default='')
     author_icon = models.FileField(upload_to='icon/', default='icon/default.jpg', verbose_name='作者图片')
-    author_user = models.ForeignKey(User, null=True, related_name='author', db_constraint=False,
-                                    on_delete=models.DO_NOTHING, verbose_name='是否是本网站用户')
+    author_user = models.OneToOneField(User, null=True, related_name='author', on_delete=models.DO_NOTHING)
     # popularity = models.IntegerField(default=0, verbose_name='作者热度')
     # average_rating = models.FloatField(default=0.0, verbose_name='平均评分')
 
@@ -129,7 +128,7 @@ class Novel_category(models.Model):
 # 小说章节表
 class Novel_chapter(models.Model):
     #chapter_id = models.IntegerField(primary_key=True,default=-1)
-    chapter_id=models.IntegerField(default=-1)
+    chapter_id=models.IntegerField(default=0)
     is_free = models.BooleanField(default=True, verbose_name='是否免费')
     price = models.IntegerField(verbose_name='价格', default=0)
     novel_chapter = models.CharField(max_length=64, verbose_name='小说章节')
@@ -241,3 +240,18 @@ class recently_reading(models.Model):
         novel_dic['category'] = self.Novel.category.category_name
         novel_dic['chapter_name'] = self.chapter.novel_chapter
         return novel_dic
+
+#书签，高亮模型
+class Bookmark(models.Model):
+    cfi = models.CharField(max_length=255, verbose_name='CFI位置')
+    note = models.TextField(verbose_name='笔记内容')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    novel = models.ForeignKey(Novel, on_delete=models.CASCADE, verbose_name='小说')
+    novel_chapter = models.ForeignKey(Novel_chapter, on_delete=models.CASCADE, verbose_name='章节')
+    is_public = models.BooleanField(default=False, verbose_name='是否公开')
+    type = models.CharField(max_length=255, verbose_name='具体类型',default=None)
+
+    @property
+    def chapter_id(self):
+        """Returns the chapter_id from the associated Novel_chapter instance."""
+        return self.novel_chapter.chapter_id if self.novel_chapter else None
