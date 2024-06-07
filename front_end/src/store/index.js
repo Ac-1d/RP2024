@@ -81,6 +81,7 @@ export default new Vuex.Store({
   getters: {
     loggedIn: state => state.loggedIn,  
     showNavBar: state => state.showNavBar,
+    userInfo: state => state.userInfo,
   },
   modules: {}
 });

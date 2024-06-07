@@ -8,7 +8,7 @@
       <el-form style="float: left;">
         <el-form-item style="width: 30vw;">
           <!-- 文件上传区域 -->
-          <el-upload style="display: flex;" drag :action="url" multiple>
+          <el-upload style="display: flex" drag :action="url" multiple>
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           </el-upload>
@@ -42,7 +42,7 @@
         </el-form-item>
       </el-form>
       <el-form style="float: left;">
-        <el-form-item label="上传封面" label-position="left" label-width="80px" style="width: 30vw;">
+        <el-form-item label="上传封面" label-position="left" label-width="80px" style="width: 20vw;">
           <!-- 封面上传按钮 -->
           <el-upload style="float:left;" class="avatar-uploader"
           :action="imgUpload"
@@ -62,23 +62,30 @@
     </el-header>
     <el-main>
       <el-table :data="works" style="width: 100%;">
-        <el-table-column prop="title" label="作品名" width="180"></el-table-column>
-        <el-table-column prop="tips" label="作品备注" width="360"></el-table-column>
-        <el-table-column prop="date" label="上次更新时间" width="180"></el-table-column>
-        <el-table-column prop="progress" label="进度"></el-table-column>
+        <el-table-column prop="novel_name" label="作品名" width="180"></el-table-column>
+        <el-table-column prop="novel_detail" label="作品备注" width="360"></el-table-column>
+        <!-- <el-table-column prop="date" label="上次更新时间" width="180"></el-table-column> -->
+        <!-- <el-table-column prop="progress" label="进度"></el-table-column> -->
+        <el-table-column label="状态" width="120">
+          <template slot-scope="scope">
+            <span>{{ scope.row.novel_status==0?'连载中':'已完结' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" width="120">
-          <el-upload
-          class="upload-demo"
-          :action="url"
-          :on-preview="handlePreview"
-          :on-remove="handleRemove"
-          :before-remove="beforeRemove"
-          multiple
-          :limit="3"
-          :on-exceed="handleExceed"
-          :file-list="fileList">
-            <el-button type="text">点击上传</el-button>
-          </el-upload>
+          <template slot-scope="scope">
+            <el-upload
+              class="upload-demo"
+              :action="url"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :before-remove="beforeRemove"
+              multiple
+              :limit="1"
+              :on-exceed="handleExceed"
+              :file-list="fileList">
+              <el-button type="text" @click.native.prevent="uploadFile(scope.$index)">点击上传</el-button>
+            </el-upload>
+          </template>
         </el-table-column>
         <el-table-column fixed="right" width="120">
           <template slot-scope="scope">
@@ -98,17 +105,20 @@
 </template>
 
 <script>
+import axios from 'axios';
+import {novels} from '@/js/Api.js';
+import {category} from '@/js/Api.js';
+
 export default{
   name: 'Upload',
   data() {
     return {
       works:[
         {
-          "bookId": "1", 
-          "title": "我看见的世界", 
-          "tips": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
-          "date": "23-12-21", 
-          "progress": "12"
+          "id": "1", 
+          "novel_name": "我看见的世界", 
+          "novel_detail": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
+          "novel_status" : 0,
         },
       ],
       options: [
@@ -130,19 +140,29 @@ export default{
       },
       fileList: [
       ],
-      user_id: 11,
-      novel_id: 101,
-      url: '/novels/addnovel?user_id='+this.user_id+'&novel_id='+this.novel_id,
       imgUpload: '/upload',
       imageUrl: '',
+      url: '',
+      author_name: '',
     }
   },
+  async created() {
+    this.works = await novels(this.author_name).results; 
+    this.options = await category();
+  },
   methods: {
-    previewNew(){
+    async previewNew(){
+      let url = this.url;
+      axios.get({url, params: this.newWork});
       console.log('preview my new Work');
     },
-    submitNew(){
+    async submitNew(){
+      let url = this.url;
+      axios.post({url, params: this.newWork});
       console.log('submit my new work');
+    },
+    uploadFile() {
+      // 添加文件
     },
     preview(index){
       console.log('preview updates of my work, workid=' + index);
@@ -157,26 +177,27 @@ export default{
       console.log(file);
     },
     handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
     },
     beforeRemove(file) {
       return this.$confirm(`确定移除 ${ file.name }？`);
     },
     handleAvatarSuccess(res, file) {
-        this.imageUrl = URL.createObjectURL(file.raw);
-      },
+      this.imageUrl = URL.createObjectURL(file.raw);
+    },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg';
+      const isPNG = file.type === 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
-        this.$message.error('上传图片只能是 JPG 格式!');
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传图片只能是 JPG/PNG 格式!');
       }
       if (!isLt2M) {
         this.$message.error('上传图片大小不能超过 2MB!');
       }
       return isJPG && isLt2M;
-    }
+    },
   }
 }
 </script>
@@ -195,7 +216,7 @@ export default{
   }
   .avatar-uploader-icon {
     text-align: center;
-    font-size: 178px;
+    font-size: 0px;
     color: #8c939d;
     width: 178px;
     height: 178px;
