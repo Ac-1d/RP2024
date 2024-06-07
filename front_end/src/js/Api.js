@@ -153,12 +153,16 @@ export async function register(data) {
 // 注册成为作者
 export async function beAuthor(id) {
   try {
-    return await axios.post('/novels/author_register', {
-      params: {
-        user_id: id,
-      }
-    })
+    console.log({user_id: id});
+    return await axios.post('novels/author_register?user_id=' + id, 
+    //   {
+    //   params: {
+    //     "user_id": id
+    //   }
+    // }
+  )
   } catch(error) {
+    console.log(error);
     return error.code;
   }
 }

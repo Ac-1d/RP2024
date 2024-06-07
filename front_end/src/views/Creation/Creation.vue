@@ -1,9 +1,21 @@
 <template>
   <el-container>
-    <el-tabs tab-position="left" style="width: max-content;">
-      <el-tab-pane label="作品上传"><Upload/></el-tab-pane>
-      <el-tab-pane label="内容管理"><Works/></el-tab-pane>
-      <el-tab-pane label="评论数据"><Reviews/></el-tab-pane>
+    <el-tabs type="border-card" tab-position="left" style="width: max-content;">
+      <el-tab-pane><span slot="label">
+        <i class="el-icon-date"></i> 内容管理</span>
+        <!--  label="内容管理" -->
+        <Works/>
+      </el-tab-pane>
+      <el-tab-pane><span slot="label">
+        <i class="el-icon-upload2"> 作品上传</i>
+      </span>
+        <Upload/>
+      </el-tab-pane>
+      <el-tab-pane><span slot="label">
+        <i class="el-icon-s-data"> 评论数据</i>
+      </span>
+        <Reviews/>
+      </el-tab-pane>
     </el-tabs>
     <Login_window :dialogflag="logvisible" @closedia="closeDialog"></Login_window>
   </el-container>
@@ -36,7 +48,8 @@ export default{
   mounted() {
     if (!this.$store.state.loggedIn) {
       this.showDialog('login');return;
-    } else if (!this.$store.state.userInfo.isWriter) {
+    } else if (!this.$store.state.userInfo['is_author']) {
+      console.log(this.$store.state.userInfo);
       this.becomeAuthor();return;
     }
   },

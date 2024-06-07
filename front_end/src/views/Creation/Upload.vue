@@ -1,113 +1,121 @@
 <template>
-  <el-container style="background-color: aliceblue;">
-    <el-header style="width: 100vw;">
-      <h1 style="display: flex;">新作品上传</h1>
-    </el-header>
-    <!-- 新作品提交 -->
-    <el-main>
-      <el-form style="float: left;">
-        <el-form-item style="width: 30vw;">
-          <!-- 文件上传区域 -->
-          <el-upload style="display: flex" drag :action="url" multiple>
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          </el-upload>
-        </el-form-item>
+  <div class="home">
+    <div class="content">
+      <div class="main-content">
+        <div class="category-bar">
+          <span class="title">作品上传</span>
+        </div><div class="separator"></div>
 
-        <el-form-item style="width: 30vw;">
-          <el-button type="primary" style="display: flex;" @click="previewNew">预览作品</el-button>
-        </el-form-item>
-        <!-- 预览按钮 -->
-        <el-form-item style="width: 30vw;">
-          <el-button type="primary" style="display: flex;" @click="submitNew">确认创建</el-button>
-        </el-form-item>
-        <!-- 提交按钮 -->
-      </el-form>
-      <el-form style="float: left;">
-        <el-form-item label="作品名" label-position="left" label-width="80px" style="width: 30vw;">
-          <el-input v-model="newWork.workName"></el-input></el-form-item>
-        <el-form-item label="备注" label-position="left" label-width="80px" style="width: 30vw;">
-          <el-input v-model="newWork.intro"></el-input></el-form-item>
-        <el-form-item label="章节" label-position="left" label-width="80px" style="width: 30vw;">
-          <el-input v-model="newWork.chapter"></el-input></el-form-item>
-        <el-form-item label="分类" label-position="left" label-width="80px" style="width: 30vw;">
-          <el-select v-model="newWork.category" placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <el-form style="float: left;">
-        <el-form-item label="上传封面" label-position="left" label-width="80px" style="width: 20vw;">
-          <!-- 封面上传按钮 -->
-          <el-upload style="float:left;" class="avatar-uploader"
-          :action="imgUpload"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      
-    </el-main>
-    <!-- 已有作品更新 -->
-    <el-header style="width: 100vw;">
-      <h1 style="display: flex;">创作更新</h1>
-    </el-header>
-    <el-main>
-      <el-table :data="works" style="width: 100%;">
-        <el-table-column prop="novel_name" label="作品名" width="180"></el-table-column>
-        <el-table-column prop="novel_detail" label="作品备注" width="360"></el-table-column>
-        <!-- <el-table-column prop="date" label="上次更新时间" width="180"></el-table-column> -->
-        <!-- <el-table-column prop="progress" label="进度"></el-table-column> -->
-        <el-table-column label="状态" width="120">
-          <template slot-scope="scope">
-            <span>{{ scope.row.novel_status==0?'连载中':'已完结' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column fixed="right" width="120">
-          <template slot-scope="scope">
-            <el-upload
-              class="upload-demo"
-              :action="url"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              multiple
-              :limit="1"
-              :on-exceed="handleExceed"
-              :file-list="fileList">
-              <el-button type="text" @click.native.prevent="uploadFile(scope.$index)">点击上传</el-button>
-            </el-upload>
-          </template>
-        </el-table-column>
-        <el-table-column fixed="right" width="120">
-          <template slot-scope="scope">
-            <el-button @click.native.prevent="preview(scope.$index)" type="text">预览
-            </el-button>
-          </template>
-        </el-table-column>
-        <el-table-column fixed="right" width="120">
-          <template slot-scope="scope">
-            <el-button @click.native.prevent="submit(scope.$index)" type="text">确认提交
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-main>
-  </el-container>
+        <!-- 作品上传区域-->
+        <el-main style="background-color: ghostwhite;">
+          <el-form style="float: left;">
+            <el-form-item style="width: 30vw;">
+              <!-- 文件上传区域 -->
+              <el-upload style="display: flex" drag :action="url" multiple>
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              </el-upload>
+            </el-form-item>
+
+            <el-form-item style="width: 30vw;">
+              <el-button type="primary" style="display: flex;" @click="previewNew">预览作品</el-button>
+            </el-form-item>
+            <!-- 预览按钮 -->
+            <el-form-item style="width: 30vw;">
+              <el-button type="primary" style="display: flex;" @click="submitNew">确认创建</el-button>
+            </el-form-item>
+            <!-- 提交按钮 -->
+          </el-form>
+          <el-form style="float: left;">
+            <el-form-item label="作品名" label-position="left" label-width="80px" style="width: 30vw;">
+              <el-input v-model="newWork.workName"></el-input></el-form-item>
+            <el-form-item label="备注" label-position="left" label-width="80px" style="width: 30vw;">
+              <el-input v-model="newWork.intro"></el-input></el-form-item>
+            <el-form-item label="章节" label-position="left" label-width="80px" style="width: 30vw;">
+              <el-input v-model="newWork.chapter"></el-input></el-form-item>
+            <el-form-item label="分类" label-position="left" label-width="80px" style="width: 30vw;">
+              <el-select v-model="newWork.category" placeholder="请选择">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <el-form style="float: left;">
+            <el-form-item label="上传封面" label-position="left" label-width="80px" style="width: 20vw;">
+              <!-- 封面上传按钮 -->
+              <el-upload style="float:left;" class="avatar-uploader"
+              :action="imgUpload"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload">
+                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                <i class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+            </el-form-item>
+          </el-form>
+        </el-main>
+
+        <!-- 作品更新区域 -->
+        <div class="separator"></div>
+        <div class="category-bar">
+          <span class="title">创作更新</span>
+        </div><div class="separator"></div>
+        <el-main style="background-color: ghostwhite;">
+          <el-table :data="works" style="width: 100%;">
+            <el-table-column prop="novel_name" label="作品名" width="180"></el-table-column>
+            <el-table-column prop="novel_detail" label="作品备注" width="360"></el-table-column>
+            <!-- <el-table-column prop="date" label="上次更新时间" width="180"></el-table-column> -->
+            <!-- <el-table-column prop="progress" label="进度"></el-table-column> -->
+            <el-table-column label="状态" width="120">
+              <template slot-scope="scope">
+                <span>{{ scope.row.novel_status==0?'连载中':'已完结' }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="120">
+              <template slot-scope="scope">
+                <el-upload
+                  class="upload-demo"
+                  :action="url"
+                  :on-preview="handlePreview"
+                  :on-remove="handleRemove"
+                  :before-remove="beforeRemove"
+                  multiple
+                  :limit="1"
+                  :on-exceed="handleExceed"
+                  :file-list="fileList">
+                  <el-button type="text" @click.native.prevent="uploadFile(scope.$index)">点击上传</el-button>
+                </el-upload>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="120">
+              <template slot-scope="scope">
+                <el-button @click.native.prevent="preview(scope.$index)" type="text">预览
+                </el-button>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="120">
+              <template slot-scope="scope">
+                <el-button @click.native.prevent="submit(scope.$index)" type="text">确认提交
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-main>
+
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
 import {novels} from '@/js/Api.js';
 import {category} from '@/js/Api.js';
+import '@/css/layout.css';
 
 export default{
   name: 'Upload',

@@ -13,7 +13,7 @@
 
       <el-button @click="userlogin">login</el-button>
       <el-button @click="$store.dispatch('logout')">logout</el-button>
-      <el-button @click="$store.dispatch('getUserInfo')">'getUserInfo'</el-button>
+      <el-button @click="$store.dispatch('getUserInfo')">getUserInfo</el-button>
     </el-main>
 
     <el-main>
