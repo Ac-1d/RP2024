@@ -136,7 +136,7 @@ export default {
   name: "EBook",
   data() {
     return {
-      showTable: true,
+      showTable: false,
       showNavigation: true,
       showNoteInput: false,
       showPersonalNote: true,
@@ -169,10 +169,9 @@ export default {
   },
   mounted() {
     this.$store.commit('setShowTopBar')
-    console.log("the book id is ", this.currentBookId, "the chapter id is ", this.currentChapterId)
     this.epubReader = useEpub();
     this.loadEpub();
-    //this.loadMark()
+    this.loadMark()
     
   },
   watch: {
@@ -187,71 +186,76 @@ export default {
   methods: {
     loadEpub() {
       novelContent(this.currentBookId, this.currentChapterId)
-        .then(response => {//很有待拆分！😫
+        .then(response => {
           const book = this.epubReader.createBook(response.data.chapter_data.content);
-          book.loaded.cover.then((cover) => {
-            if (cover) {
-              book.archive.createUrl(cover).then((_url) => {
-                this.coverUrl = _url
-                console.log("parse url:", this.coverUrl)
-              })
-            }
-            else {//TODO: 无封面加载一个默认封面
-    
-            }
-          })
-          book.loaded.metadata.then((_metadata) => {
-            this.metadata = _metadata
-            console.log("parse metadata:", this.metadata)
-          })
-          book.loaded.navigation.then((nav) => {
-            let index = 0
-            nav.toc.forEach((toc) => {
-              this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
-            })
-            console.log("parse navigation")
-          })
+          this.loadBook(book)
           this.epubReader.render("epub_render", {
             width: window.innerWidth,
             height: window.innerHeight,
             allowScriptedContent: true
           });
           let rendition = this.epubReader.getRendition()
-          //以下三个事件依赖于rendition的实例化
-          rendition.on("selected", (cfiRange, contents) => {
-            console.log("listener detectes text selected:", cfiRange, contents)
-            this.noteCfiRange = cfiRange
-            this.noteContents = contents
-            if (this.allowTakeNote) {
-              this.takeNote()
-              this.allowTakeNote = false
-            }
-          })
-          rendition.on("mouseup", () => {
-            console.log("listener detectes mouseup")
-            if (this.settings.isTakingNote == false)
-              return
-            if (this.noteCfiRange) {
-              this.takeNote()
-            }
-            else {
-              console.warn("cfiRange is undefined")
-              this.allowTakeNote = true
-            }
-          })
-          rendition.on("markClicked", (cfiRange) => {
-            console.log("listener detectes 'markClicked'")
-            console.log(cfiRange)
-            if (this.settings.isRemovingNote)
-              this.epubReader.removeMark(cfiRange)
-            else {
-              console.log(this.epubReader.getNoteText(cfiRange))
-            }
-          })
+          this.loadListener(rendition)
         })
         .catch(error => {
           console.error("error: ", error)
         })
+    },
+    loadBook(book) {
+      book.loaded.cover.then((cover) => {
+        if (cover) {
+          book.archive.createUrl(cover).then((_url) => {
+            this.coverUrl = _url
+            console.log("parse url:", this.coverUrl)
+          })
+        }
+        else {//TODO: 无封面加载一个默认封面
+
+        }
+      })
+      book.loaded.metadata.then((_metadata) => {
+        this.metadata = _metadata
+        console.log("parse metadata:", this.metadata)
+      })
+      book.loaded.navigation.then((nav) => {
+        let index = 0
+        nav.toc.forEach((toc) => {
+          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
+        })
+        console.log("parse navigation")
+      })
+    },
+    loadListener(rendition) {
+      rendition.on("selected", (cfiRange, contents) => {
+        console.log("listener detectes text selected:", cfiRange, contents)
+        this.noteCfiRange = cfiRange
+        this.noteContents = contents
+        if (this.allowTakeNote) {
+          this.takeNote()
+          this.allowTakeNote = false
+        }
+      })
+      rendition.on("mouseup", () => {
+        console.log("listener detectes mouseup")
+        if (this.settings.isTakingNote == false)
+          return
+        if (this.noteCfiRange) {
+          this.takeNote()
+        }
+        else {
+          console.warn("cfiRange is undefined")
+          this.allowTakeNote = true
+        }
+      })
+      rendition.on("markClicked", (cfiRange) => {
+        console.log("listener detectes 'markClicked'")
+        console.log(cfiRange)
+        if (this.settings.isRemovingNote)
+          this.epubReader.removeMark(cfiRange)
+        else {
+          console.log(this.epubReader.getNoteText(cfiRange))
+        }
+      })
     },
     prevPage() {
       this.epubReader.prevPage();
@@ -312,6 +316,24 @@ export default {
     },
     loadMark() {
       //请求获取他人笔记与私人笔记
+      //处理personalNote
+      for(let note in this.personalNoteList) {
+        const type = note.type
+        const cfi = note.cfi
+        const noteText = note.noteText
+        const isPublic = note.isPublic
+        if(type == 'highlight') {
+          this.epubReader.takeNote(type, cfi)
+        }
+        else if(type == 'underline') {
+          this.epubReader.takeNote(type, cfi)
+          this.epubReader.setNoteText(noteText, isPublic, true)
+        }
+        else {
+          console.error("type error in loadMark: ", type)
+        }
+      }
+      
     },
     exit() {
       const url = '/book/' + this.currentBookId
@@ -334,6 +356,7 @@ export default {
   beforeDestroy() {
     // TODO: 销毁监听器
     this.$store.commit('setShowTopBar')
+    // saveNote()
   }
 };
 </script>
