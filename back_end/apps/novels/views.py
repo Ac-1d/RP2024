@@ -214,7 +214,7 @@ class GetCommentsView(APIView):
         # 使用获取的参数进行查询
         if novel_id is not None and chapter_id is not None:
             comments = models.Comment.objects.filter(novel__id=novel_id, chapter__chapter_id=chapter_id).order_by('-comment_time')
-            print(comments.count())
+            #print(comments.count())
             serializer = serializers.GetCommentSerializer(comments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -232,11 +232,11 @@ class RegisterAsAuthorAPIView(APIView):
         else:
             user.is_author=True
             author = models.Author(
-                author_name=user.username,  # 假设用户名作为作者名
+                author_name=user.username,
                 author_user=user,
-                author_icon=user.user_icon,  # 使用相同的图标
+                author_icon=user.user_icon,
                 author_gender=user.gender,
-                author_detail='这是作者的详细描述'  # 默认的作者描述
+                #author_detail='这是作者的详细描述'
             )
             author.save()
             return Response({'status': 201, 'message': '用户成功注册为作者'})
@@ -286,12 +286,12 @@ class BookmarkListAPIView(APIView):
             user=get_object_or_404(User, pk=user_id),
             novel=get_object_or_404(models.Novel, pk=novel_id),
             novel_chapter=get_object_or_404(models.Novel_chapter, novel=novel_id,chapter_id=chapter_id)
-        ).order_by('-id')  # Assuming you want the latest bookmarks first
+        ).order_by('-id')
 
         bookmark_list = [serializers.BookmarkSerializer(bookmark).data for bookmark in bookmarks]
         return Response({'bookmarks': bookmark_list})
 
-
+#查询公共书签
 class PublicBookmarkAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
