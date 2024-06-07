@@ -316,8 +316,10 @@ export default {
     },
     loadMark() {
       //请求获取他人笔记与私人笔记
+      let personalNoteList
+      let othersNoteList
       //处理personalNote
-      for(let note in this.personalNoteList) {
+      for(let note in personalNoteList) {
         const type = note.type
         const cfi = note.cfi
         const noteText = note.noteText
@@ -328,12 +330,17 @@ export default {
         else if(type == 'underline') {
           this.epubReader.takeNote(type, cfi)
           this.epubReader.setNoteText(noteText, isPublic, true)
+          this.personalNoteList.push({'note': noteText, 'cfi': cfi})
         }
         else {
           console.error("type error in loadMark: ", type)
         }
       }
-      
+      for(let note in othersNoteList) {
+        const cfi = note.cfi
+        const noteText = note.noteText
+        const name = note.
+      }
     },
     exit() {
       const url = '/book/' + this.currentBookId
