@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from . import models
 from ..users.models import User
 
@@ -94,8 +96,13 @@ class CommentSerializer(serializers.ModelSerializer):
         chapter_id = validated_data.pop('chapter_id')
         novel_id = validated_data.pop('novel_id')
 
-        # 根据 novel_id 和 chapter_id 获取 Novel_chapter 实例
-        chapter = models.Novel_chapter.objects.get(novel_id=novel_id, chapter_id=chapter_id)
+        try:
+            # 根据 novel_id 和 chapter_id 获取 Novel_chapter 实例
+            chapter = models.Novel_chapter.objects.get(novel_id=novel_id, chapter_id=chapter_id)
+        except models.Novel_chapter.DoesNotExist:
+            raise ValidationError({'error': f'No chapter found with chapter_id {chapter_id} for novel_id {novel_id}'})
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
 
         # 添加chapter实例到validated_data
         validated_data['chapter'] = chapter
