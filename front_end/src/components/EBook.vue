@@ -2,16 +2,12 @@
   <div id="ebook">
     <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
     <div id="epub_render"></div>
-    <!-- TODO: 陆续被替换的设计 -->
     <div id="buttons">
-      <!-- <button id="tableButton" @click="callTable">点我呼出菜单</button> -->
       <div id="tableButton">
         <el-button type="info" icon="el-icon-d-arrow-left" @click="prevPage" circle></el-button>
         <el-button type="info" icon="el-icon-setting" @click="callTable" circle></el-button>
         <el-button type="info" icon="el-icon-d-arrow-right" @click="nextPage" circle></el-button>
-        <!-- <button id="nextPageButton" @click="nextPage">点我向后翻页</button> -->
       </div>
-      <!-- <button id="prevPageButton" @click="prevPage">点我向前翻页</button> -->
     </div>
     <div id="table" v-if="showTable">
       <div id="bookInfo" class="side-bar">
@@ -33,7 +29,7 @@
         </div>
         <div class="bookInfo-body" v-if="showNavigation">
           <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
-            <hr v-if="item.index != 1" class="parting-line">
+            <hr class="parting-line">
             <span @click="setHref(item.href)">
               {{ item.index }}.{{ item.label }}
             </span>
@@ -45,7 +41,7 @@
           </div>
           <div v-else>
             <div v-for="item in searchResult" :key="item.index" class="text">
-              <hr v-if="item.index != 1" class="parting-line">
+              <hr class="parting-line">
               <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
             </div>
           </div>
@@ -57,7 +53,7 @@
       </div>
       <div id="setting" class="side-bar">
         <div id="header">
-          <el-form ref="settings" :model="settings" label-width="80px">
+          <el-form ref="settings" :model="settings" label-width="100px">
             <el-form-item label="深色模式">
               <el-switch v-model="settings.nightTheme"></el-switch>
             </el-form-item>
@@ -65,36 +61,78 @@
               <el-switch v-model="settings.isTakingNote"></el-switch>
             </el-form-item>
             <el-form-item label="笔记方式" v-if="settings.isTakingNote">
-              <el-radio-group v-model="settings.noteType" size="medium">
+              <el-radio-group v-model="settings.noteType" size="small">
                 <el-radio border label="underline">记笔记</el-radio>
-                <el-radio border label="highlight">高亮标注</el-radio>
+                <el-radio border label="highlight">高亮</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
             </el-form-item>
+            <!-- 可能不需要 -->
+            <el-form-item label="显示他人笔记">
+              <el-switch v-model="settings.showOthersNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="显示个人笔记">
+              <el-switch v-model="settings.showPersonalNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="字体大小" :rules="[
+              { type: 'number', message: '字体大小必须为数字值' }
+            ]">
+              <el-input v-model.number="settings.fontSize" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="changeFontSize">设置</el-button>
+              <el-button @click="defaultFontSize">默认大小</el-button>
+            </el-form-item>
           </el-form>
         </div>
-        <h1>这里是设置</h1>
-        <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
-        调整字体大小：
-        <input type="text" v-model="fontSize">
-        <router-link to="/BookDetail">点我退出</router-link>
+        <el-form>
+          <el-form-item>
+            <el-button @click="showPersonalNote = true; showOthersNote = false">我的笔记</el-button>
+            <el-button @click="showPersonalNote = false; showOthersNote = true">他的笔记</el-button>
+          </el-form-item>
+        </el-form>
+        <div id="body">
+          <div v-if="showPersonalNote" class="contents">
+            <div v-for="item in personalNoteList" :key="item.index" class="text bookInfo-text">
+              <hr class="parting-line">
+              <span v-if="item.note && item.isPublic">{{ item.note }}</span>
+            </div>
+          </div>
+          <div v-if="showOthersNote" class="contents">
+
+          </div>
+        </div>
       </div>
     </div>
     <div id="take-note-component" v-if="showNoteInput">
       <div id="mask"></div>
       <div id="note-input">
-        <p>笔记记录：</p>
-        <textarea id="input" v-model="noteText"></textarea><br>
-        <button @click="finishTakeNote">确认</button>
+        <div id="contents">
+          <el-form label-position="top" label-width="100px">
+            <el-form-item label="笔记记录">
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText" resize="none">
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <el-form>
+            <el-form-item label="是否公开" style="margin: 5% 10%">
+              <el-switch v-model="isNotePublic"></el-switch>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="finishTakeNote(true)">确认</el-button>
+              <el-button @click="finishTakeNote(false)">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { useEpub } from "../js/Ebook.js";
+import { useEpub } from "../js/Ebook.js"; 
 
 export default {
   name: "EBook",
@@ -103,38 +141,56 @@ export default {
       showTable: true,
       showNavigation: true,
       showNoteInput: false,
-      fontSize: '',
+      showPersonalNote: true,
+      showOthersNote: false,
+      isNotePublic: false,
       noteText: '',
       coverUrl: '',
       metadata: null,
       navigation: [],
       searchText: '',
       searchResult: [],
+      noteCfiRange: '',
+      noteContents: '',
+      allowTakeNote: false,
       settings: {
         nightTheme: false,
         isTakingNote: false,
         isRemovingNote: false,
+        showPersonalNote: true,
+        showOthersNote: false,
         noteType: '',
+        fontSize: '',
       },
+      personalNoteList: [],
+      othersNoteList: [],
     }
   },
-  props: [
-    'showNav'
-  ],
   mounted() {
+    this.$store.commit('setShowTopBar')
     this.epubReader = useEpub();
     this.loadEpub();
+    //this.loadMark()
     let rendition = this.epubReader.getRendition()
     rendition.on("selected", (cfiRange, contents) => {
       console.log("listener detectes text selected:", cfiRange, contents)
-      this.epubReader.setForNote(cfiRange, contents)
+      this.noteCfiRange = cfiRange
+      this.noteContents = contents
+      if(this.allowTakeNote){
+        this.takeNote()
+        this.allowTakeNote = false
+      }
     })
     rendition.on("mouseup", () => {
       console.log("listener detectes mouseup")
-      if (this.epubReader.checkIsTakingNote() && this.settings.isTakingNote) {
-        if (this.settings.noteType == 'underline')
-          this.showNoteInput = true
-        this.epubReader.takeNote(this.settings.noteType)
+      if(this.settings.isTakingNote == false)
+        return
+      if(this.noteCfiRange){
+        this.takeNote()
+      }
+      else{
+        console.warn("cfiRange is undefined")
+        this.allowTakeNote = true
       }
     })
     rendition.on("markClicked", (cfiRange) => {
@@ -148,10 +204,6 @@ export default {
     })
   },
   watch: {
-    fontSize(newValue) {
-      console.log("call fontSize in watch");
-      this.changeFontSize(newValue);
-    },
     'settings.nightTheme': function(nightTheme) {
       console.log("call set night theme",nightTheme)
       if(nightTheme)//true为深色模式
@@ -162,7 +214,9 @@ export default {
   },
   methods: {
     loadEpub() {
+      //文件路径需要请求获取
       const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
+      console.log(book)
       book.loaded.cover.then((cover) => {
         if (cover) {
           book.archive.createUrl(cover).then((_url) => {
@@ -200,9 +254,13 @@ export default {
     callTable() {
       this.showTable = !this.showTable;
     },
-    changeFontSize(fontSize) {
+    changeFontSize() {
       console.log("call setFontSize");
-      this.epubReader.setFontSize(fontSize);
+      this.epubReader.setFontSize(this.settings.fontSize);
+    },
+    defaultFontSize() {
+      this.settings.fontSize = null
+      this.epubReader.setFontSize(16)
     },
     doSearch() {
       console.log("call do search")
@@ -228,23 +286,38 @@ export default {
         this.showNavigation = false
       })
     },
-    finishTakeNote() {
-      this.epubReader.setNoteText(this.noteText)
+    takeNote() {
+      if(this.epubReader.checkCFIRangeLegal(this.noteCfiRange)){
+          if (this.settings.noteType == 'underline')
+            this.showNoteInput = true
+          this.epubReader.takeNote(this.settings.noteType, this.noteCfiRange)
+          console.log(this.noteList)
+        }
+        this.noteContents.window.getSelection().removeAllRanges()
+        this.noteCfiRange = null
+    },
+    finishTakeNote(isTakeNote) {
+      this.epubReader.setNoteText(this.noteText, this.isNotePublic, isTakeNote)
+      this.isNotePublic = false
       this.noteText = null
       this.showNoteInput = false
     },
+    loadMark() {
+      //请求获取他人笔记与私人笔记
+    },
     test() {
-      this.epubReader.test();
+
     },
     emptyFunction() {
     },
     setHref(href) {
       console.log("set page to", href)
       this.epubReader.getRendition().display(href)
-    }
+    },
   },
   beforeDestroy() {
     // TODO: 销毁监听器
+    this.$store.commit('setShowTopBar')
   }
 };
 </script>
@@ -311,8 +384,14 @@ export default {
       right: 0;
 
       #header {
-        width: 100%;
-        height: 164px;
+        width: 90%;
+        margin: 5% 5%;
+      }
+      #body {
+        width: 90%;
+        margin: 5% 5%;
+        height: calc(90% - 452px);
+        overflow: scroll;
       }
     }
 
@@ -338,11 +417,8 @@ export default {
       background: white;
       border: 1px dashed black;
       z-index: 9999;
-
-      #input {
-        height: 150px;
-        width: 250px;
-        resize: none;
+      #contents {
+        margin: 5%;
       }
     }
 
