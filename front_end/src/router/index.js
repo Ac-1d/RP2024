@@ -14,7 +14,7 @@ import Register from "../views/Register.vue";
 import Comments from "../views/Comments.vue";
 import Mail from "../views/Mail/Mail.vue";
 import Creation from "../views/Creation/Creation.vue";
-
+import CategoriesDetail from '@/views/CategoriesDetail.vue';
 Vue.use(VueRouter);
 
 const routes = [
@@ -22,6 +22,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home
+  },
+  {
+      path: '/categories-detail',
+      name: 'CategoriesDetail',
+      component: CategoriesDetail
   },
   {
     path: "/about",

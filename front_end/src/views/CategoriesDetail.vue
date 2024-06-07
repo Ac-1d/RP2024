@@ -13,7 +13,7 @@
       <li :class="{ active: selectedCategory === '绘本漫画' }" @click="filterBooks('绘本漫画')">绘本漫画</li>
     </ul>
     <div class="book-list">
-      <div class="book-item" v-for="book in filteredBooks" :key="book.id">
+      <div class="book-item" v-for="book in filteredBooks" :key="book.id" @click="goToBookDetail(book.id)">
         <img :src="require(`@/assets/${book.image}`)" :alt="book.title" class="book-image" />
         <div class="book-info">
           <h2 class="book-title">{{ book.title }}</h2>
@@ -58,6 +58,9 @@ export default {
     renderStars(rating) {
       const stars = Math.round(rating / 2); // 将评分转换为5颗星的比例
       return "★".repeat(stars) + "☆".repeat(5 - stars); // 返回星星字符
+    },
+    goToBookDetail(bookId) {
+      this.$router.push({ name: 'BookDetail', params: { bookId } });
     }
   }
 };
@@ -111,6 +114,12 @@ export default {
   border-radius: 5px; /* 边框圆角 */
   padding: 10px; /* 添加内边距 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  cursor: pointer; /* 鼠标变为手型 */
+  transition: transform 0.3s ease; /* 添加过渡效果 */
+}
+
+.book-item:hover {
+  transform: scale(1.05); /* 放大效果 */
 }
 
 .book-image {
