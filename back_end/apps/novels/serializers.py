@@ -147,7 +147,7 @@ class CreateBookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Bookmark
-        fields = ('cfi', 'note', 'user_id', 'novel_id', 'chapter_id', 'is_public')
+        fields = ('cfi', 'note', 'user_id', 'novel_id', 'chapter_id', 'is_public','type')
 
     def create(self, validated_data):
         # 获取并移除外键字段的ID值
