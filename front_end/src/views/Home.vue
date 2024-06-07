@@ -83,8 +83,9 @@ export default {
   methods: {
     async fetchBooks() {
       try {
-        const response = await axios.get('/api/books'); // 假设你的后端API路径是 /api/books
-        this.books = response.data;
+        const response = (await axios.get('/novels/novel'));
+        console.log(response.data.results);
+        this.books = response.data.results;
       } catch (error) {
         console.error('Error fetching books:', error);
       }

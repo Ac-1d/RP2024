@@ -39,7 +39,7 @@ export async function novels(search) {
 // 查找所有小说
 export async function allNovels() {
   try {
-    const novel = await axios.get(`/novels/novel`);
+    const novel = await axios.get(`novels/novel`);
     return novel.data;
   } catch (error) {
     console.error('Error fetching novel:', error);  
