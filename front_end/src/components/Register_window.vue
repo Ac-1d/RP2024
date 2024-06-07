@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="登录"
+    title="注册"
     :visible="dialogflag"
 
     :close-on-click-modal="false"
@@ -8,22 +8,26 @@
     :destroy-on-close="true"
   >
 
-    <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
+    <el-form :model="regisForm" :rules="rules" ref="regisForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
       <el-form-item label="电话" prop="tele">
-        <el-input v-model="logForm.tele" autocomplete="off"></el-input>
+        <el-input v-model="regisForm.tele" autocomplete="off"></el-input>
       </el-form-item>
 
+      <el-form-item  label="用户名" prop="username">
+        <el-input v-model="regisForm.username" autocomplete="off"></el-input>
+      </el-form-item>
 
       <el-form-item label="密码" prop="password">
-        <el-input v-model="logForm.password" show-password></el-input>
+        <el-input v-model="regisForm.password" show-password></el-input>
+      </el-form-item>
+      <el-form-item  label="确认密码" prop="password2">
+        <el-input v-model="regisForm.password2" show-password></el-input>
       </el-form-item>
 
-
       <el-form-item>
-        <el-button type="primary" @click="submitForm('logForm')">登录</el-button>
-        <el-button  @click="logdialogCancel('logForm')">取消</el-button>
-
+        <el-button type="primary" @click="submitForm('regisForm')">注册</el-button>
+        <el-button  @click="logdialogCancel('regisForm')">取消</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -32,7 +36,7 @@
 <script>
 
 export default {
-  name: "Login_window",
+  name: "Register_window",
   props: {
     dialogflag: Boolean,
   },
@@ -40,9 +44,11 @@ export default {
   emits: ['closedia'],
   data() {
     return {
-      logForm: {
+      regisForm: {
         tele:'',
+        username: '',
         password: '',
+        password2: '',
       },
       rules :{
          tele: [
@@ -54,12 +60,26 @@ export default {
             }
 
          ],
-
+         username : [
+           { required: true, message: '请输入昵称', trigger: 'blur' },
+         ],
          password: [
             { required: true, message: '请设置密码', trigger: 'blur' },
             { min: 8, max: 14, message: '密码长度为8-14位', trigger: 'blur' }
          ],
-
+         password2: [
+            { required: true, message: '请再次输入密码', trigger: 'blur' },
+            {
+               validator: (rule, value, callback) => {
+                  if (value !== this.regisForm.password) {
+                    callback(new Error('两次输入密码不一致'));
+                  } else {
+                    callback();
+                  }
+               },
+               trigger: 'blur'
+            }
+         ],
       },
     };
   },
@@ -76,9 +96,12 @@ export default {
        this.$confirm('确认关闭？')
            .then(() => {
                console.log('close');
-               this.logForm.tele='',
-               this.logForm.password= '',
-
+               this.regisForm.tele='',
+               this.regisForm.username= '',
+               this.regisForm.password= '',
+               this.regisForm.password2= '',
+               console.log('tele');
+               console.log(this.tele);
                this.$emit('closedia');
            })
            .catch(() => {});
@@ -86,10 +109,11 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+            alert('注册成功!');
             this.$refs[formName].resetFields();
             this.$emit('closedia');
         }else{
-            console.log('信息错误!!');
+            console.log('错误提交!!');
             return false;
         }
       });
