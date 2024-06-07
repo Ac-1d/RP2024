@@ -4,6 +4,8 @@ from . import views
 
 
 urlpatterns = [
+    path('create_novel', views.CreateNovelView.as_view()), #新建小说接口
+    path('create_chapter', views.CreateNovelChapterView.as_view()), #新建章节接口
     path('category_all',views.CategoryAllAPIView.as_view()),  #查询所有的小说分类
     path('category',views.CategoryAPIView.as_view()),  #按分类查询小说(第二排序为推荐）
     path('novel',views.NovelAllAPIView.as_view()),#超级搜索小说

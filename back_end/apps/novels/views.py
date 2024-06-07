@@ -5,6 +5,7 @@ from django.db.models import Sum, Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from  rest_framework.filters import OrderingFilter,SearchFilter
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, get_object_or_404
@@ -17,6 +18,26 @@ class CategoryAllAPIView(ListAPIView):
     queryset = models.Novel_category.objects.all()
     serializer_class = serializers.CategoryAllSerializer
 
+#新建小说
+class CreateNovelView(APIView):
+    parser_classes = (MultiPartParser, FormParser)  # 添加解析器以处理文件上传
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.NovelSerializer(data=request.data)
+        if serializer.is_valid():
+            novel = serializer.save()
+            return Response({'id': novel.pk}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#新建章节
+class CreateNovelChapterView(APIView):
+    parser_classes = (MultiPartParser, FormParser)  # 允许文件上传
+
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.NovelChapterSerializer(data=request.data)
+        if serializer.is_valid():
+            novel_chapter = serializer.save()
+            return Response({"Create Success"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #按分类返回小说详情
 class CategoryAPIView(APIView):

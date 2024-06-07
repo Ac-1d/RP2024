@@ -19,6 +19,22 @@ class NovelCategorySerializer(serializers.ModelSerializer):
         model = models.Novel_category
         fields = ['category_name','novel_list']
 
+#创建小说
+class NovelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Novel
+        exclude = ('tuijian', 'dianji')  # 排除推荐和点击字段
+
+    def create(self, validated_data):
+        return models.Novel.objects.create(**validated_data)
+#创建章节
+class NovelChapterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Novel_chapter
+        fields = '__all__'  # 或列出所有字段
+
+    def create(self, validated_data):
+        return models.Novel_chapter.objects.create(**validated_data)
 
 #获取所有小说
 class NovelAllSerializer(serializers.ModelSerializer):
@@ -129,14 +145,16 @@ class AuthorSerializer(serializers.ModelSerializer):
 #书签序列器
 class BookmarkSerializer(serializers.ModelSerializer):
     chapter_id = serializers.SerializerMethodField()
-
+    user_name = serializers.SerializerMethodField()
     class Meta:
         model = models.Bookmark
-        fields = '__all__'  # 确保包括所有默认字段以及新添加的 chapter_id
+        fields = '__all__'
 
     def get_chapter_id(self, obj):
         """Retrieve chapter_id from the associated Novel_chapter instance."""
-        return obj.chapter_id if obj.novel_chapter else None
+        return obj.novel_chapter.chapter_id if obj.novel_chapter else None
+    def get_user_name(self,obj):
+        return obj.user.username if obj.user else None
 
 
 #新建书签
