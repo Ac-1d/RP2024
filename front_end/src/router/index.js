@@ -45,7 +45,8 @@ const routes = [
   {
     path: "/bookshelf",
     name: "Bookshelf",
-    component: Bookshelf
+    component: Bookshelf,
+    meta: { requiresAuth: true }, // 标记需要验证
   },
   {
     path: "/ebooks",
@@ -67,6 +68,7 @@ const routes = [
     name: "Search",
     component: Search
   },
+
   {
     path: "/book/:bookId",
     name: "BookDetail",

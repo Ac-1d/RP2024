@@ -1,8 +1,9 @@
 <template>
   <div class="book">
-    <img :src="bookImage" :alt="book.title" @click="goToDetailPage" @mouseover="showDetails" @mouseleave="hideDetails" />
+    <img :src="bookImage" :alt="book.title" @click="goToRead" @mouseover="showDetails" @mouseleave="hideDetails" />
     <div class="title">{{ book.title }}</div>
     <div class="author">{{ book.author }}</div>
+    <i class="el-icon-remove" @click = "removeBook"></i>
 
     <transition name="fade">
       <div class="details" v-if="isHovered">
@@ -21,12 +22,17 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-  name: "Book",
+  name: "ShelfBook",
   props: {
     book: {
       type: Object,
       required: true
+    },
+    novelId: {
+      type: [Number], // 根据bookId的实际类型调整
+      required: true // 如果这个属性是必须的，可以设置为true
     }
   },
   data() {
@@ -46,9 +52,45 @@ export default {
     hideDetails() {
       this.isHovered = false;
     },
-    goToDetailPage() {
+    goToRead() {
       this.$router.push({ name: 'BookDetail', params: { bookId: this.book.id } });
-    }
+    },
+    removeBook() {
+        this.$confirm('确认删除', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.remove();
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+     },
+     remove: async function() {
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/novels/delete_novel`, {
+             novel_id: this.novelId,
+             user_id: this.$store.state.ID,
+        });
+
+        if (response.status === 200 && response.data.status === 'success') {
+          console.log(response.data.msg);
+          // 在此处处理成功删除的结果，例如通知用户或刷新列表
+        } else {
+          console.error('删除失败');
+          alert
+        }
+      } catch (error) {
+        console.error(error);
+      }
+     }
   }
 };
 </script>

@@ -93,12 +93,19 @@ export default {
 
             const ans = this.$store.dispatch('login',userData);
             console.log("得到ans:"+ans);
-
+            this.userInfo();
         }else{
             console.log('信息错误!!');
             return false;
         }
       });
+    },
+    async userInfo() {
+      try {
+        await this.$store.dispatch('getUserInfo');
+      } catch (error) {
+        console.error('Error fetching info:', error);
+      }
     },
   },
 };

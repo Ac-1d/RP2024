@@ -12,6 +12,7 @@ export default new Vuex.Store({
     showNavBar: true,
     currentBookId: null,
     currentChapterId: null,
+    ID:1,
   },
   mutations: {
     LOGIN(state, data) { 
@@ -83,6 +84,7 @@ export default new Vuex.Store({
     loggedIn: state => state.loggedIn,  
     showNavBar: state => state.showNavBar,
     userInfo: state => state.userInfo,
+    ID: state => state.ID,
   },
   modules: {}
 });

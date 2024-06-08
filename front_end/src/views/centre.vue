@@ -29,7 +29,22 @@
       </ul>
     </aside>
     <main class="main">
-      <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
+
+     <ShelfBook
+         v-for="book in paginatedBooks"
+         :key="book.title"
+         :book="book"
+         :novelId="book.id"
+     />
+
+
+        <!-- 翻页栏 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
+          <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
+        </div>
+
     </main>
     </header>
     <Modify_info :drawer="showModi" :ruleForm="user" @closedia="showModi = false" @send = "changeModify"></Modify_info>
@@ -37,14 +52,14 @@
 </template>
 
 <script>
-import Book from "@/components/Book.vue";
+import ShelfBook from "@/components/ShelfBook.vue";
 import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
 
   components: {
-      Book,
+      ShelfBook,
       Modify_info,
   },
 
@@ -63,6 +78,8 @@ export default {
           "password":'59jkb2h0',
       },
       showModi: false,
+      currentPage: 1, // 当前页码
+      booksPerPage: 12, // 每页显示的书籍数量
     };
   },
   methods:{
@@ -73,6 +90,19 @@ export default {
         this.user.birth = newInfo.birth;
         console.log('center'+this.user.nickName);
       },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page;
+    },
 
 
   },
@@ -102,11 +132,14 @@ export default {
       const day = temp[1] ? temp : '0' +temp ;
       return `${year}.${month}.${day}`;
     },
-    paginatedBooks() {
-    // 假设你有一个分页逻辑，这里简单返回全部书籍作为示例
-    return this.books;
+    totalPages() {
+      return Math.ceil(this.books.length / this.booksPerPage);
     },
-
+    paginatedBooks() {
+      const start = (this.currentPage - 1) * this.booksPerPage;
+      const end = start + this.booksPerPage;
+      return this.books.slice(start, end);
+    }
   },
 };
 </script>
