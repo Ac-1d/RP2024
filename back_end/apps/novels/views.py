@@ -344,7 +344,8 @@ class CheckAuthorAPI(APIView):
                     'author_detail': author.author_detail,
                     'author_icon': request.build_absolute_uri(author.author_icon.url),
                     'popularity': author.popularity,
-                    'average_rating': author.average_rating
+                    'average_rating': author.average_rating,
+                    'related_novels':author.related_novels
                 }
                 return Response({'user_name': user.username, 'author_info': author_data}, status=status.HTTP_200_OK)
             except models.Author.DoesNotExist:

