@@ -40,7 +40,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return models.User.objects.create(**validated_data)
 #普通登录序列化类
 class LoginModelSerializer(ModelSerializer):
-    username = serializers.CharField(write_only=True)
+    mobile = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
     class Meta:
         model = models.User
@@ -48,9 +48,9 @@ class LoginModelSerializer(ModelSerializer):
 
 
     def validate(self, attrs):
-        username = attrs.get('username')
         password = attrs.get('password')
-        user = models.User.objects.filter(username=username,is_delete=False).first()
+        mobile = attrs.get('mobile')
+        user = models.User.objects.filter(mobile=mobile,is_delete=False).first()
         if not user:
             raise ValidationError('该用户不存在')
         if(user.password != password):
