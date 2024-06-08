@@ -51,7 +51,8 @@ export async function categoryNovels(category_id) {
 export async function novels(search) {
   try {
     const novel = await axios.get(`/novels/novel?search=${search}`);
-    return novel.data;
+    
+    return novel.data.results;
   } catch (error) {
     console.error('Error fetching novel:', error);  
     return error.code;
