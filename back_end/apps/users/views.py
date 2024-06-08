@@ -85,7 +85,7 @@ class UserInfoAPIView(APIView):
             'username': user_info.username,
             'mobile': user_info.mobile,
             'email': user_info.email,
-            'gender': '男' if user_info.gender == 0 else '女',
+            'gender':'男' if user_info.gender == 0 else '女',
             'related_novels': user_info.related_novels,
             'is_author': user_info.is_author,
             'password':user_info.password,
