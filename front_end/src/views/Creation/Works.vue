@@ -45,8 +45,10 @@ export default {
   },
   async mounted() {
     const user_id = this.$store.state.userInfo.id;
+    console.log(user_id);
     
     const author_name = await authorInfo(user_id).author_name;
+
     console.log(author_name);
     this.books = await novels(author_name);
   },

@@ -41,12 +41,12 @@ export default new Vuex.Store({
   },
   actions: {
     async login({ commit }, loginData) { 
-      let username = loginData.username;
+      let mobile = loginData.mobile;
       let password = loginData.password;
       let msg = '登录失败';
-      if (username && password) {
+      if (mobile && password) {
         await axios.post("/users/login", {  
-          username: username,  
+          mobile: mobile,  
           password: password,
         }).then(response => {
           if (response.data.status == 200 && response.data.msg == '登录成功') {

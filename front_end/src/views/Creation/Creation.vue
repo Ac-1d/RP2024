@@ -53,6 +53,7 @@ export default{
     Upload,
   },
   mounted() {
+    console.log(this.$store.state.userInfo);
     if (!this.$store.state.userInfo['is_author']) {
       console.log(this.$store.state.userInfo);
       this.becomeAuthor();return;

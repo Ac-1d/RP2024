@@ -10,8 +10,8 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="logForm.username" autocomplete="off"></el-input>
+      <el-form-item label="用户名" prop="mobile">
+        <el-input v-model="logForm.mobile" autocomplete="off"></el-input>
       </el-form-item>
 
 
@@ -41,11 +41,11 @@ export default {
   data() {
     return {
       logForm: {
-        username:'',
+        mobile:'',
         password: '',
       },
       rules :{
-         username: [
+         mobile: [
             { required: true, message: '请输入用户名', trigger: 'blur' },
 
          ],
@@ -71,25 +71,31 @@ export default {
        this.$confirm('确认关闭？')
            .then(() => {
                console.log('close');
-               this.logForm.username='',
+               this.logForm.mobile='',
                this.logForm.password= '',
                this.$emit('closedia');
            })
            .catch(() => {});
     },
 
+    async getUserInfo() {
 
+    },
 
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
             const userData = {
-              username:this.logForm.username,
+              mobile:this.logForm.mobile,
               password:this.logForm.password,
             };
-            this.$store.dispatch('login',userData);
-
             this.$refs[formName].resetFields();
+
+            await this.$store.dispatch('login',userData);
+            await this.$store.dispatch('getUserInfo');
+            console.log('submit');
+            console.log(this.$store.getters.userInfo);
+            
             this.$emit('closedia');
 
         }else{
