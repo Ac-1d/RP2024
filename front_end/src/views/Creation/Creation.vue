@@ -35,14 +35,13 @@
 import Works from '@/views/Creation/Works.vue';
 import Reviews from '@/views/Creation/Reviews.vue';
 import Upload from '@/views/Creation/Upload.vue';
-import {beAuthor} from '@/js/Api.js';
+// import {beAuthor} from '@/js/Api.js';
 
 export default{
   name: 'Creation',
   data() {
     return {
       logvisible: false,
-      beAuthor: false,
       works: [],
       category: [],
     }
@@ -54,23 +53,23 @@ export default{
   },
   mounted() {
     console.log(this.$store.state.userInfo);
-    if (!this.$store.state.userInfo['is_author']) {
-      console.log(this.$store.state.userInfo);
-      this.becomeAuthor();return;
-    }
+    // if (!this.$store.state.userInfo['is_author']) {
+    //   console.log(this.$store.state.userInfo);
+    //   this.becomeAuthor();return;
+    // }
   },
   methods: {
-    becomeAuthor() {
-      this.$alert('成为作者？', '提示', {
-        confirmButtonText: '确定',
-        callback: action => {
-          this.$message({
-            type: 'success',
-            message: `be author: ${ action }, welcome`
-          });
-        beAuthor(this.$store.state.userInfo.id);
-      }});
-    },
+    // becomeAuthor() {
+    //   this.$alert('成为作者？', '提示', {
+    //     confirmButtonText: '确定',
+    //     callback: action => {
+    //       this.$message({
+    //         type: 'success',
+    //         message: `be author: ${ action }, welcome`
+    //       });
+    //     beAuthor(this.$store.state.userInfo.id);
+    //   }});
+    // },
   }
 }
 
