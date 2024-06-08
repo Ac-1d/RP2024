@@ -1,11 +1,7 @@
 <template>
   <div class="home">
-    <!-- 中部导航栏 -->
-    <!-- <MiddleNavBar /> -->
 
     <div class="content">
-      <!-- 功能栏 -->
-      <!-- <SideBar /> -->
 
       <div class="main-content">
         <div class="category-bar">
@@ -31,36 +27,24 @@
 <script>
 import Book from "@/components/Book.vue";
 import {authorInfo} from '@/js/Api.js';
-// import {novels} from '@/js/Api.js';
-// import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
-// import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
 import "@/css/layout.css";
 
 export default {
   name: "Home",
   components: {
     Book,
-    // MiddleNavBar, // 注册 MiddleNavBar 组件
-    // SideBar // 注册 SideBar 组件
   },
   async mounted() {
     const user_id = this.$store.state.userInfo.id;
-    console.log(user_id);
-
-    console.log(await authorInfo(user_id));
-    
-    this.authorInfo = await authorInfo(user_id).author_info;
-
-    this.books = this.authorInfo.related_novels;
-
-    console.log(this.books);
+    const info = await authorInfo(user_id);
+    this.authorInfo = info;
+    this.books = info.author_info.related_novels;
   },
   data() {
     return {
       books: [], 
       currentPage: 1, // 当前页码
       booksPerPage: 12, // 每页显示的书籍数量
-      query: '', // 搜索查询
       authorInfo: null,
     };
   },

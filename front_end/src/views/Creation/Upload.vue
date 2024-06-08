@@ -162,11 +162,13 @@ export default{
     async previewNew(){
       let url = this.url;
       axios.get({url, params: this.newWork});
+      
       console.log('preview my new Work');
     },
     async submitNew(){
       let url = this.url;
       axios.post({url, params: this.newWork});
+
       console.log('submit my new work');
     },
     uploadFile() {

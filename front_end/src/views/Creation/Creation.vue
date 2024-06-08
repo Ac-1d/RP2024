@@ -2,10 +2,10 @@
   <el-container>
     <el-tabs type="border-card" tab-position="left" style="width: 100vw; height: 100vh;">
       <el-tab-pane aria-disabled="true">
-        <span slot="label">作者信息
-          <i class="el-icon-user"> </i> 
+        <span slot="label" style="height: 200px; display: block;">作者信息
+          <i class="el-icon-user"> </i>
         </span>
-        <Works/>
+        <Reviews/>
       </el-tab-pane>
 
       <el-tab-pane>
@@ -20,12 +20,6 @@
         </span>
         <Upload/>
       </el-tab-pane>
-      <el-tab-pane>
-        <span slot="label">评论数据
-          <i class="el-icon-s-data"> </i>
-        </span>
-        <Reviews/>
-      </el-tab-pane>
     </el-tabs>
   </el-container>
 </template>
@@ -35,6 +29,7 @@
 import Works from '@/views/Creation/Works.vue';
 import Reviews from '@/views/Creation/Reviews.vue';
 import Upload from '@/views/Creation/Upload.vue';
+import {authorInfo} from '@/js/Api.js';
 // import {beAuthor} from '@/js/Api.js';
 
 export default{
@@ -42,8 +37,7 @@ export default{
   data() {
     return {
       logvisible: false,
-      works: [],
-      category: [],
+      authorInfo: null,
     }
   },
   components: {
@@ -51,25 +45,16 @@ export default{
     Reviews,
     Upload,
   },
-  mounted() {
-    console.log(this.$store.state.userInfo);
-    // if (!this.$store.state.userInfo['is_author']) {
-    //   console.log(this.$store.state.userInfo);
-    //   this.becomeAuthor();return;
-    // }
+  async mounted() {
+    const user_id = this.$store.state.userInfo.id;
+    
+    this.authorInfo = await authorInfo(user_id);
+
+    // console.log( await authorInfo(user_id));
+
+    // console.log(this.authorInfo);
   },
   methods: {
-    // becomeAuthor() {
-    //   this.$alert('成为作者？', '提示', {
-    //     confirmButtonText: '确定',
-    //     callback: action => {
-    //       this.$message({
-    //         type: 'success',
-    //         message: `be author: ${ action }, welcome`
-    //       });
-    //     beAuthor(this.$store.state.userInfo.id);
-    //   }});
-    // },
   }
 }
 

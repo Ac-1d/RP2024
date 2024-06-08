@@ -5,7 +5,7 @@
 
       <div class="main-content">
         <div class="category-bar">
-          <span class="title">作品数据</span>
+          <span class="title">作者信息</span>
         </div><div class="separator"></div>
 
       </div>
