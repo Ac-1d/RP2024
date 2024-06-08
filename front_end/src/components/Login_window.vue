@@ -10,8 +10,8 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="电话" prop="tele">
-        <el-input v-model="logForm.tele" autocomplete="off"></el-input>
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="logForm.username" autocomplete="off"></el-input>
       </el-form-item>
 
 
@@ -41,22 +41,17 @@ export default {
   data() {
     return {
       logForm: {
-        tele:'',
+        username:'',
         password: '',
       },
       rules :{
-         tele: [
-            { required: true, message: '请输入电话号码', trigger: 'blur' },
-            {
-                pattern: /^1[3-9]\d{9}$/, // 中国手机号正则，以1开头，第二位是3-9之间的数字，后面跟9位数字
-                message: '请输入正确的电话号码格式',
-                trigger: ['blur', 'change'] // 触发验证的时机，这里设定为失去焦点或值变化时
-            }
+         username: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
 
          ],
 
          password: [
-            { required: true, message: '请设置密码', trigger: 'blur' },
+            { required: true, message: '请输入密码', trigger: 'blur' },
             { min: 8, max: 14, message: '密码长度为8-14位', trigger: 'blur' }
          ],
 
@@ -76,18 +71,27 @@ export default {
        this.$confirm('确认关闭？')
            .then(() => {
                console.log('close');
-               this.logForm.tele='',
+               this.logForm.username='',
                this.logForm.password= '',
-
                this.$emit('closedia');
            })
            .catch(() => {});
     },
+
+
+
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+            const userData = {
+              username:this.logForm.username,
+              password:this.logForm.password,
+            };
+            this.$store.dispatch('login',userData);
+
             this.$refs[formName].resetFields();
             this.$emit('closedia');
+
         }else{
             console.log('信息错误!!');
             return false;
