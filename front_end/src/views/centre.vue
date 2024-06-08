@@ -42,23 +42,25 @@ import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
-   components: {
+
+  components: {
       Book,
       Modify_info,
-   },
+  },
+
   data() {
     return {
       books:booksData,
       user:{
-         "ID": "U88965",
-         "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
-         "level": 7,
-         "nickName": "pizza_k",
-         "sex": "女",
-         "birth": new Date('2004-07-13'),
-         "signature": "",
-         "tele":"15513107588",
-         "password":'59jkb2h0',
+          "ID": "U88965",
+          "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
+          "level": 7,
+          "nickName": "pizza_k",
+          "sex": "女",
+          "birth": new Date('2004-07-13'),
+          "signature": "",
+          "tele":"15513107588",
+          "password":'59jkb2h0',
       },
       showModi: false,
     };
@@ -70,8 +72,9 @@ export default {
         this.user.signature = newInfo.signature;
         this.user.birth = newInfo.birth;
         console.log('center'+this.user.nickName);
+      },
 
-      }
+
   },
 
   computed:{
@@ -103,6 +106,7 @@ export default {
     // 假设你有一个分页逻辑，这里简单返回全部书籍作为示例
     return this.books;
     },
+
   },
 };
 </script>
