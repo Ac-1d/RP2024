@@ -5,7 +5,7 @@ from .models import *
 class NovelAdmin(admin.ModelAdmin):
     list_display = ('id', 'novel_name')
 class NCAdmin(admin.ModelAdmin):
-    list_display = ('novel_chapter','novel','chapter_id','id')
+    list_display = ('title','novel','chapter_id','id')
 
 class CMAdmin(admin.ModelAdmin):
     list_display = ('novel','chapter','user','comment_time')
