@@ -105,9 +105,9 @@ class Author(models.Model):
                 'total_words': novel.total_words,
                 'novel_status': novel.novel_status,
                 'novel_id': novel.pk,
-                'novel_author': novel.author.author_name,  # 假设Author模型有一个user字段关联到User模型
+                'novel_author': novel.author.author_name,
                 'chapter_start': novel.chapter_start,
-                'chapter_end': novel.chapter_end,  # 增加了结束章节的信息
+                'chapter_end': novel.chapter_end,
                 'category': novel.category.category_name if novel.category else None
             })
         return related_novels
@@ -152,7 +152,7 @@ class Novel_chapter(models.Model):
 
     class Meta:
         verbose_name_plural = '小说章节表'
-        unique_together = ('novel', 'chapter_id')  # 确保每本小说中的chapter_id是唯一的
+        unique_together = ('novel', 'chapter_id')
     def __str__(self):
         return self.title
 
