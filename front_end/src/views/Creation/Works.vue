@@ -31,7 +31,7 @@
 <script>
 import Book from "@/components/Book.vue";
 import {authorInfo} from '@/js/Api.js';
-import {novels} from '@/js/Api.js';
+// import {novels} from '@/js/Api.js';
 // import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
 // import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
 import "@/css/layout.css";
@@ -49,9 +49,9 @@ export default {
 
     console.log(await authorInfo(user_id));
     
-    this.authorInfo = await authorInfo(user_id);
+    this.authorInfo = await authorInfo(user_id).author_info;
 
-    this.books = await novels(user_id);
+    this.books = this.authorInfo.related_novels;
 
     console.log(this.books);
   },
