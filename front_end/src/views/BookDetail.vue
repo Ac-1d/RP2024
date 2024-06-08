@@ -87,6 +87,7 @@
 
 <script>
 import { mapActions } from 'vuex';
+// import { mapState } from 'vuex';
 import axios from 'axios';
 import reviews from '@/assets/reviews.json'; // 导入评论数据
 
@@ -144,8 +145,8 @@ export default {
   methods: {
     ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     startReading() {
-      this.setCurrentBookId(this.book.id);
-      this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
+      this.$store.commit('setCurrentBookId', this.book.id)
+      this.$store.commit('setCurrentChapterId', this.selectedChapter || this.chapters[0]?.chapter_id)
       this.$router.push({name: 'Reader'});
     },
     linktoComments() {
@@ -168,7 +169,7 @@ export default {
       console.log(`评分为: ${star}`);
     },
     fetchChapters(bookId) {
-      // 获取章节数据的API调用示例
+      // 获取章节数据的API调用示例 有待封装
       axios.get(`http://127.0.0.1:8000/novels/chapter_list`, {params: {novel_id: bookId}})
           .then(response => {
             this.chapters = response.data.chapter_data.chapter_list;
