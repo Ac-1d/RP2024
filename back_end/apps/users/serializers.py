@@ -12,7 +12,6 @@ from django.conf import settings
 
 # 注册序反列化类
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    #code = serializers.CharField(required=True, write_only=True)
 
     class Meta:
         model = models.User
@@ -45,7 +44,7 @@ class LoginModelSerializer(ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = models.User
-        fields = ('username','password',)
+        fields = ('mobile','password',)
 
 
     def validate(self, attrs):
@@ -64,8 +63,27 @@ class LoginModelSerializer(ModelSerializer):
         self.token = token
         return attrs
 
+#用户信息更新序列器
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['username', 'email', 'mobile', 'user_icon', 'gender']  # 包括更多可更新的字段
+        extra_kwargs = {
+            'email': {'required': False},
+            'mobile': {'required': False},
+            'user_icon': {'required': False},
+            'gender': {'required': False},
+            'username': {'required': False}
+        }
 
-
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'password' and value:
+                instance.set_password(value)  # 密码需要特殊处理
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 
