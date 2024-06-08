@@ -3,6 +3,28 @@ import axios from 'axios';
 
 // const replyLimitTime = 5000;// 5秒响应时间
 
+// 注册成为作者
+export async function beAuthor(id) {
+  try {
+    console.log({user_id: id});
+    return await axios.post(`novels/author_register?user_id=${id}`);
+  } catch(error) {
+    console.log(error);
+    return error.code;
+  }
+}
+
+// 获取作者信息
+export async function authorInfo(user_id) {
+  try {
+    const authorinfo = await axios.get(`/novels/author_info?user_id=${user_id}`);
+    return authorinfo.data;
+  } catch (error) {
+    console.error('Error getting authorInfo:', error); 
+    return error.code;
+  }
+}
+
 // 查找全部小说类别
 export async function category() {
   try {
@@ -146,23 +168,6 @@ export async function register(data) {
         "mobile": data.mobile
     }).data.user_id;
   } catch(error) {
-    return error.code;
-  }
-}
-
-// 注册成为作者
-export async function beAuthor(id) {
-  try {
-    console.log({user_id: id});
-    return await axios.post('novels/author_register?user_id=' + id, 
-    //   {
-    //   params: {
-    //     "user_id": id
-    //   }
-    // }
-  )
-  } catch(error) {
-    console.log(error);
     return error.code;
   }
 }

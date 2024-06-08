@@ -30,9 +30,10 @@
 
 <script>
 import Book from "@/components/Book.vue";
+import {authorInfo} from '@/js/Api.js';
+import {novels} from '@/js/Api.js';
 // import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
 // import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 import "@/css/layout.css";
 
 export default {
@@ -42,29 +43,29 @@ export default {
     // MiddleNavBar, // 注册 MiddleNavBar 组件
     // SideBar // 注册 SideBar 组件
   },
+  async mounted() {
+    const user_id = this.$store.state.userInfo.id;
+    
+    const author_name = await authorInfo(user_id).author_name;
+    console.log(author_name);
+    this.books = await novels(author_name);
+  },
   data() {
     return {
-      books: booksData, // 使用本地的 books.json 数据
+      books: [], 
       currentPage: 1, // 当前页码
       booksPerPage: 12, // 每页显示的书籍数量
-      selectedCategory: "全部", // 当前选中的分类
-      query: "" // 搜索查询
+      query: '', // 搜索查询
     };
   },
   computed: {
-    filteredBooks() {
-      if (this.selectedCategory === "全部") {
-        return this.books;
-      }
-      return this.books.filter(book => book.category === this.selectedCategory);
-    },
     totalPages() {
-      return Math.ceil(this.filteredBooks.length / this.booksPerPage);
+      return Math.ceil(this.books.length / this.booksPerPage);
     },
     paginatedBooks() {
       const start = (this.currentPage - 1) * this.booksPerPage;
       const end = start + this.booksPerPage;
-      return this.filteredBooks.slice(start, end);
+      return this.books.slice(start, end);
     }
   },
   methods: {
@@ -80,15 +81,6 @@ export default {
     },
     goToPage(page) {
       this.currentPage = page;
-    },
-    filterBooks(category) {
-      this.selectedCategory = category;
-      this.currentPage = 1; // 重置到第一页
-    },
-    search() {
-      if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
-      }
     },
     goToCategoriesDetail() {
       this.$router.push({ name: 'CategoriesDetail' });

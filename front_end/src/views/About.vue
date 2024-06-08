@@ -5,6 +5,7 @@
       <!-- 如果userInfo为空，就不加载，从而避免了报错 -->
       <p>用户名：{{ $store.state.userInfo.username }}</p>
       <p>ID-{{ $store.state.userInfo.id }}</p>
+      <p>{{ $store.state.userInfo }}</p>
     </el-main>
 
     <el-main style="position: left; display:block;">
