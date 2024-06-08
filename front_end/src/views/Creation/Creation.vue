@@ -27,7 +27,6 @@
         <Reviews/>
       </el-tab-pane>
     </el-tabs>
-    <!-- <Login_window :dialogflag="logvisible" @closedia="closeDialog"></Login_window> -->
   </el-container>
 </template>
 
@@ -36,7 +35,6 @@
 import Works from '@/views/Creation/Works.vue';
 import Reviews from '@/views/Creation/Reviews.vue';
 import Upload from '@/views/Creation/Upload.vue';
-// import Login_window from '@/components/Login_window.vue';
 import {beAuthor} from '@/js/Api.js';
 
 export default{
@@ -53,12 +51,8 @@ export default{
     Works,
     Reviews,
     Upload,
-    // Login_window,
   },
   mounted() {
-    // if (!this.$store.state.loggedIn) {
-    //   this.showDialog('login');return;
-    // } else 
     if (!this.$store.state.userInfo['is_author']) {
       console.log(this.$store.state.userInfo);
       this.becomeAuthor();return;
@@ -76,21 +70,6 @@ export default{
         beAuthor(this.$store.state.userInfo.id);
       }});
     },
-    // showDialog(option) {
-    //   if (option == 'login') this.logvisible = true;
-    //   else if (option == 'beAuthor') this.beAuthor = true;
-    // },
-    // closeDialog(option) {
-    //   if (option == 'login') this.logvisible = false;
-    //   else if (option == 'beAuthor') this.beAuthor = false;
-    //   if(!this.$store.state.loggedIn) {// 如果没有登录成功
-    //     this.$router.push({name: 'Home'});
-    //     // this.$message({
-    //     //   type: 'error',
-    //     //   message: `登录失败`
-    //     // });
-    //   }
-    // },
   }
 }
 
