@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from . import models
 from ..users.models import User
 
@@ -17,6 +19,22 @@ class NovelCategorySerializer(serializers.ModelSerializer):
         model = models.Novel_category
         fields = ['category_name','novel_list']
 
+#创建小说
+class NovelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Novel
+        exclude = ('tuijian', 'dianji')  # 排除推荐和点击字段
+
+    def create(self, validated_data):
+        return models.Novel.objects.create(**validated_data)
+#创建章节
+class NovelChapterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Novel_chapter
+        fields = '__all__'  # 或列出所有字段
+
+    def create(self, validated_data):
+        return models.Novel_chapter.objects.create(**validated_data)
 
 #获取所有小说
 class NovelAllSerializer(serializers.ModelSerializer):
@@ -83,11 +101,30 @@ class RecentlyNovelListSerializer(serializers.ModelSerializer):
 
 #上传评论
 class CommentSerializer(serializers.ModelSerializer):
+    chapter_id = serializers.IntegerField(write_only=True)  # 前端只需提交chapter_id
+    novel_id = serializers.IntegerField(write_only=True)  # 前端同时提交novel_id
+
     class Meta:
         model = models.Comment
-        fields = ['novel', 'chapter', 'user', 'comment_content', 'up_number']
+        fields = ['novel_id', 'user', 'comment_content', 'up_number', 'chapter_id', 'novel_id']
 
     def create(self, validated_data):
+        chapter_id = validated_data.pop('chapter_id')
+        novel_id = validated_data.pop('novel_id')
+
+        try:
+            # 根据 novel_id 和 chapter_id 获取 Novel_chapter 实例
+            chapter = models.Novel_chapter.objects.get(novel_id=novel_id, chapter_id=chapter_id)
+        except models.Novel_chapter.DoesNotExist:
+            raise ValidationError({'error': f'No chapter found with chapter_id {chapter_id} for novel_id {novel_id}'})
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
+
+        # 添加chapter实例到validated_data
+        validated_data['chapter'] = chapter
+        validated_data['novel'] = chapter.novel
+
+        # 创建并返回新的评论实例
         return models.Comment.objects.create(**validated_data)
 
 
@@ -108,14 +145,16 @@ class AuthorSerializer(serializers.ModelSerializer):
 #书签序列器
 class BookmarkSerializer(serializers.ModelSerializer):
     chapter_id = serializers.SerializerMethodField()
-
+    user_name = serializers.SerializerMethodField()
     class Meta:
         model = models.Bookmark
-        fields = '__all__'  # 确保包括所有默认字段以及新添加的 chapter_id
+        fields = '__all__'
 
     def get_chapter_id(self, obj):
         """Retrieve chapter_id from the associated Novel_chapter instance."""
-        return obj.chapter_id if obj.novel_chapter else None
+        return obj.novel_chapter.chapter_id if obj.novel_chapter else None
+    def get_user_name(self,obj):
+        return obj.user.username if obj.user else None
 
 
 #新建书签
@@ -126,7 +165,7 @@ class CreateBookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Bookmark
-        fields = ('cfi', 'note', 'user_id', 'novel_id', 'chapter_id', 'is_public')
+        fields = ('cfi', 'note', 'user_id', 'novel_id', 'chapter_id', 'is_public','type')
 
     def create(self, validated_data):
         # 获取并移除外键字段的ID值
