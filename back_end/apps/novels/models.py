@@ -93,6 +93,24 @@ class Author(models.Model):
         # 返回平均值，如果没有数据则返回 0.0
         return result['avg_up_number'] or 0.0
 
+    @property
+    def related_novels(self):
+        novels = Novel.objects.filter(author=self)
+        related_novels = []
+        for novel in novels:
+            related_novels.append({
+                'novel_name': novel.novel_name,
+                'novel_img': novel.novel_img.url if novel.novel_img else None,
+                'novel_detail': novel.detail,
+                'total_words': novel.total_words,
+                'novel_status': novel.novel_status,
+                'novel_id': novel.pk,
+                'novel_author': novel.author.author_name,
+                'chapter_start': novel.chapter_start,
+                'chapter_end': novel.chapter_end,
+                'category': novel.category.category_name if novel.category else None
+            })
+        return related_novels
 
 # 小说分类
 class Novel_category(models.Model):
@@ -134,7 +152,7 @@ class Novel_chapter(models.Model):
 
     class Meta:
         verbose_name_plural = '小说章节表'
-        unique_together = ('novel', 'chapter_id')  # 确保每本小说中的chapter_id是唯一的
+        unique_together = ('novel', 'chapter_id')
     def __str__(self):
         return self.title
 
