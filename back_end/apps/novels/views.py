@@ -1,7 +1,11 @@
 import os
 from datetime import timezone
 
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Sum, Avg
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from  rest_framework.filters import OrderingFilter,SearchFilter
@@ -28,6 +32,24 @@ class CreateNovelView(APIView):
             return Response({'id': novel.pk}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, *args, **kwargs):
+        # 通过查询字符串获取小说ID
+        novel_id = request.query_params.get('novel_id')
+        if not novel_id:
+            return Response({'error': '缺少小说ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            novel = models.Novel.objects.get(pk=novel_id)
+        except models.Novel.DoesNotExist:
+            return Response({'error': '小说不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 使用 partial=True 允许部分更新
+        serializer = serializers.NovelSerializer(novel, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': '小说信息更新成功'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 #新建章节
 class CreateNovelChapterView(APIView):
     parser_classes = (MultiPartParser, FormParser)  # 允许文件上传
@@ -37,6 +59,25 @@ class CreateNovelChapterView(APIView):
         if serializer.is_valid():
             novel_chapter = serializer.save()
             return Response({"Create Success"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, *args, **kwargs):
+        # 从查询字符串获取 novel_id 和 chapter_id
+        novel_id = request.query_params.get('novel_id')
+        chapter_id = request.query_params.get('chapter_id')
+        if not novel_id or not chapter_id:
+            return Response({'error': '缺少novel_id或chapter_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            novel_chapter = models.Novel_chapter.objects.get(novel_id=novel_id, chapter_id=chapter_id)
+        except models.Novel_chapter.DoesNotExist:
+            return Response({'error': '章节不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 使用 partial=True 允许部分更新
+        serializer = serializers.NovelChapterSerializer(novel_chapter, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': '章节更新成功'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #按分类返回小说详情
@@ -166,7 +207,7 @@ class AddNoveltoCrackAPIView(APIView):
         return Response({'status': 200, 'msg': message})
 
 
-#小说最近阅读接口
+#新建最近阅读接口
 class RecentlyNovelAPIView(APIView):
     def post(self, request, *args, **kwargs):
         novel_id = request.query_params.get('novel_id')
@@ -191,22 +232,18 @@ class RecentlyNovelListAPIView(APIView):
         return Response({'recent_reads': novel_list})
 
 
-#小说删除接口
+#从书架中删除小说接口
 class DeleteNovelAPIView(APIView):
-    authentication_classes = [JSONWebTokenAuthentication]
-    def get(self,request,*args,**kwargs):
-        nid = request.query_params.get('nid')
-        print(nid)
+    def post(self,request,*args,**kwargs):
+        novel_id = request.query_params.get('novel_id')
+        user_id = request.query_params.get('user_id')
 
-
-        novel_obj = models.Novel_list.objects.filter(user=request.user,Novel_id=nid).first()
+        novel_obj = models.Novel_list.objects.filter(user=user_id,Novel_id=novel_id).first()
         if novel_obj:
-            print(11)
             novel_obj.delete()
             return Response({'status':200,'msg':'删除成功'})
         else:
-            novel_obj = models.recently_reading.objects.filter(user=request.user,Novel_id=nid).first()
-            print(222)
+            novel_obj = models.recently_reading.objects.filter(user=request.user,Novel_id=novel_id).first()
             novel_obj.delete()
             return Response({'status': 200, 'msg': '删除成功'})
 
@@ -241,12 +278,17 @@ class GetCommentsView(APIView):
         else:
             return Response({"error": "缺少必要的参数"}, status=status.HTTP_400_BAD_REQUEST)
 
+#注册成为作者
 class RegisterAsAuthorAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id')  # 通过POST请求的body获取用户ID
+        user_id = request.query_params.get('user_id')
 
-        # 获取User实例
-        user = get_object_or_404(User, pk=user_id)
+        try:
+            user = models.User.objects.get(pk=user_id)
+        except ObjectDoesNotExist:
+            return Response({'message': '没有找到对应的用户信息'}, status=status.HTTP_404_NOT_FOUND)
+
 
         if user.is_author:
             return Response({'status': 400, 'message': '用户已经是作者'})
@@ -257,10 +299,27 @@ class RegisterAsAuthorAPIView(APIView):
                 author_user=user,
                 author_icon=user.user_icon,
                 author_gender=user.gender,
-                #author_detail='这是作者的详细描述'
             )
+            user.save()
             author.save()
             return Response({'status': 201, 'message': '用户成功注册为作者'})
+
+    def patch(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+
+        try:
+            author = models.Author.objects.get(author_user_id=user_id)
+        except ObjectDoesNotExist:
+            return Response({'message': '没有找到对应的作者信息'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+        with transaction.atomic():
+            for key, value in data.items():
+                if hasattr(author, key):
+                    setattr(author, key, value)
+            author.save()
+
+        return Response({'message': '作者信息更新成功'}, status=status.HTTP_200_OK)
 
 #作者信息接口
 class CheckAuthorAPI(APIView):
@@ -332,6 +391,7 @@ class PublicBookmarkAPIView(APIView):
 
 #新建书签
 class CreateBookmarkAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         # 使用请求中的JSON数据创建BookmarkSerializer实例
@@ -345,3 +405,45 @@ class CreateBookmarkAPIView(APIView):
         else:
             # 如果数据无效，返回错误信息
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        novel_id = request.query_params.get('novel_id')
+        chapter_id = request.query_params.get('chapter_id')
+
+
+        try:
+            bookmark = models.Bookmark.objects.get(user=user_id,novel=novel_id,novel_chapter__chapter_id=chapter_id)
+        except models.Bookmark.DoesNotExist:
+            return Response({'error': '书签不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+        try:
+            with transaction.atomic():
+                for key, value in data.items():
+                    if hasattr(bookmark, key):
+                        setattr(bookmark, key, value)
+                bookmark.save()
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': '书签信息更新成功'}, status=status.HTTP_200_OK)
+
+#删除指定书签
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DeleteBookmarkAPIView(APIView):
+    def delete(self, request):
+        user_id = request.query_params.get('user_id')
+        novel_id = request.query_params.get('novel_id')
+        chapter_id = request.query_params.get('chapter_id')
+
+        if not (user_id and novel_id and chapter_id):
+            return Response({"error": "必须提供user_id, novel_id和chapter_id参数。"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            bookmark = models.Bookmark.objects.get(user_id=user_id, novel_id=novel_id, novel_chapter__id=chapter_id)
+            bookmark.delete()
+            return Response({"删除成功！"},status=status.HTTP_204_NO_CONTENT)
+        except models.Bookmark.DoesNotExist:
+            return Response({"error": "未找到对应的书签"}, status=status.HTTP_404_NOT_FOUND)

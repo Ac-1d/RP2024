@@ -75,8 +75,6 @@ class Author(models.Model):
     author_detail = models.TextField(verbose_name='作者简介', default='')
     author_icon = models.FileField(upload_to='icon/', default='icon/default.jpg', verbose_name='作者图片')
     author_user = models.OneToOneField(User, null=True, related_name='author', on_delete=models.DO_NOTHING)
-    # popularity = models.IntegerField(default=0, verbose_name='作者热度')
-    # average_rating = models.FloatField(default=0.0, verbose_name='平均评分')
 
     class Meta:
         verbose_name_plural = '作者表'

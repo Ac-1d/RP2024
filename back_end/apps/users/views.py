@@ -1,7 +1,9 @@
 import json
 
-from django.shortcuts import render
+from django.db import transaction
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
@@ -85,18 +87,34 @@ class UserInfoAPIView(APIView):
             'email': user_info.email,
             'gender': user_info.gender,
             'lately_data': user_info.lately_data,
-            'is_author': user_info.is_author
+            'is_author': user_info.is_author,
+            'password':user_info.password
         }
 
         return Response({'info': response_data})
 
 #注册接口
 class RegisterView(APIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     def post(self, request, *args, **kwargs):
         serializer = serializers.UserRegistrationSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             return Response({'message': '注册成功', 'user_id': user.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response({'error': '缺少用户ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_object_or_404(models.User, pk=user_id)
+
+        serializer = serializers.UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            with transaction.atomic():
+                serializer.save()
+            return Response({'message': '用户信息更新成功'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
