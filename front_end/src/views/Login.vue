@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Login_window from "../components/Login_window.vue"
+import Login_window from "@/components/Login_window.vue"
 
 export default {
   name: 'Login',
@@ -25,6 +25,7 @@ export default {
     closeDialog() {
       this.logvisible = false;
     },
+
   },
 };
 </script>

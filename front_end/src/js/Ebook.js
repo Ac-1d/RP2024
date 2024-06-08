@@ -14,20 +14,15 @@ export function useEpub() {
    * 好像存起来也没啥用，先存着吧
    */
   let locations
-  /**目录  */
-  let navigation
   /**在切换渲染参数前储存当前阅读位置
    * 后续可以考虑缓存该属性
    */
   let currentLocation
   let isLocationLoadFinished = false
-  let cfiRange
-  let contents
   let fillColorList = [//一些合理的颜色选择
     'yellow', 'green', 'pink', 'red'
   ]
   let fillColorIndex = 0
-  let takeNoteAvailable = false
   let noteList = []
   let themeList = [
     {
@@ -43,7 +38,7 @@ export function useEpub() {
       name: 'Dark',
       style: {
         body: {
-          'color': '#FFF',
+          'color': '#808080',
           'background': '#000'
         }
       }
@@ -59,8 +54,6 @@ export function useEpub() {
     }
     book.ready
       .then(() => {
-        navigation = book.navigation
-        console.log(navigation)
         console.log("Location init...")
         return book.locations.generate()
       })
@@ -170,54 +163,32 @@ export function useEpub() {
     rendition.display(location)
   }
 
-  function setForNote(_cfiRange, _contents) {
-    cfiRange = _cfiRange
-    contents = _contents
-    console.log(cfiRange, contents)
-    console.log(takeNoteAvailable)
-    //解决获取选中文字Location异步的问题
-    //完全没有解决，暂时弃用，这个问题会导致快速选取文字无法立即高亮/下划线
-    if (takeNoteAvailable){
-      takeNote()
-    }
-  }
 
   /**epubjs中编辑样式是使用svg来实现的 */
   //TODO: 几乎解决了自定义样式的问题，但下划线颜色无法编辑
-  function takeNote(takeNoteType) {
+  function takeNote(takeNoteType, cfiRange) {
     console.log("try to take note")
-    if (cfiRange) {
-      if(checkCFIRangeLegal(cfiRange)){
-        switch (takeNoteType) {
-          case 'highlight':
-            rendition.annotations.highlight(cfiRange, {}, () => {}, null, {
-              "fill": fillColorList[fillColorIndex]
-            });
-            break;
-          case 'underline':
-            rendition.annotations.underline(cfiRange, {}, () => {}, null, {
-              "stroke": 'transparent',
-              "stroke-opacity": "0.8",
-              "mix-blend-mode": "normal"
-            })
-            break;
-          default:
-            console.error("unkown operation")
-            break;
-        }
-        noteList.push({'cfiRange': cfiRange, 'note': null, 'type': takeNoteType})//TODO: 填入note部分
-        console.log("push cfiRange to noteList")
-      }
-      contents.window.getSelection().removeAllRanges();
-      cfiRange = null
+    switch (takeNoteType) {
+      case 'highlight':
+        rendition.annotations.highlight(cfiRange, {}, () => { }, null, {
+          "fill": fillColorList[fillColorIndex]
+        });
+        break;
+      case 'underline':
+        rendition.annotations.underline(cfiRange, {}, () => { }, null, {
+          "stroke": 'transparent',
+          "stroke-opacity": "0.8",
+          "mix-blend-mode": "normal"
+        })
+        break;
+      default:
+        console.error("unkown operation")
+        break;
     }
-    else
-      console.warn("cfiRange is undefined")
-  }
+    noteList.push({ 'cfiRange': cfiRange, 'note': null, 'type': takeNoteType, isPublic: false })
+    console.log("push cfiRange to noteList")
 
-  function setTakeNoteAvailable() {
-    takeNoteAvailable = true
-  }
+}
 
   function setFillColor(index) {
     fillColorIndex = index
@@ -239,13 +210,20 @@ export function useEpub() {
     rendition.annotations.remove(note.cfiRange, note.type)
     noteList.splice(noteList.indexOf(note))
   }
-
-  function setNoteText(noteText) {
+  /**TODO: 此处代码有待处理：对笔记进行处理的流程应该重构(有时间的话) */
+  function setNoteText(noteText, isNotePublic, isTakeNote) {
     console.log("set note text")
     let note = noteList.pop()
-    note.note = noteText
-    console.log(note)
-    noteList.push(note)
+    if(isTakeNote){
+      note.note = noteText
+      note.isPublic = isNotePublic
+      console.log(note)
+      noteList.push(note)
+    }
+    else{
+      noteList.push(note)
+      removeMark(note.cfiRange)
+    }
   }
 
   function getNoteText(cfiRange) {
@@ -261,8 +239,9 @@ export function useEpub() {
     return noteText
   }
 
-  /**private function */
+  
   function checkCFIRangeLegal(cfiRange) {
+    console.log("call check cfi range legel, cfiRange:", cfiRange)
     let {startCfi: _startCfi, endCfi: _endCfi} = cfiRange2cfi(cfiRange)
     let EF = new EpubCFI();
     for (let i = 0; i < noteList.length; i++) {
@@ -299,6 +278,7 @@ export function useEpub() {
 
   /**private function */
   function cfiRange2cfi(cfiRange) {
+    console.log("call cfi range 2 cfi, cfiRange: ", cfiRange)
     let cfiParts = cfiRange.split(','); 
     // 起始点
     let startCfi = cfiParts[0] + cfiParts[1] + ')';  
@@ -307,11 +287,19 @@ export function useEpub() {
     return {startCfi, endCfi}
   }
 
-  /**用于hack epubjs源码^^
-   * 或是一些临时的测试函数
-   */
-  function test() {
-    console.log("-----------")
+  function doSearch(q) {
+    return Promise.all(
+      book.spine.spineItems.map((section) => 
+        section
+          .load(book.load.bind(book))
+          .then(section.find.bind(section, q))
+          .finally(section.unload.bind(section))
+      )
+    ).then((results) => Promise.resolve([].concat.apply([], results)))
+  }
+
+  function getNoteList() {
+    return noteList
   }
 
   function setLatedPage() {
@@ -319,8 +307,25 @@ export function useEpub() {
     rendition.display(currentLocation.start.cfi)
   }
 
+  function highlight(cfiRange) {
+    rendition.annotations.highlight(cfiRange, {}, () => { }, null, {
+      "fill": 'red'
+    })
+    setTimeout(() => {
+      rendition.annotations.remove(cfiRange, 'highlight')
+    }, 5000);
+  }
+
+  /**用于hack epubjs源码^^
+   * 或是一些临时的测试函数
+   */
+  function test(location) {
+    rendition.display(location)
+  }
+
   return {
     createBook, render, getBook, getRendition, nextPage, prevPage, setFontSize, setViewStyle, test, setTheme, setPage, setLatedPage,
-    setForNote, takeNote, setTakeNoteAvailable, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText
+    takeNote, setFillColor, getIsLocationLoadFinished, removeMark, setNoteText, getNoteText, checkCFIRangeLegal, highlight, 
+    doSearch, getNoteList
   }
 }

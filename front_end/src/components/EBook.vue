@@ -1,106 +1,261 @@
 <template>
   <div id="ebook">
-    <!-- TODO: 窗口大小溢出，原因未知 -->
-    <div id="epub_render" @click="checkclick"></div>
-    <div id="mask">
-      <button id="tableButton" @click="callTable">点我呼出菜单</button>
-      <button id="nextPageButton" @click="nextPage">点我向后翻页</button>
-      <button id="prevPageButton" @click="prevPage">点我向前翻页</button>
+    <!-- TODO: 窗口大小改变时应该重新渲染(?) -->
+    <div id="epub_render"></div>
+    <div id="buttons">
+      <div id="tableButton">
+        <el-button type="info" icon="el-icon-d-arrow-left" @click="prevPage" circle></el-button>
+        <el-button type="info" icon="el-icon-setting" @click="callTable" circle></el-button>
+        <el-button type="info" icon="el-icon-d-arrow-right" @click="nextPage" circle></el-button>
+      </div>
     </div>
     <div id="table" v-if="showTable">
-      <div id="bookInfo">这里是书籍信息</div>
-      <div id="setting">
-        <h1>这里是设置</h1>
-        <!-- TODO: 最好改为按下回车/点击页面时修改数值 -->
-        调整字体大小：
-        <input type="text" v-model="fontSize">
-        <div>{{ fontSize }}</div>
-        <button id="changeViewStyleButton" @click="changeViewStyle">点我修改视图</button>
-        <button @click="test">点我调用test()</button>
-        <button @click="changeTheme(0)">点我切换浅色模式</button>
-        <button @click="changeTheme(1)">点我切换深色模式</button>
-        <button @click="changeLocation">点我修改至储存location位置</button>
-        <input type="text" v-model="testPageNumber">
-        <button @click="changeTakeNoteType('highlight')">点我标记高亮</button>
-        <button @click="changeTakeNoteType('underline')">点我做笔记</button>
-        <button @click="testIsRemove=!testIsRemove">点我切换查看/删除</button>
-        <input type="text" id="note" v-if="isTakeNote" @keyup.enter="hideInput" v-model="noteText">
+      <div id="bookInfo" class="side-bar">
+        <div id="bookInfo-header">
+          <img :src="coverUrl" id="bookInfo-cover">
+          <div id="bookInfo-text">
+            <!-- 文本无法垂直方向居中 -->
+            <p id="title" class="text bookInfo-text">{{ metadata.title }}</p>
+            <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
+            <p class="text bookInfo-text">已读：12h</p>
+            <p class="text bookInfo-search">全文搜索：</p>
+            <div id="block">
+              <el-input class="search-input" @change="doSearch" v-model="searchText" placeholder="请输入内容"
+                size="mini"></el-input>
+              <el-button id="search-hide" icon="el-icon-close" circle
+                @click="showNavigation = true; searchText = null"></el-button>
+            </div>
+          </div>
+        </div>
+        <div class="bookInfo-body" v-if="showNavigation">
+          <div v-for="item in navigation" :key="item.index" class="text bookInfo-text">
+            <hr class="parting-line">
+            <span @click="setHref(item.href)">
+              {{ item.index }}.{{ item.label }}
+            </span>
+          </div>
+        </div>
+        <div class="bookInfo-body" v-if="!showNavigation"><!-- 与上面同级div块不同时渲染 -->
+          <div v-if="!searchResult || searchResult.length === 0">
+            <p class="bookInfo-text">搜索内容不存在</p>
+          </div>
+          <div v-else>
+            <div v-for="item in searchResult" :key="item.index" class="text">
+              <hr class="parting-line">
+              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="progressBar">
-        这里是进度条
-        <!-- TODO：需要添加更多修饰，如：在locations尚未加载完毕时隐藏进度条 -->
-        <input type="range" v-model="pageNumber">
+      <div id="setting" class="side-bar">
+        <div id="header">
+          <el-form ref="settings" :model="settings" label-width="100px">
+            <el-form-item label="深色模式">
+              <el-switch v-model="settings.nightTheme"></el-switch>
+            </el-form-item>
+            <el-form-item label="笔记模式">
+              <el-switch v-model="settings.isTakingNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="笔记方式" v-if="settings.isTakingNote">
+              <el-radio-group v-model="settings.noteType" size="small">
+                <el-radio border label="underline">记笔记</el-radio>
+                <el-radio border label="highlight">高亮</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
+              <el-switch v-model="settings.isRemovingNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="显示个人笔记">
+              <el-switch v-model="settings.showPersonalNote"></el-switch>
+            </el-form-item>
+            <el-form-item label="字体大小" :rules="[
+              { type: 'number', message: '字体大小必须为数字值' }
+            ]">
+              <el-input v-model.number="settings.fontSize" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="changeFontSize">设置</el-button>
+              <el-button @click="defaultFontSize">默认大小</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="danger" @click="exit">退出阅读</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-divider></el-divider>
+        <el-form>
+          <el-form-item>
+            <el-button @click="showPersonalNote = true; showOthersNote = false">我的笔记</el-button>
+            <el-button @click="showPersonalNote = false; showOthersNote = true">他的笔记</el-button>
+          </el-form-item>
+        </el-form>
+        <div id="body">
+          <div v-if="showPersonalNote" class="contents">
+            <div v-for="item in personalNoteList" :key="item.index" class="text bookInfo-text">
+              <hr class="parting-line">
+              <span v-if="item.note && item.isPublic">{{ item.note }}</span>
+            </div>
+          </div>
+          <div v-if="showOthersNote" class="contents">
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="take-note-component" v-if="showNoteInput">
+      <div id="mask"></div>
+      <div id="note-input">
+        <div id="contents">
+          <el-form label-position="top" label-width="100px">
+            <el-form-item label="笔记记录">
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText" resize="none">
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <el-form>
+            <el-form-item label="是否公开" style="margin: 5% 10%">
+              <el-switch v-model="isNotePublic"></el-switch>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="finishTakeNote(true)">确认</el-button>
+              <el-button @click="finishTakeNote(false)">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import {useEpub} from "../js/Ebook.js";
+import { mapState } from "vuex";
+import { useEpub } from "../js/Ebook.js"; 
+import { novelContent } from '../js/Api.js';
 
 export default {
   name: "EBook",
   data() {
     return {
       showTable: false,
-      fontSize: '',
-      pageNumber: '',
-      testPageNumber:'',
-      testIsRemove: false,
-      takeNoteType: 'underline',
-      isTakeNote: false,
-      noteText: ''
+      showNavigation: true,
+      showNoteInput: false,
+      showPersonalNote: true,
+      showOthersNote: false,
+      isNotePublic: false,
+      noteText: '',
+      coverUrl: '',
+      metadata: null,
+      navigation: [],
+      searchText: '',
+      searchResult: [],
+      noteCfiRange: '',
+      noteContents: '',
+      allowTakeNote: false,
+      settings: {
+        nightTheme: false,
+        isTakingNote: false,
+        isRemovingNote: false,
+        showPersonalNote: true,
+        showOthersNote: false,
+        noteType: '',
+        fontSize: '',
+      },
+      personalNoteList: [],
+      othersNoteList: [],
     }
   },
-  props: [
-    'showNav'
-  ],
+  computed: {
+    ...mapState(['currentChapterId', 'currentBookId', ])
+  },
   mounted() {
+    this.$store.commit('setShowTopBar')
     this.epubReader = useEpub();
     this.loadEpub();
-    let rendition = this.epubReader.getRendition()
-    rendition.on("selected", (cfiRange, contents) =>{
-      console.log("listener detectes text selected:", cfiRange, contents)
-      this.epubReader.setForNote(cfiRange, contents)
-    })
-    rendition.on("mouseup", ()=> {
-      console.log("listener detectes mouseup")
-      if(this.takeNoteType == 'underline')
-        this.isTakeNote = true
-      this.epubReader.takeNote(this.takeNoteType)
-    })
-    rendition.on("markClicked", (cfiRange)=> {
-      console.log("listener detectes 'markClicked'")
-      console.log(cfiRange)
-      if(this.testIsRemove)
-        this.epubReader.removeMark(cfiRange)
-      else {
-        console.log(this.epubReader.getNoteText(cfiRange)) 
-      }
-    })
+    this.loadMark()
+    
   },
   watch: {
-    fontSize(newValue) {
-      console.log("call fontSize in watch");
-      this.changeFontSize(newValue);
+    'settings.nightTheme': function(nightTheme) {
+      console.log("call set night theme",nightTheme)
+      if(nightTheme)//true为深色模式
+        this.epubReader.setTheme(1)
+      else
+        this.epubReader.setTheme(0)
     },
-    pageNumber(newValue) {
-      // console.log("pageNumber changed", newValue)
-      this.changePage(newValue)
-    },
-    testPageNumber(newValue) {
-      this.epubReader.test(newValue)
-    }
   },
   methods: {
     loadEpub() {
-      this.epubReader.createBook("books_tmp/09.epub");
-      this.epubReader.render("epub_render", {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        // flow: "scrolled-doc",
-        allowScriptedContent: true
-      });
+      novelContent(this.currentBookId, this.currentChapterId)
+        .then(response => {
+          const book = this.epubReader.createBook(response.data.chapter_data.content);
+          this.loadBook(book)
+          this.epubReader.render("epub_render", {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            allowScriptedContent: true
+          });
+          let rendition = this.epubReader.getRendition()
+          this.loadListener(rendition)
+        })
+        .catch(error => {
+          console.error("error: ", error)
+        })
+    },
+    loadBook(book) {
+      book.loaded.cover.then((cover) => {
+        if (cover) {
+          book.archive.createUrl(cover).then((_url) => {
+            this.coverUrl = _url
+            console.log("parse url:", this.coverUrl)
+          })
+        }
+        else {//TODO: 无封面加载一个默认封面
+
+        }
+      })
+      book.loaded.metadata.then((_metadata) => {
+        this.metadata = _metadata
+        console.log("parse metadata:", this.metadata)
+      })
+      book.loaded.navigation.then((nav) => {
+        let index = 0
+        nav.toc.forEach((toc) => {
+          this.navigation.push({ 'id': toc.id, 'href': toc.href, 'label': toc.label, 'index': ++index })
+        })
+        console.log("parse navigation")
+      })
+    },
+    loadListener(rendition) {
+      rendition.on("selected", (cfiRange, contents) => {
+        console.log("listener detectes text selected:", cfiRange, contents)
+        this.noteCfiRange = cfiRange
+        this.noteContents = contents
+        if (this.allowTakeNote) {
+          this.takeNote()
+          this.allowTakeNote = false
+        }
+      })
+      rendition.on("mouseup", () => {
+        console.log("listener detectes mouseup")
+        if (this.settings.isTakingNote == false)
+          return
+        if (this.noteCfiRange) {
+          this.takeNote()
+        }
+        else {
+          console.warn("cfiRange is undefined")
+          this.allowTakeNote = true
+        }
+      })
+      rendition.on("markClicked", (cfiRange) => {
+        console.log("listener detectes 'markClicked'")
+        console.log(cfiRange)
+        if (this.settings.isRemovingNote)
+          this.epubReader.removeMark(cfiRange)
+        else {
+          console.log(this.epubReader.getNoteText(cfiRange))
+        }
+      })
     },
     prevPage() {
       this.epubReader.prevPage();
@@ -111,57 +266,97 @@ export default {
     callTable() {
       this.showTable = !this.showTable;
     },
-    changeFontSize(fontSize) {
+    changeFontSize() {
       console.log("call setFontSize");
-      this.epubReader.setFontSize(fontSize);
+      this.epubReader.setFontSize(this.settings.fontSize);
     },
-    changeViewStyle() {
-      this.epubReader.setViewStyle();
+    defaultFontSize() {
+      this.settings.fontSize = null
+      this.epubReader.setFontSize(16)
     },
-    changeTheme(index) {
-      this.epubReader.setTheme(index);
+    doSearch() {
+      console.log("call do search")
+      this.epubReader.getBook().ready.then(() => {
+        if (!this.searchText) {
+          console.log("empty input")
+          return
+        }
+        this.epubReader.doSearch(this.searchText).then((results) => {
+          this.searchResult = results
+          this.searchResult.map((item) => {
+            console.log(item.excerpt, "|||", this.searchText)
+            let regexPattern = new RegExp(this.searchText, "gi")
+            let tmp = item.excerpt.match(regexPattern)[0]
+            let targetString = `<span style="color: red;">` + tmp + `</span>`
+            item.excerpt = item.excerpt.replace(
+              regexPattern,
+              targetString
+            )
+            return item
+          })
+        })
+        this.showNavigation = false
+      })
     },
-    changePage(pageNumber) {
-      this.epubReader.setPage(pageNumber)
+    takeNote() {
+      if(this.epubReader.checkCFIRangeLegal(this.noteCfiRange)){
+          if (this.settings.noteType == 'underline')
+            this.showNoteInput = true
+          this.epubReader.takeNote(this.settings.noteType, this.noteCfiRange)
+          console.log(this.noteList)
+        }
+        this.noteContents.window.getSelection().removeAllRanges()
+        this.noteCfiRange = null
     },
-    getSelectedTextPosition() {
-      var selection = window.getSelection(); // 获取用户选择的文本
-      if (selection.rangeCount > 0) { // 如果存在选中文本
-        var range = selection.getRangeAt(0); // 获取选中文本的范围
-        var startContainer = range.startContainer; // 起始节点
-        var startOffset = range.startOffset; // 起始偏移量
-        var endContainer = range.endContainer; // 结束节点
-        var endOffset = range.endOffset; // 结束偏移量
-
-        console.log("Start Node:", startContainer);
-        console.log("Start Offset:", startOffset);
-        console.log("End Node:", endContainer);
-        console.log("End Offset:", endOffset);
-      } else {
-        console.log("No text selected.");
+    finishTakeNote(isTakeNote) {
+      this.epubReader.setNoteText(this.noteText, this.isNotePublic, isTakeNote)
+      this.isNotePublic = false
+      this.noteText = null
+      this.showNoteInput = false
+    },
+    loadMark() {
+      //请求获取他人笔记与私人笔记
+      //处理personalNote
+      for(let note in this.personalNoteList) {
+        const type = note.type
+        const cfi = note.cfi
+        const noteText = note.noteText
+        const isPublic = note.isPublic
+        if(type == 'highlight') {
+          this.epubReader.takeNote(type, cfi)
+        }
+        else if(type == 'underline') {
+          this.epubReader.takeNote(type, cfi)
+          this.epubReader.setNoteText(noteText, isPublic, true)
+        }
+        else {
+          console.error("type error in loadMark: ", type)
+        }
       }
+      
     },
-    changeLocation() {
-      this.epubReader.setLatedPage()
-    },
-    changeTakeNoteType(takeNoteType) {
-      this.takeNoteType = takeNoteType
-    },
-    hideInput() {
-      this.isTakeNote = false
-      this.epubReader.setNoteText(this.noteText)
+    exit() {
+      const url = '/book/' + this.currentBookId
+      if(this.currentBookId)
+        this.$router.push(url)
+      else
+        this.$router.push('/home')
     },
     test() {
-      this.epubReader.test();
+
     },
     emptyFunction() {
     },
-    checkclick() {
-      console.log("success click the block")
-    }
+    setHref(href) {
+      console.log("set page to", href)
+      this.epubReader.getRendition().display(href)
+      this.epubReader.highlight(href)
+    },
   },
   beforeDestroy() {
     // TODO: 销毁监听器
+    this.$store.commit('setShowTopBar')
+    // saveNote()
   }
 };
 </script>
@@ -169,47 +364,78 @@ export default {
 <style lang="scss" scoped>
 #ebook {
   position: relative;
-  // #epub_render {
-  //   width: 100%;
-  //   height: 100vh;
-  //   justify-content: center;
-  //   align-content: center;
-  // }
-  #mask {
+
+  #buttons {
     #tableButton {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
       top: 0;
     }
+
     #nextPageButton {
       position: fixed;
       right: 0;
       bottom: 0;
     }
+
     #prevPageButton {
       position: fixed;
       left: 0;
       bottom: 0;
     }
   }
+
   #table {
     #bookInfo {
       position: fixed;
       top: 0;
       left: 0;
-      width: 200px;
-      height: 100%;
-      background-color: grey;
+
+
+      #bookInfo-header {
+        width: auto;
+        height: 20%;
+        display: flex;
+
+        #bookInfo-cover {
+          height: 100%;
+          object-fit: contain;
+        }
+
+        #bookInfo-text {//对低高度适配性极差^^'
+          margin-top: 5%;
+          height: 95%;
+          width: 60%;
+          display: flex;
+          flex-direction: column;
+          // overflow: scroll;
+          #block {
+            width: 100%;
+          }
+        }
+      }
     }
+
     #setting {
       position: fixed;
       top: 0;
       right: 0;
-      width: 200px;
-      height: 100%;
-      background-color: grey;
+
+      #header {
+        width: 90%;
+        margin: 5% 5%;
+        max-height: 50%;
+        overflow: scroll;
+      }
+      #body {
+        width: 90%;
+        margin: 5% 5%;
+        height: 50%;
+        overflow: scroll;
+      }
     }
+
     #progressBar {
       position: fixed;
       align-content: center;
@@ -220,5 +446,109 @@ export default {
       height: 100px;
     }
   }
+
+  #take-note-component {
+    #note-input {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10%;
+      height: 300px;
+      width: 500px;
+      background: white;
+      border: 1px dashed black;
+      z-index: 9999;
+      #contents {
+        margin: 5%;
+      }
+    }
+
+    #mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.25);
+      /* 半透明黑色背景 */
+      z-index: 9998;
+    }
+  }
+}
+
+.search-input {
+  width: 75%;
+  margin-right: 5%;
+}
+
+.text {
+  text-align: left;
+}
+
+.bookInfo-text {
+  margin: 0%;
+  width: 100%;
+  flex-basis: 20%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookInfo-body {
+  margin: 5% 20px;
+  height: 75%;
+  overflow: scroll;
+}
+
+.parting-line {
+  height: 1px;
+  border: none;
+  border-top: 1px dashed grey;
+}
+
+.side-bar {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 4px;
+  width: 350px;
+  height: 100%;
+}
+
+.settings {
+  height: 20%;
+}
+
+.el-row {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.el-col {
+  border-radius: 4px;
+}
+
+.bg-purple-dark {
+  background: #99a9bf;
+}
+
+.bg-purple {
+  background: #d3dce6;
+}
+
+.bg-purple-light {
+  background: #e5e9f2;
+}
+
+.grid-content {
+  border-radius: 4px;
+  min-height: 60px;
+}
+
+.row-bg {
+  padding: 10px 0;
+  background-color: #f9fafc;
 }
 </style>

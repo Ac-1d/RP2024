@@ -1,62 +1,102 @@
 <template>
   <el-dialog
+    title="登录"
     :visible="dialogflag"
-    :color=pick
+
     :close-on-click-modal="false"
     :before-close="logdialogclose"
     :destroy-on-close="true"
   >
-  <Menu></Menu>
-    <el-form :model="loginForm" ref="loginFormRef" label-width="80px">
+
+    <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="电话">
-        <el-input v-model="loginForm.tele"></el-input>
-      </el-form-item>
-      <el-form-item v-if='isRegister' label="用户名">
-        <el-input v-model="loginForm.username"></el-input>
-      </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="loginForm.password" show-password></el-input>
-      </el-form-item>
-      <el-form-item v-if='isRegister' label="确认密码" >
-        <el-input v-model="loginForm.password2" show-password></el-input>
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="logForm.username" autocomplete="off"></el-input>
       </el-form-item>
 
+
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="logForm.password" show-password></el-input>
+      </el-form-item>
+
+
       <el-form-item>
-        <el-button v-if='isRegister' type="primary" @click="submitForm">注册</el-button>
-        <el-button type="primary" @click="logdialogclose">取消</el-button>
+        <el-button type="primary" @click="submitForm('logForm')">登录</el-button>
+        <el-button  @click="logdialogCancel('logForm')">取消</el-button>
+
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script>
-import Menu from "@/components/Menu.vue"
-export default {
 
+export default {
   name: "Login_window",
   props: {
     dialogflag: Boolean,
   },
-  components: { Menu },
+
   emits: ['closedia'],
   data() {
     return {
-      loginForm: {
-        tele:'',
-        username: '',
+      logForm: {
+        username:'',
         password: '',
-        password2: '',
       },
-      isRegister: true,
+      rules :{
+         username: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+
+         ],
+
+         password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 8, max: 14, message: '密码长度为8-14位', trigger: 'blur' }
+         ],
+
+      },
     };
   },
   methods: {
-    logdialogclose() {
-      this.$emit('closedia');
+    logdialogCancel(formName) {
+      this.$confirm('确认关闭？')
+          .then(() => {
+               this.$refs[formName].resetFields();
+               this.$emit('closedia');
+          })
+          .catch(() => {});
     },
-    submitForm() {
-      // 实现登录逻辑
+    logdialogclose() {
+       this.$confirm('确认关闭？')
+           .then(() => {
+               console.log('close');
+               this.logForm.username='',
+               this.logForm.password= '',
+               this.$emit('closedia');
+           })
+           .catch(() => {});
+    },
+
+
+
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+            const userData = {
+              username:this.logForm.username,
+              password:this.logForm.password,
+            };
+            this.$store.dispatch('login',userData);
+
+            this.$refs[formName].resetFields();
+            this.$emit('closedia');
+
+        }else{
+            console.log('信息错误!!');
+            return false;
+        }
+      });
     },
   },
 };
