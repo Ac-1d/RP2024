@@ -137,13 +137,12 @@ export default {
               email:this.regisForm.email,
               mobile:this.regisForm.tele,
           };
-          console.log('1');
+
           const response = await axios.post('http://127.0.0.1:8000/users/register', userData);
-          console.log('2');
+
           console.log('注册接口响应详情:', response);
 
           if (response.status === 400) {
-
             throw new Error(`注册失败，状态码：${response.status}`);
           } else{
             alert('注册成功!,用户ID:'+response.data.user_id);

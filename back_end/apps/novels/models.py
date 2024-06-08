@@ -75,8 +75,6 @@ class Author(models.Model):
     author_detail = models.TextField(verbose_name='作者简介', default='')
     author_icon = models.FileField(upload_to='icon/', default='icon/default.jpg', verbose_name='作者图片')
     author_user = models.OneToOneField(User, null=True, related_name='author', on_delete=models.DO_NOTHING)
-    # popularity = models.IntegerField(default=0, verbose_name='作者热度')
-    # average_rating = models.FloatField(default=0.0, verbose_name='平均评分')
 
     class Meta:
         verbose_name_plural = '作者表'
@@ -127,11 +125,8 @@ class Novel_category(models.Model):
 
 # 小说章节表
 class Novel_chapter(models.Model):
-    #chapter_id = models.IntegerField(primary_key=True,default=-1)
-    chapter_id=models.IntegerField(default=0)
-    is_free = models.BooleanField(default=True, verbose_name='是否免费')
-    price = models.IntegerField(verbose_name='价格', default=0)
-    novel_chapter = models.CharField(max_length=64, verbose_name='小说章节')
+    chapter_id=models.IntegerField(default=0,verbose_name='章节号')
+    title = models.CharField(max_length=64, verbose_name='章节标题',default=None)
     content = models.FileField(upload_to='novel_content',verbose_name='章节内容', blank=True)
     words = models.IntegerField(verbose_name='字数', default=0)
     novel = models.ForeignKey(to='Novel', null=True, related_name='Novel', verbose_name='小说外键',
@@ -141,7 +136,7 @@ class Novel_chapter(models.Model):
         verbose_name_plural = '小说章节表'
         unique_together = ('novel', 'chapter_id')  # 确保每本小说中的chapter_id是唯一的
     def __str__(self):
-        return self.novel_chapter
+        return self.title
 
     # 小说名字
     @property
@@ -250,8 +245,3 @@ class Bookmark(models.Model):
     novel_chapter = models.ForeignKey(Novel_chapter, on_delete=models.CASCADE, verbose_name='章节')
     is_public = models.BooleanField(default=False, verbose_name='是否公开')
     type = models.CharField(max_length=255, verbose_name='具体类型',default=None)
-
-    @property
-    def chapter_id(self):
-        """Returns the chapter_id from the associated Novel_chapter instance."""
-        return self.novel_chapter.chapter_id if self.novel_chapter else None

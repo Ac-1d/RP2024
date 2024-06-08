@@ -41,12 +41,12 @@ export default new Vuex.Store({
   },
   actions: {
     async login({ commit }, loginData) { 
-      let username = loginData.username;
+      let mobile = loginData.mobile;
       let password = loginData.password;
       let msg = '登录失败';
-      if (username && password) {
+      if (mobile && password) {
         await axios.post("/users/login", {  
-          username: username,  
+          mobile: mobile,
           password: password,
         }).then(response => {
           if (response.data.status == 200 && response.data.msg == '登录成功') {
@@ -55,6 +55,7 @@ export default new Vuex.Store({
           }
         }).catch(error => {
           msg = '验证失败，错误码：' + error.response.status;
+          alert("登录失败，用户不存在或密码错误");
         })
       }
       return {msg: msg};

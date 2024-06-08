@@ -12,7 +12,6 @@ from django.conf import settings
 
 # 注册序反列化类
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    #code = serializers.CharField(required=True, write_only=True)
 
     class Meta:
         model = models.User
@@ -41,17 +40,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return models.User.objects.create(**validated_data)
 #普通登录序列化类
 class LoginModelSerializer(ModelSerializer):
-    username = serializers.CharField(write_only=True)
+    mobile = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
     class Meta:
         model = models.User
-        fields = ('username','password',)
+        fields = ('mobile','password',)
 
 
     def validate(self, attrs):
-        username = attrs.get('username')
         password = attrs.get('password')
-        user = models.User.objects.filter(username=username,is_delete=False).first()
+        mobile = attrs.get('mobile')
+        user = models.User.objects.filter(mobile=mobile,is_delete=False).first()
         if not user:
             raise ValidationError('该用户不存在')
         if(user.password != password):
@@ -64,8 +63,27 @@ class LoginModelSerializer(ModelSerializer):
         self.token = token
         return attrs
 
+#用户信息更新序列器
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['username', 'email', 'mobile', 'user_icon', 'gender']  # 包括更多可更新的字段
+        extra_kwargs = {
+            'email': {'required': False},
+            'mobile': {'required': False},
+            'user_icon': {'required': False},
+            'gender': {'required': False},
+            'username': {'required': False}
+        }
 
-
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'password' and value:
+                instance.set_password(value)  # 密码需要特殊处理
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 

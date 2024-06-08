@@ -10,8 +10,8 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="logForm.username" autocomplete="off"></el-input>
+      <el-form-item label="电话" prop="tele">
+        <el-input v-model="logForm.tele" autocomplete="off"></el-input>
       </el-form-item>
 
 
@@ -41,12 +41,17 @@ export default {
   data() {
     return {
       logForm: {
-        username:'',
+        tele:'',
         password: '',
       },
       rules :{
-         username: [
-            { required: true, message: '请输入用户名', trigger: 'blur' },
+         tele: [
+            { required: true, message: '请输入电话号码', trigger: 'blur' },
+            {
+                pattern: /^1[3-9]\d{9}$/, // 中国手机号正则，以1开头，第二位是3-9之间的数字，后面跟9位数字
+                message: '请输入正确的电话号码格式',
+                trigger: ['blur', 'change'] // 触发验证的时机，这里设定为失去焦点或值变化时
+            }
 
          ],
 
@@ -71,26 +76,23 @@ export default {
        this.$confirm('确认关闭？')
            .then(() => {
                console.log('close');
-               this.logForm.username='',
+               this.logForm.tele='',
                this.logForm.password= '',
                this.$emit('closedia');
            })
            .catch(() => {});
     },
 
-
-
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
             const userData = {
-              username:this.logForm.username,
+              mobile:this.logForm.tele,
               password:this.logForm.password,
             };
-            this.$store.dispatch('login',userData);
 
-            this.$refs[formName].resetFields();
-            this.$emit('closedia');
+            const ans = this.$store.dispatch('login',userData);
+            console.log("得到ans:"+ans);
 
         }else{
             console.log('信息错误!!');
