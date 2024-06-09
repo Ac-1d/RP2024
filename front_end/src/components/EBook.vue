@@ -140,7 +140,7 @@
 <script>
 import { mapState } from "vuex";
 import { useEpub } from "../js/Ebook.js";
-import { novelContent, getPersonalNote, getPublicNote } from '../js/Api.js';
+import { novelContent, getPersonalNote, getPublicNote, postNote, deleteNote } from '../js/Api.js';
 
 export default {
   name: "EBook",
@@ -196,9 +196,12 @@ export default {
   },
   methods: {
     loadEpub() {
+      console.log(this.currentBookId, this.currentChapterId)
       novelContent(this.currentBookId, this.currentChapterId)
         .then(response => {
+          console.log(response)
           const book = this.epubReader.createBook(response.data.chapter_data.content);
+          console.log(book)
           this.loadBook(book)
           this.epubReader.render("epub_render", {
             width: window.innerWidth,
@@ -403,11 +406,13 @@ export default {
       this.personalNoteList.forEach(note => {
         if(this.oldPersonalNoteList.includes(note) == false) {
           //post
+          postNote(note)
         }
       })
       this.oldPersonalNoteList.forEach(note => {
         if(this.personalNoteList.includes(note) == false) {
           //delete
+          deleteNote(note.cfi)
         }
       })
     }

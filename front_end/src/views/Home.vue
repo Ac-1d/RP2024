@@ -27,7 +27,7 @@
         <div class="separator"></div>
 
         <!-- 书籍展示区域 -->
-        <div class="books">
+        <div class="books">  
           <Book v-for="book in  paginatedBooks" :key="book.title" :book="book" />
         </div>
 

@@ -179,4 +179,26 @@ export async function getPublicNote(user, book, chapter) {
   }
 }
 
-export async function postNote()
+export async function postNote(note){
+  try {
+    return await axios.post(`/novels/create_bookmarks`, {
+      'cfi': note.cfi,
+      'note': note.note,
+      'user_id': note.user_id,
+      'novel_id': note.novel_id,
+      'chapter_id': note.chapter_id,
+      'is_public': note.is_public,
+      'type': note.type
+    })
+  } catch (error) {
+    return error.code
+  }
+}
+
+export async function deleteNote(cfi){
+  try {
+    axios.delete(`/novels/delete_bookmarks?cfi=${cfi}`)
+  } catch (error) {
+    return error.code
+  }
+}
