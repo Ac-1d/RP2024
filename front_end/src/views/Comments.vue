@@ -46,21 +46,10 @@ export default {
   components: { Login_window },
   data() {
     return {
-<<<<<<< HEAD
-      bookId: this.$store.getters.currentBookId, 
-      
-      chapterId: this.$store.getters.currentChapterId,
-      
-      userInfo: null,
-
-      comments: null,// 已有评论
-
-=======
-      bookId: this.$route.params.bookId, // 从路由参数中获取 bookId
+      bookId: this.$route.getters.currentBookId, // 从路由参数中获取 bookId
       chapterId: this.$store.getters.currentChapterId, // 从 Vuex 中获取当前章节ID
       userInfo: this.$store.state.userInfo, // 从 Vuex 中获取用户信息
       comments: [], // 已有评论
->>>>>>> zhengyujiejie
       newComment: {
         novel_id: null,
         chapter_id: null,
@@ -74,24 +63,10 @@ export default {
       logvisible: false,
     };
   },
-<<<<<<< HEAD
-  async created() {// 该页面创建的时候，就通过向后端发送请求，载入评论
-    // this.bookId = this.$route.params.bookId;
-    console.log(this.bookId + ' ' + this.chapterId);
-    const respond = await getComments(this.bookId, this.chapterId);
-    this.comments = respond;
-    this.newComment.novel_id = this.bookId;
-    this.newComment.chapter_id = this.chapterId;
-    if(this.$store.state.loggedIn)
-      this.userInfo = this.$store.state.userInfo; // 如果登录，载入当前用户信息
-    // console.log(this.comments);
-    console.log();
-=======
   async created() {
     this.newComment.novel_id = this.bookId;
     this.newComment.chapter_id = this.chapterId;
     await this.fetchComments();
->>>>>>> zhengyujiejie
   },
   methods: {
     async fetchComments() {

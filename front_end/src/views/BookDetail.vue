@@ -145,6 +145,9 @@ export default {
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
+        this.$store.dispatch('setCurrentBookId', bookId);
+        this.$store.dispatch('setCurrentChapterId', 0);
+        console.log(this.$store.state);
         this.book = response;
         this.finalRating = this.book.rating;
       } catch (error) {
@@ -165,6 +168,7 @@ export default {
       this.$router.push({ name: 'Reader' });
     },
     linktoComments() {
+      console.log('book id' + this.book.id );
       this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
     },
     setRating(star) {

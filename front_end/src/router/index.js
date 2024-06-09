@@ -14,13 +14,10 @@ import Mail from "../views/Mail/Mail.vue";
 import Creation from "../views/Creation/Creation.vue";
 import CategoriesDetail from '@/views/CategoriesDetail.vue';
 
-<<<<<<< HEAD
 import store from '@/store';
 import { MessageBox } from 'element-ui';
 Vue.use(MessageBox);
 
-=======
->>>>>>> zhengyujiejie
 Vue.use(VueRouter);
 
 
@@ -86,11 +83,6 @@ const routes = [
     path:'/book/:bookId/comments',
     name: 'Comments',
     component: Comments,
-<<<<<<< HEAD
-    props: true,
-=======
-    props: true
->>>>>>> zhengyujiejie
   },// lzy
   {// 创作
     path:'/creation',

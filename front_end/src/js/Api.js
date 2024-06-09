@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-<<<<<<< HEAD
 // 注册成为作者
 export async function beAuthor(id) {
   try {
@@ -74,9 +73,6 @@ export async function updateChapterInfo(novel_id, chapter_id, formData) {
   }
 }
 
-=======
-// 跨域问题暂时通过代理解决了，但是部署之后还要用其他方法
->>>>>>> zhengyujiejie
 
 // 查找全部小说类别
 export async function category() {
@@ -103,14 +99,8 @@ export async function categoryNovels(category_id) {
 // 按条件（作者名，id，小说名）
 export async function novels(search) {
   try {
-<<<<<<< HEAD
-    const novel = await axios.get(`/novels/novel?search=${search}`);
-    
-    return novel.data.results;
-=======
     const response = await axios.get(`/novels/novel?search=${search}`);
     return response.data;
->>>>>>> zhengyujiejie
   } catch (error) {
     console.error('Error fetching novel:', error);
     return error.code;
@@ -217,23 +207,4 @@ export async function register(data) {
     console.error('Error registering user:', error);
     return error.code;
   }
-<<<<<<< HEAD
 }
-=======
-}
-
-// 注册成为作者
-export async function beAuthor(id) {
-  try {
-    const response = await axios.get('/novels/author_register', {
-      params: {
-        id: id,
-      }
-    });
-    return response.data;
-  } catch(error) {
-    console.error('Error registering as author:', error);
-    return error.code;
-  }
-}
->>>>>>> zhengyujiejie

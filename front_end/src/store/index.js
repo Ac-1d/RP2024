@@ -40,7 +40,6 @@ export default new Vuex.Store({
     }
   },
   actions: {
-<<<<<<< HEAD
     async login({ commit }, loginData) { 
       let mobile = loginData.mobile;
       let password = loginData.password;
@@ -48,15 +47,6 @@ export default new Vuex.Store({
       if (mobile && password) {
         await axios.post("/users/login", {  
           mobile: mobile,  
-=======
-    async login({ commit }, loginData) {
-      let username = loginData.username;
-      let password = loginData.password;
-      let msg = '登录失败';
-      if (username && password) {
-        await axios.post("/users/login", {
-          username: username,
->>>>>>> zhengyujiejie
           password: password,
         }).then(response => {
           if (response.data.status == 200 && response.data.msg == '登录成功') {
