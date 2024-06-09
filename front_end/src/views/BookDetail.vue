@@ -127,6 +127,7 @@ export default {
       try {
         const response = await novelDetail(bookId);
         this.book = response.data; // 假设API返回的书籍数据在data属性中
+        console.log(response);
         this.finalRating = this.book.rating;
       } catch (error) {
         console.error('Error fetching book details:', error);
