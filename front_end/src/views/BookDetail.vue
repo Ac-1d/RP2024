@@ -86,7 +86,6 @@
 </template>
 
 <script>
-// import { mapActions } from 'vuex';
 import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
@@ -141,7 +140,6 @@ export default {
     this.fetchChapters(bookId);
   },
   methods: {
-    // ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
@@ -155,21 +153,25 @@ export default {
       }
     },
     async fetchChapters(bookId) {
-      try {
-        const response = await novelChapter(bookId);
+    try {
+      const response = await novelChapter(bookId);
+      if (response && response.chapter_data) {
         this.chapters = response.chapter_data.chapter_list;
-      } catch (error) {
-        console.error('Error fetching chapters:', error);
+      } else {
+        console.error('Chapter data is undefined or invalid.');
       }
-    },
-    startReading() {
-      this.setCurrentBookId(this.book.id);
-      this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
-      this.$router.push({ name: 'Reader' });
-    },
+    } catch (error) {
+      console.error('Error fetching chapters:', error);
+    }
+  },
+  startReading() {
+    console.log("in book detail, book id: ", this.$route.params.bookId);
+    this.$store.dispatch('setCurrentBookId', this.$route.params.bookId);
+    this.$store.dispatch('setCurrentChapterId', 1);
+    this.$router.push({ name: 'Reader' });
+  },
     linktoComments() {
-      console.log('book id' + this.book.id );
-      this.$router.push({ name: 'Comments'});
+      this.$router.push({ name: 'Comments', params: { bookId: this.$route.params.bookId } });
     },
     setRating(star) {
       this.currentRating = star;
@@ -180,7 +182,6 @@ export default {
     rateBook(star) {
       this.finalRating = star;
       this.currentRating = star;
-      // 这里可以添加逻辑，例如将评分发送到服务器
       console.log(`评分为: ${star}`);
     },
     selectChapter(chapterId) {
@@ -189,7 +190,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .book-detail {

@@ -203,25 +203,26 @@ export default {
   },
   methods: {
     loadEpub() {
-      console.log(this.currentBookId, this.currentChapterId)
-      novelContent(this.currentBookId, this.currentChapterId)
-        .then(response => {
-          console.log(response)
-          const book = this.epubReader.createBook(response.data.chapter_data.content);
-          console.log(book)
-          this.loadBook(book)
+    novelContent(this.currentBookId, this.currentChapterId)
+      .then(response => {
+        if (response && response.chapter_data && response.chapter_data.content) {
+          const book = this.epubReader.createBook(response.chapter_data.content);
+          this.loadBook(book);
           this.epubReader.render("epub_render", {
             width: window.innerWidth,
             height: window.innerHeight,
             allowScriptedContent: true
           });
-          const rendition = this.epubReader.getRendition()
-          this.loadListener(rendition)
-        })
-        .catch(error => {
-          console.error("error: ", error)
-        })
-    },
+          let rendition = this.epubReader.getRendition();
+          this.loadListener(rendition);
+        } else {
+          console.error('Chapter data is undefined or invalid.');
+        }
+      })
+      .catch(error => {
+        console.error("error: ", error);
+      });
+  },
     loadBook(book) {
       book.loaded.cover.then((cover) => {
         if (cover) {

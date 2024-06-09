@@ -68,6 +68,11 @@ export default {
   async created() {
     // console.log('current status');
     await this.fetchComments();
+    // this.bookId = this.$route.getters.currentBookId;
+    // this.chapterId = this.$r
+    this.newComment.novel_id = this.bookId;
+    this.newComment.chapter_id = this.chapterId;
+    await this.fetchComments();
     this.book = await novelDetail(this.$store.state.currentBookId);
   },
   methods: {
