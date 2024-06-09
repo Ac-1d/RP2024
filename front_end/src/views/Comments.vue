@@ -1,5 +1,6 @@
 <template>
   <el-container class="layout-round-middle">
+    <el-header><h1>书评——《{{ book.detail_data.novel_name }}》</h1></el-header>
     <!-- 评论显示 -->
     <el-main>
       <div v-for="(comment, index) in comments" :key="index">
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-import { addComments, getComments } from '@/js/Api.js';
+import { addComments, getComments , novelDetail } from '@/js/Api.js';
 import { extractDateTime } from '@/js/Time.js';
 import Login_window from '@/components/Login_window.vue';
 
@@ -46,14 +47,15 @@ export default {
   components: { Login_window },
   data() {
     return {
-      bookId: this.$route.getters.currentBookId, // 从路由参数中获取 bookId
-      chapterId: this.$store.getters.currentChapterId, // 从 Vuex 中获取当前章节ID
+      bookId: this.$store.state.currentBookId, // 从路由参数中获取 bookId
+      chapterId: this.$store.state.currentChapterId, // 从 Vuex 中获取当前章节ID
       userInfo: this.$store.state.userInfo, // 从 Vuex 中获取用户信息
+      book: null,
       comments: [], // 已有评论
       newComment: {
-        novel_id: null,
-        chapter_id: null,
-        user_id: this.userInfo ? this.userInfo.id : null,
+        novel_id: this.$store.state.currentBookId,
+        chapter_id: this.$store.state.currentChapterId,
+        user_id: this.$store.state.userInfo.id,
         content: '',
         up_number: 0, // 评分，0表示未评分
       },
@@ -64,14 +66,15 @@ export default {
     };
   },
   async created() {
-    this.newComment.novel_id = this.bookId;
-    this.newComment.chapter_id = this.chapterId;
+    // console.log('current status');
     await this.fetchComments();
+    this.book = await novelDetail(this.$store.state.currentBookId);
   },
   methods: {
     async fetchComments() {
       try {
-        const response = await getComments(this.bookId, this.chapterId);
+        const response = await getComments(this.$store.state.currentBookId, this.$store.state.currentChapterId);
+        console.log(response);
         this.comments = response;
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -100,7 +103,8 @@ export default {
         return;
       }
       try {
-        await addComments(this.newComment);
+        await addComments(this.newComment, this.$store.state.verify.token);
+        // console.log('token' + this.$store.state.verify.token);
         await this.fetchComments();
         this.newComment.content = '';
       } catch (error) {

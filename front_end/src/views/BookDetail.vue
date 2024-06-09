@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+// import { mapActions } from 'vuex';
 import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
@@ -141,7 +141,7 @@ export default {
     this.fetchChapters(bookId);
   },
   methods: {
-    ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
+    // ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
@@ -169,7 +169,7 @@ export default {
     },
     linktoComments() {
       console.log('book id' + this.book.id );
-      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
+      this.$router.push({ name: 'Comments'});
     },
     setRating(star) {
       this.currentRating = star;

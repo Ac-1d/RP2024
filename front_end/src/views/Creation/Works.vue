@@ -10,29 +10,29 @@
 
         <!-- 书籍展示区域 -->
         <div class="books">
-          <!-- <Book v-for="book in paginatedBooks" :key="book.title" :book="book" /> -->
+          <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
         </div>
 
         <!-- 翻页栏 -->
-        <!-- <div class="pagination">
+        <div class="pagination">
           <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
           <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
           <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
-        </div> -->
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// import Book from "@/components/Book.vue";
+import Book from "@/components/Book.vue";
 import {authorInfo} from '@/js/Api.js';
 import "@/css/layout.css";
 
 export default {
   name: "Home",
   components: {
-    // Book,
+    Book,
   },
   async created() {
     await this.getInfo();

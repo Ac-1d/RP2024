@@ -35,7 +35,6 @@ export default new Vuex.Store({
       state.currentBookId = bookId;
     },
     setCurrentChapterId(state, chapterId){
-      console.log("set current chapter id to ", chapterId);
       state.currentChapterId = chapterId;
     }
   },

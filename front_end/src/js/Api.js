@@ -152,7 +152,7 @@ export async function novelContent(novel_id, chapter_id) {
 }
 
 // 上传评论
-export async function addComments(comment) {
+export async function addComments(comment, token) {
   console.log({
     "novel": comment.novel_id,
     "chapter": comment.chapter_id,
@@ -160,13 +160,19 @@ export async function addComments(comment) {
     "comment_content": comment.content,
     "up_number": comment.up_number,
   });
+  console.log(token);
   try {
-    const response = await axios.post('/novels/add_comments', {
-      "novel": comment.novel_id,
-      "chapter": comment.chapter_id,
-      "user": comment.user_id,
-      "comment_content": comment.content,
-      "up_number": comment.up_number,
+    const response = await axios.post('/novels/add_comments',{
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: {
+        "novel": comment.novel_id,
+        "chapter": comment.chapter_id,
+        "user": comment.user_id,
+        "comment_content": comment.content,
+        "up_number": comment.up_number,
+      }
     });
     return response.data;
   } catch (error) {
