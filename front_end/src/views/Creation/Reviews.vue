@@ -8,12 +8,17 @@
           <span class="title">作者信息</span>
         </div><div class="separator"></div>
 
-        <div class="avatar"><img :src="imgsrc" alt="Avatar" /></div>
+        <div class="avatar" v-if="authorInfo"><img :src="imgsrc" alt="Avatar" /></div>
 
         <div class="info">
-          {{ authorInfo }}
-          <ul class='infoSide'>
+          <!-- {{ authorInfo }} -->
+          <ul class='infoSide' v-if="authorInfo">
             <li><h1>资料卡片:</h1></li>
+            <li>作者昵称：{{ authorInfo.author_info.author_name }}</li>
+            <li>性别：{{ authorInfo.author_info.author_gender }}</li>
+            <li>简介：{{ authorInfo.author_info.detail }}</li>
+            <li>知名度：{{ authorInfo.author_info.popularity }}</li>
+            <li>作品评级：<el-rate :value="authorInfo.author_info.average_rating" disabled="true"></el-rate></li>
           </ul>
         </div>
 
@@ -32,19 +37,22 @@ export default{
   data() {
     return {
       authorInfo: null,
-      imgsrc: null,
+      imgsrc: '',
     }
   },
   computed: {},
   async created() {
     const user_id = this.$store.state.userInfo.id;
-    this.authorInfo = await authorInfo(user_id);
-    let string = this.authorInfo.author_info.author_icon;  
+    const info = await authorInfo(user_id);
+    this.authorInfo = info;
+
+    let string = this.authorInfo.author_info.author_icon;
     let delimiter = 'http://127.0.0.1:8000/';  
     let parts = string.split(delimiter);  
-    this.imgsrc = parts[1];
-    console.log(this.imgsrc);
-    console.log(this.authorInfo.author_info);
+    this.imgsrc = 'user_' + parts[1];
+    // console.log(this.imgsrc);
+    // console.log('authorInfo:');
+    // console.log(this.authorInfo);
   },
 }
 </script>

@@ -200,8 +200,8 @@ class Novel_list(models.Model):
                               on_delete=models.DO_NOTHING, verbose_name='小说外键')
     user = models.ForeignKey(User, db_constraint=False, related_name='user', on_delete=models.DO_NOTHING,
                               verbose_name='用户外键',default=None)
-    chapter = models.ForeignKey(to=Novel_chapter, null=True, related_name='chapter', db_constraint=False,
-                                on_delete=models.DO_NOTHING, verbose_name='章节id')
+    # chapter = models.ForeignKey(to=Novel_chapter, null=True, related_name='chapter', db_constraint=False,
+    #                             on_delete=models.DO_NOTHING, verbose_name='章节id')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
     class Meta:
@@ -209,21 +209,6 @@ class Novel_list(models.Model):
 
     def __str__(self):
         return str(self.pk)
-
-    @property
-    def novel_info(self):
-        novel_dic = {}
-        novel_dic['novel_name'] = self.Novel.novel_name
-        novel_dic['novel_img'] = r'media/image/' + str(self.Novel.novel_img).split('\\')[-1]
-        novel_dic['novel_detail'] = novel_detail(self.Novel.detail)
-        novel_dic['total_words'] = self.Novel.total_words
-        novel_dic['novel_status'] = self.Novel.novel_status
-        novel_dic['novel_id'] = self.Novel.pk
-        novel_dic['novel_author'] = self.Novel.author.author_name
-        novel_dic['chapter_start'] = self.Novel.chapter_start
-        novel_dic['category'] = self.Novel.category.category_name
-        novel_dic['chapter_name'] = self.chapter.novel_chapter
-        return novel_dic
 
 
 # 普通最近阅读表
