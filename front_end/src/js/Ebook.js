@@ -200,15 +200,19 @@ export function useEpub() {
 
   function removeMark(cfiRange) {
     let note
+    console.log("in Ebook.js, remove mark, note list: ", noteList)
     noteList.forEach(element => {
+      console.log("note in noteList", element)
       if(element.cfiRange == cfiRange){
-        note = element
+        note = element 
+        rendition.annotations.remove(note.cfiRange, note.type)
+        noteList.splice(noteList.indexOf(note), 1)
+        console.log("after splice, note list: ", noteList)
+        return
       }
     });
     if(!note)
       console.warn("cfiRange not found")
-    rendition.annotations.remove(note.cfiRange, note.type)
-    noteList.splice(noteList.indexOf(note))
   }
   /**TODO: 此处代码有待处理：对笔记进行处理的流程应该重构(有时间的话) */
   function setNoteText(noteText, isNotePublic, isTakeNote) {

@@ -184,7 +184,7 @@ export async function postNote(note, user_id, novel_id, chapter_id){
     console.log("note", note)
     console.log({
       'cfi': note.cfi,
-      'note': note.note,
+      'note': note.note ? note.note : 'null',
       'user_id': 8,
       'novel_id': novel_id,
       'chapter_id': chapter_id,
@@ -193,11 +193,11 @@ export async function postNote(note, user_id, novel_id, chapter_id){
     })
     return await axios.post(`/novels/create_bookmarks`, {
       'cfi': note.cfi,
-      'note': note.note,
+      'note': note.note ? note.note : 'null',
       'user_id': 8,
       'novel_id': novel_id,
       'chapter_id': chapter_id ? chapter_id : 1,
-      'is_public': note.ispublic,
+      'is_public': note.note ? note.ispublic : false,
       'type': note.note ? 'underline' : 'highlight'
     })
   } catch (error) {

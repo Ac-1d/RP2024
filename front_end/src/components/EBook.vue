@@ -166,7 +166,6 @@ export default {
         isTakingNote: false,
         isRemovingNote: false,
         showPersonalNote: true,
-        showOthersNote: false,
         noteType: '',
         fontSize: '',
       },
@@ -193,6 +192,14 @@ export default {
       else
         this.epubReader.setTheme(0)
     },
+    'settings.showPersonalNote': function (newValue) {
+      if(newValue) {
+        this.rendAllMarks()
+      }
+      else {
+        this.removeAllMarks()
+      }
+    }
   },
   methods: {
     loadEpub() {
@@ -268,7 +275,7 @@ export default {
           this.epubReader.removeMark(cfiRange)
           this.personalNoteList.forEach(note => {
             if(note.cfi == cfiRange){
-              this.personalNoteList.splice(this.personalNoteList.indexOf(note))
+              this.personalNoteList.splice(this.personalNoteList.indexOf(note), 1)
             }
           })
         }
@@ -357,6 +364,7 @@ export default {
             console.log("isPublic: ", isPublic)
             if (type == 'highlight') {
               this.epubReader.takeNote(type, cfi)
+              this.personalNoteList.push({'note': null, 'cfi': cfi, 'isPublic': false})
             }
             else if (type == 'underline') {
               this.epubReader.takeNote(type, cfi)
@@ -428,7 +436,27 @@ export default {
           deleteNote(note.cfi)
         }
       })
-    }
+    },
+    removeAllMarks() {
+      console.log("call remove all marks")
+      console.log("in personal note list, personal note list: ", this.personalNoteList)
+      this.personalNoteList.forEach(note =>{
+        console.log(note, note.cfi)
+        this.epubReader.removeMark(note.cfi)
+      })
+    },
+    rendAllMarks() {
+      this.personalNoteList.forEach(note => {
+        const cfi = note.cfi
+        if(note.note) {
+          this.epubReader.takeNote('underline', cfi)
+          this.epubReader.setNoteText(note.noteText, note.isPublic, true)
+        } else {
+          console.log("call take note at highlight")
+          this.epubReader.takeNote('highlight', cfi)
+        }
+      })
+    },
   },
   beforeDestroy() {
     // TODO: 销毁监听器
