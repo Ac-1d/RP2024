@@ -18,8 +18,9 @@
 </template>
 
 <script>
+import axios from 'axios';
 import ShelfBook from "@/components/ShelfBook.vue";
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+//import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 
 
 export default {
@@ -27,17 +28,37 @@ export default {
   components: {
       ShelfBook,
   },
+  props: {
+      mode:Number,
+  },
 
   data() {
     return {
-      books:booksData,
-
+      books: [],
       currentPage: 1, // 当前页码
       booksPerPage: 21, // 每页显示的书籍数量
     };
   },
-  methods:{
 
+  created() {
+    console.log("grwraesvr");
+    this.getBookShelfL();
+  },
+  methods:{
+    getBookShelfL: async function(){
+        try {
+            const response = await axios.get('/novels/bookrack', {
+              params: {
+                user_id: this.$store.state.userInfo.id,
+                sort: 'preference'
+              }
+            });
+            console.log(response);
+            this.books = response.data.bookrack;
+        }catch(error) {
+            console.log(error);
+        }
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;

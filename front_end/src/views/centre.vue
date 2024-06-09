@@ -47,7 +47,7 @@
 
     </main>
     </header>
-    <Modify_info :drawer="showModi" :ruleForm="user" @closedia="showModi = false" @send = "changeModify"></Modify_info>
+    <Modify_info :drawer="showModi" :ruleForm="userInfo" @closedia="showModi = false" @send = "changeModify"></Modify_info>
   </div>
 </template>
 
@@ -65,22 +65,11 @@ export default {
   data() {
     return {
       books:booksData,
-      user:{
-          "ID": "U88965",
-          "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
-          "level": 7,
-          "nickName": "pizza_k",
-          "sex": "女",
-          "birth": new Date('2004-07-13'),
-          "signature": "",
-          "tele":"15513107588",
-          "password":'59jkb2h0',
-      },
       userInfo:{
           "ID": "U88965",
           "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
           "level": 7,
-          "nickName": "pizza_k",
+          "nickName": "pizza_k9999",
           "sex": "女",
           "birth": new Date('2004-07-13'),
           "signature": "",
@@ -101,7 +90,12 @@ export default {
     this.userInfo.sex = this.$store.state.userInfo.gender;
     this.userInfo.password = this.$store.state.userInfo.password;
     this.userInfo.nickName = this.$store.state.userInfo.username;
-    this.userInfo.birth = this.$store.state.userInfo.birth_date;
+
+    let dateObj = new Date(this.$store.state.userInfo.birth_date);
+    let formattedDate = dateObj.toISOString().split('T')[0];
+    let birth = new Date(formattedDate);
+    this.userInfo.birth = birth;
+
     this.userInfo.signature = this.$store.state.userInfo.signature;
     this.userInfo.tele = this.$store.state.userInfo.mobile;
     console.log(this.userInfo.nickName);
@@ -109,11 +103,11 @@ export default {
 
   methods:{
       changeModify(newInfo){
-        this.user.nickName = newInfo.nickName;
-        this.user.sex = newInfo.sex;
-        this.user.signature = newInfo.signature;
-        this.user.birth = newInfo.birth;
-        console.log('center'+this.user.nickName);
+        this.userInfo.nickName = newInfo.nickName;
+        this.userInfo.sex = newInfo.sex;
+        this.userInfo.signature = newInfo.signature;
+        this.userInfo.birth = newInfo.birth;
+        console.log('center'+this.userInfo.nickName);
       },
     prevPage() {
       if (this.currentPage > 1) {
@@ -129,27 +123,13 @@ export default {
       this.currentPage = page;
     },
 
-    commitInfo: async function() {
-        let formData = new FormData();
-        formData.append('username', this.userInfo.nickName);
-        formData.append('gender', this.userInfo.sex);
-        formData.append('password', this.userInfo.password);
-        // formData.append('user_icon', this.userInfo.avatar_path);
-        formData.append('birth_date', this.userInfo.birth);
-        formData.append('signature', this.userInfo.signature);
-        fetch('/api/upload', {
-            method: 'PATCH',
-            body: formData
-    })
-    .then(response => response.json())
-           },
    },
 
   computed:{
     hiddenTele(){
         console.log('TeleBegin');
-        const prefix = this.user.tele.substring(0, 3);
-        const suffix = this.user.tele.substring(this.user.tele.length - 2);
+        const prefix = this.userInfo.tele.substring(0, 3);
+        const suffix = this.userInfo.tele.substring(this.userInfo.tele.length - 2);
         console.log('TeleEnd');
         return `${prefix}****${suffix}`;
 
@@ -161,11 +141,14 @@ export default {
 
     formattedBirth() {
       let temp;
-      const year = this.user.birth.getFullYear();
-      temp = this.user.birth.getMonth() + 1;// 月份是从0开始的，所以需要+1
+      console.log("---");
+      console.log(this.userInfo.birth);
+      console.log(this.userInfo.birth instanceof Date);
+      const year = this.userInfo.birth.getFullYear();
+      temp = this.userInfo.birth.getMonth() + 1;// 月份是从0开始的，所以需要+1
       temp = temp.toString();
       const month = temp[1] ? temp : '0' +temp ;
-      temp = this.user.birth.getDate() ;
+      temp = this.userInfo.birth.getDate() ;
       temp = temp.toString();
       const day = temp[1] ? temp : '0' +temp ;
       return `${year}.${month}.${day}`;

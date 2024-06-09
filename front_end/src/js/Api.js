@@ -121,9 +121,50 @@ export async function getComments(novel_id, chapter_id) {
 // 提交、更新最近阅读
 
 // 获取最新阅读
+export async function getRecentRead(user_id){
+   try {
+     const respond = await axios.get('/novels/get_recently', {
+        params: {
+            user_id: user_id
+        }
+     });
 
-// 查询个人书架
+     console.log(respond.data);
+     return respond.data;
+     }catch(error) {
+          console.log(error);
+     }
+}
+// 查询个人书架(按时间)
+export async function getBookShelfT(user_id){
+   try {
+     const respond = await axios.get('/novels/bookrack', {
+        params: {
+            user_id: user_id,
+            sort: 'preference'
+        }
+     });
 
+     console.log(respond.data);
+     return respond.data['bookrack'];
+     }catch(error) {
+          console.log(error);
+     }
+}
+
+// 查询个人书架(按喜好)
+export async function getBookShelfL(user_id){
+   try {
+     return await axios.get('/novels/bookrack', {
+        params: {
+            user_id: user_id ,
+        }
+     });
+
+   }catch(error) {
+        console.log(error);
+   }
+}
 // 注册
 /** register
  * @param
