@@ -2,7 +2,7 @@
   <el-container>
     <el-tabs type="border-card" tab-position="left" style="width: 100vw; height: 100vh;">
       <el-tab-pane aria-disabled="true">
-        <span slot="label" style="height: 200px; display: block;">作者信息
+        <span slot="label">作者信息
           <i class="el-icon-user"> </i>
         </span>
         <Reviews/>
@@ -45,14 +45,9 @@ export default{
     Reviews,
     Upload,
   },
-  async mounted() {
+  async created() {
     const user_id = this.$store.state.userInfo.id;
-    
     this.authorInfo = await authorInfo(user_id);
-
-    // console.log( await authorInfo(user_id));
-
-    // console.log(this.authorInfo);
   },
   methods: {
   }

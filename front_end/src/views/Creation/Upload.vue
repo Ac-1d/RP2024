@@ -17,9 +17,9 @@
               </el-upload>
             </el-form-item>
 
-            <el-form-item style="width: 30vw;">
+            <!-- <el-form-item style="width: 30vw;">
               <el-button type="primary" style="display: flex;" @click="previewNew">预览作品</el-button>
-            </el-form-item>
+            </el-form-item> -->
             <!-- 预览按钮 -->
             <el-form-item style="width: 30vw;">
               <el-button type="primary" style="display: flex;" @click="submitNew">确认创建</el-button>
@@ -36,7 +36,7 @@
             <el-form-item label="分类" label-position="left" label-width="80px" style="width: 30vw;">
               <el-select v-model="newWork.category" placeholder="请选择">
                 <el-option
-                  v-for="item in options"
+                  v-for="item in category"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -60,7 +60,7 @@
         </el-main>
 
         <!-- 作品更新区域 -->
-        <div class="separator"></div>
+        <!-- <div class="separator"></div>
         <div class="category-bar">
           <span class="title">创作更新</span>
         </div><div class="separator"></div>
@@ -68,8 +68,6 @@
           <el-table :data="works" style="width: 100%;">
             <el-table-column prop="novel_name" label="作品名" width="180"></el-table-column>
             <el-table-column prop="novel_detail" label="作品备注" width="360"></el-table-column>
-            <!-- <el-table-column prop="date" label="上次更新时间" width="180"></el-table-column> -->
-            <!-- <el-table-column prop="progress" label="进度"></el-table-column> -->
             <el-table-column label="状态" width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.novel_status==0?'连载中':'已完结' }}</span>
@@ -104,7 +102,7 @@
               </template>
             </el-table-column>
           </el-table>
-        </el-main>
+        </el-main> -->
 
       </div>
     </div>
@@ -112,74 +110,90 @@
 </template>
 
 <script>
-import axios from 'axios';
-import {novels} from '@/js/Api.js';
+// import {novels} from '@/js/Api.js';
 import {category} from '@/js/Api.js';
+import {createNovel} from '@/js/Api.js';
 import '@/css/layout.css';
 
 export default{
   name: 'Upload',
   data() {
     return {
-      works:[
-        {
-          "id": "1", 
-          "novel_name": "我看见的世界", 
-          "novel_detail": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
-          "novel_status" : 0,
-        },
-      ],
-      options: [
-        {value: '全部', label: '全部'},
-        {value: '文学', label: '文学'}, 
-        {value: '小说', label: '小说'},
-        {value: '历史文化', label: '历史文化'},
-        {value: '社会纪实', label: '社会纪实'},
-        {value: '科学新知', label: '科学新知'}, 
-        {value: '艺术设计', label: '艺术设计'}, 
-        {value: '商业经管', label: '商业经管'}, 
-        {value: '绘本漫画', label: '绘本漫画'},
-      ],
+      // works:[
+      //   {
+      //     "id": "1", 
+      //     "novel_name": "我看见的世界", 
+      //     "novel_detail": "这是一本描述人工智能领域的书籍，详细介绍了作者在这一领域的研究和见解。",
+      //     "novel_status" : 0,
+      //   },
+      // ],
+      // options: [
+      //   {value: '全部', label: '全部'},
+      //   {value: '文学', label: '文学'}, 
+      //   {value: '小说', label: '小说'},
+      //   {value: '历史文化', label: '历史文化'},
+      //   {value: '社会纪实', label: '社会纪实'},
+      //   {value: '科学新知', label: '科学新知'}, 
+      //   {value: '艺术设计', label: '艺术设计'}, 
+      //   {value: '商业经管', label: '商业经管'}, 
+      //   {value: '绘本漫画', label: '绘本漫画'},
+      // ],
       newWork: {
         workName: '',
         intro: '',
         chapter: '',
         category: '',
       },
-      fileList: [
-      ],
+      
       imgUpload: '/upload',
       imageUrl: '',
       url: '',
       author_name: '',
+
+      category: [],
+      fileList: [],
     }
   },
   async created() {
-    this.works = await novels(this.author_name).results; 
-    this.options = await category();
+    // this.works = await novels(this.author_name).results; 
+    this.category = await category();
+  },
+  computed: {
+    formData() {
+      const formData = new FormData();
+      formData.append('novel_status', 0);
+      formData.append('novel_name', this.newWork.workName);
+      formData.append('detail', this.newWork.intro);
+      formData.append('author', this.$store.getters.userInfo.id);
+      if (this.fileList) {  
+        formData.append('novel_img', this.fileList);  
+      }  
+      return formData;
+    }
   },
   methods: {
-    async previewNew(){
-      let url = this.url;
-      axios.get({url, params: this.newWork});
-      
-      console.log('preview my new Work');
-    },
+    // async previewNew(){
+    //   let url = this.url;
+    //   axios.get({url, params: this.newWork});
+
+    //   console.log('preview my new Work');
+    // },
     async submitNew(){
-      let url = this.url;
-      axios.post({url, params: this.newWork});
+      // let url = this.url;
+      // axios.post({url, params: this.newWork});
+      createNovel(this.formData);
 
       console.log('submit my new work');
     },
     uploadFile() {
       // 添加文件
     },
-    preview(index){
-      console.log('preview updates of my work, workid=' + index);
-    },
-    submit(index){
-      console.log('updating my work, workid=' + index);
-    },
+    // preview(index){
+    //   console.log('preview updates of my work, workid=' + index);
+    // },
+    // submit(index){
+    //   console.log('updating my work, workid=' + index);
+    // },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },

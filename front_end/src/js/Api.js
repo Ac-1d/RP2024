@@ -1,15 +1,13 @@
 import axios from 'axios';  
 // 跨域问题暂时通过代理解决了，但是部署之后还要用其他方法
 
-// const replyLimitTime = 5000;// 5秒响应时间
-
 // 注册成为作者
 export async function beAuthor(id) {
   try {
-    console.log({user_id: id});
+    // console.log({user_id: id});
     return await axios.post(`novels/author_register?user_id=${id}`);
   } catch(error) {
-    console.log(error);
+    // console.log(error);
     return error.code;
   }
 }
@@ -24,6 +22,58 @@ export async function authorInfo(user_id) {
     return error.code;
   }
 }
+
+// 更新作者信息
+export async function updateAuthorInfo(author_id, formData) {
+  try {
+    const reply = await axios.patch(`/novels/author_register?user_id=${author_id}`, formData);
+    return reply.data.message;
+  } catch(error) {
+    return error.code;
+  }
+}
+
+// 小说新建
+export async function createNovel(formData) {
+  try {
+    const reply  = await axios.post(`/novels/create_novel?`, formData);
+    return reply.data.message;
+  } catch(error) {
+    return error.code;
+  }
+} 
+
+// 小说详情更新
+export async function updateNovelInfo(novel_id, formData) {
+  try {
+    const reply = await axios.patch(`/novels/create_novel?novel_id=${novel_id}`, formData);
+    return reply.data.message;
+  } catch(error) {
+    return error.code;
+  }
+} 
+
+// 创建小说章节
+export async function createChapter(formData) {
+  try {
+    const reply = await axios.post(`/novels/create_chapter`, formData);
+    return reply.data.message;
+  } catch(error) {
+    return error.code;
+  }
+}
+
+// 更新章节信息 /novels/create_chapter
+export async function updateChapterInfo(novel_id, chapter_id, formData) {
+  try {
+    const reply = 
+      await axios.patch(`/novels/create_chapter?novel_id=${novel_id}&chapter_id=${chapter_id}`, formData);
+    return reply.data.message;
+  } catch(error) {
+    return error.code;
+  }
+}
+
 
 // 查找全部小说类别
 export async function category() {
