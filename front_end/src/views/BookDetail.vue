@@ -187,8 +187,6 @@ export default {
 </script>
 
 
-
-
 <style scoped>
 .book-detail {
   margin: 20px auto;

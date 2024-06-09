@@ -33,13 +33,13 @@
 </template>
 
 <script>
-import booksData from "@/assets/book.json"; // 导入本地的 book.json 数据
+import axios from 'axios'; // 导入 axios
 
 export default {
   name: "CategoriesDetail",
   data() {
     return {
-      books: booksData, // 使用本地的 book.json 数据
+      books: [], // 初始为空数组
       selectedCategory: "全部" // 当前选中的分类
     };
   },
@@ -52,6 +52,14 @@ export default {
     }
   },
   methods: {
+    async fetchBooks() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/novels/novel'); // 使用正确的API路径
+        this.books = response.data;
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    },
     filterBooks(category) {
       this.selectedCategory = category;
     },
@@ -62,6 +70,9 @@ export default {
     goToBookDetail(bookId) {
       this.$router.push({ name: 'BookDetail', params: { bookId } });
     }
+  },
+  created() {
+    this.fetchBooks(); // 在组件创建时获取书籍数据
   }
 };
 </script>
