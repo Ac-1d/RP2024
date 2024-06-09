@@ -67,7 +67,7 @@ class LoginModelSerializer(ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ['username', 'email', 'mobile', 'user_icon', 'gender']  # 包括更多可更新的字段
+        fields = ['password','username', 'email', 'mobile', 'user_icon', 'gender','birth_date','signature']
         extra_kwargs = {
             'email': {'required': False},
             'mobile': {'required': False},
@@ -78,9 +78,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
-            if attr == 'password' and value:
-                instance.set_password(value)  # 密码需要特殊处理
-            else:
                 setattr(instance, attr, value)
         instance.save()
         return instance
