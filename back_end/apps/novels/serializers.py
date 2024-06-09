@@ -89,9 +89,10 @@ class ChapterContentSerializer(serializers.ModelSerializer):
 
 #小说书架
 class BookrackSerializer(serializers.ModelSerializer):
+    novel_info = NovelDetailSerializer(source='Novel', read_only=True)
     class Meta:
         model = models.Novel_list
-        fields = ['chapter','novel_info']
+        fields = ['novel_info']
 
 #最近阅读
 class RecentlyNovelListSerializer(serializers.ModelSerializer):

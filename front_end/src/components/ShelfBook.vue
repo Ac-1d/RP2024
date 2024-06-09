@@ -1,21 +1,20 @@
 <template>
   <div class="book">
-    <img :src="bookImage" :alt="book.title" @click="goToRead" @mouseover="showDetails" @mouseleave="hideDetails" />
-    <div class="title">{{ book.title }}</div>
-    <div class="author">{{ book.author }}</div>
+    <img :src="book.novel_info.novel_img" :alt="book.novel_info.novel_name" @click="goToRead" @mouseover="showDetails" @mouseleave="hideDetails" />
+    <div class="title">{{ book.novel_info.novel_name }}</div>
+    <div class="author">{{ book.novel_info.author_namw }}</div>
     <i class="el-icon-remove" @click = "removeBook"></i>
 
     <transition name="fade">
       <div class="details" v-if="isHovered">
-        <h3>{{ book.title }}</h3>
-        <p><strong>作者:</strong> {{ book.author }}</p>
-        <p><strong>分类:</strong> {{ book.category }}</p>
-        <p><strong>出版社:</strong> {{ book.publisher }}</p>
-        <p><strong>出版时间:</strong> {{ book.publish_date }}</p>
-        <p><strong>页数:</strong> {{ book.pages }}</p>
-        <p><strong>价格:</strong> {{ book.price }}</p>
-        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-        <p><strong>描述:</strong> {{ book.description }}</p>
+        <h3>{{ book.novel_info.novel_name }}</h3>
+        <p><strong>作者:</strong> {{ book.novel_info.author_name }}</p>
+        <p><strong>分类:</strong> {{ book.novel_info.category_name }}</p>
+        <p><strong>状态:</strong> {{ bookState() }}</p>
+        <p><strong>字数:</strong> {{ book.novel_info.total_words }}</p>
+
+        <p><strong>描述:</strong> {{ book.novel_info.novel_detail }}</p>
+
       </div>
     </transition>
   </div>
@@ -30,22 +29,23 @@ export default {
       type: Object,
       required: true
     },
-    novelId: {
-      type: [Number], // 根据bookId的实际类型调整
-      required: true // 如果这个属性是必须的，可以设置为true
-    }
+
   },
   data() {
     return {
       isHovered: false
     };
   },
-  computed: {
-    bookImage() {
-      return require(`@/assets/${this.book.image}`);
-    }
-  },
+
   methods: {
+    bookState() {
+        console.log("book is"+this.book);
+        if(this.book.novel_info.novel_status == 0){
+            return "连载中...";
+        } else {
+            return "已完结";
+        }
+    },
     showDetails() {
       this.isHovered = true;
     },
@@ -76,8 +76,8 @@ export default {
      remove: async function() {
         try {
             const response = await axios.post(`http://127.0.0.1:8000/novels/delete_novel`, {
-             novel_id: this.novelId,
-             user_id: this.$store.state.ID,
+             novel_id: this.book.novel_info.id,
+             user_id: this.$store.state.userInfo.id,
         });
 
         if (response.status === 200 && response.data.status === 'success') {

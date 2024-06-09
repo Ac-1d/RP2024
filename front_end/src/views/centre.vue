@@ -29,22 +29,7 @@
       </ul>
     </aside>
     <main class="main">
-
-     <ShelfBook
-         v-for="book in paginatedBooks"
-         :key="book.title"
-         :book="book"
-         :novelId="book.id"
-     />
-
-
-        <!-- 翻页栏 -->
-        <div class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
-          <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
-          <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
-        </div>
-
+        <Shelf :mode="choose"/>
     </main>
     </header>
     <Modify_info :drawer="showModi" :ruleForm="userInfo" @closedia="showModi = false" @send = "changeModify"></Modify_info>
@@ -52,19 +37,18 @@
 </template>
 
 <script>
-import ShelfBook from "@/components/ShelfBook.vue";
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+import Shelf from '@/views/Shelf.vue';
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
   components: {
-      ShelfBook,
+      Shelf,
       Modify_info,
   },
 
   data() {
     return {
-      books:booksData,
+
       userInfo:{
           "ID": "U88965",
           "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
@@ -77,8 +61,7 @@ export default {
           "password":'59jkb2h0',
       },
       showModi: false,
-      currentPage: 1, // 当前页码
-      booksPerPage: 12, // 每页显示的书籍数量
+
     };
   },
 
@@ -109,19 +92,6 @@ export default {
         this.userInfo.birth = newInfo.birth;
         console.log('center'+this.userInfo.nickName);
       },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-      }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-    goToPage(page) {
-      this.currentPage = page;
-    },
 
    },
 
@@ -153,14 +123,7 @@ export default {
       const day = temp[1] ? temp : '0' +temp ;
       return `${year}.${month}.${day}`;
     },
-    totalPages() {
-      return Math.ceil(this.books.length / this.booksPerPage);
-    },
-    paginatedBooks() {
-      const start = (this.currentPage - 1) * this.booksPerPage;
-      const end = start + this.booksPerPage;
-      return this.books.slice(start, end);
-    }
+
   },
 };
 </script>
@@ -247,7 +210,6 @@ export default {
 .main {
   flex:1;
   background-color: #fff;
-  display: flex;
   flex-wrap: wrap;
   justify-content: flex-start; /* 左对齐 */
 }

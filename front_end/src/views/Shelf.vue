@@ -2,9 +2,8 @@
     <div class="main">
      <ShelfBook
          v-for="book in paginatedBooks"
-         :key="book.title"
+         :key="book.index"
          :book="book"
-         :novelId="book.id"
      />
 
         <!-- 翻页栏 -->
@@ -39,7 +38,18 @@ export default {
       booksPerPage: 21, // 每页显示的书籍数量
     };
   },
-
+  watch: {
+    mode: {
+      handler(newVal) {
+        console.log("newMode:"+newVal);
+        if(newVal === 0){
+            this.getBookShelfL();
+        }else{
+            this.getBookShelfT();
+        }
+      },
+    },
+  },
   created() {
     console.log("grwraesvr");
     this.getBookShelfL();
@@ -55,6 +65,21 @@ export default {
             });
             console.log(response);
             this.books = response.data.bookrack;
+            console.log(this.books);
+        }catch(error) {
+            console.log(error);
+        }
+    },
+    getBookShelfT: async function(){
+        try {
+            const response = await axios.get('/novels/bookrack', {
+              params: {
+                user_id: this.$store.state.userInfo.id,
+              }
+            });
+            console.log(response);
+            this.books = response.data.bookrack;
+            console.log(this.books);
         }catch(error) {
             console.log(error);
         }
@@ -84,6 +109,7 @@ export default {
     paginatedBooks() {
       const start = (this.currentPage - 1) * this.booksPerPage;
       const end = start + this.booksPerPage;
+      console.log("paginatedBooks", this.books.slice(start, end));
       return this.books.slice(start, end);
     }
   },

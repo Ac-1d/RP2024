@@ -1,84 +1,50 @@
 <template>
-    <div class="main">
-     <ShelfBook
-         v-for="book in paginatedBooks"
-         :key="book.title"
-         :book="book"
-         :novelId="book.id"
-     />
-
-        <!-- 翻页栏 -->
-        <div class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
-          <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
-          <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
-        </div>
-
-  </div>
+<div>
+  <el-table
+    :data="tableData"
+    stripe
+    style="width: 100%">
+    <el-table-column
+      prop="date"
+      label="日期"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="name"
+      label="姓名"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="address"
+      label="地址">
+    </el-table-column>
+  </el-table>
+</div>
 </template>
 
 <script>
-import ShelfBook from "@/components/ShelfBook.vue";
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
-
-
-export default {
-
-  components: {
-      ShelfBook,
-  },
-
-  data() {
-    return {
-      books:booksData,
-
-      currentPage: 1, // 当前页码
-      booksPerPage: 21, // 每页显示的书籍数量
-    };
-  },
-  methods:{
-
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
+  export default {
+    name:'historyRecord',
+    data() {
+      return {
+        tableData: [{
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1517 弄'
+        }, {
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1516 弄'
+        }]
       }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-    goToPage(page) {
-      this.currentPage = page;
-    },
-
-
-  },
-
-  computed:{
-
-    totalPages() {
-      return Math.ceil(this.books.length / this.booksPerPage);
-    },
-    paginatedBooks() {
-      const start = (this.currentPage - 1) * this.booksPerPage;
-      const end = start + this.booksPerPage;
-      return this.books.slice(start, end);
     }
-  },
-};
+  }
 </script>
-
-
-<style scoped>
-
-.main {
-  flex:1;
-  background-color: #fff;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start; /* 左对齐 */
-}
-
-
-</style>
