@@ -162,3 +162,19 @@ export async function beAuthor(id) {
     return error.code;
   }
 }
+
+export async function getPersonalNote(user, book, chapter) {
+  try {
+    return await axios.get(`/novels/get_bookmarks?user_id=${user}&novel_id=${book}&chapter_id=${chapter}`)
+  } catch (error) {
+    return error.code;
+  }
+}
+
+export async function getPublicNote(user, book, chapter) {
+  try {
+    return await axios.get(`/novels/public_get_bookmarks?user_id=${user}&novel_id=${book}&chapter_id=${chapter}`)
+  } catch (error) {
+    return error.code
+  }
+}

@@ -42,7 +42,7 @@
           <div v-else>
             <div v-for="item in searchResult" :key="item.index" class="text">
               <hr class="parting-line">
-              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
+              <div @click="setToSearch(item.cfi);" v-html="item.excerpt"></div>
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
               <el-button type="primary" @click="changeFontSize">设置</el-button>
               <el-button @click="defaultFontSize">默认大小</el-button>
             </el-form-item>
-            <el-form-item>
+            <el-form-item style="margin-right: 100px">
               <el-button type="danger" @click="exit">退出阅读</el-button>
             </el-form-item>
           </el-form>
@@ -92,12 +92,21 @@
         <div id="body">
           <div v-if="showPersonalNote" class="contents">
             <div v-for="item in personalNoteList" :key="item.index" class="text bookInfo-text">
-              <hr class="parting-line">
-              <span v-if="item.note && item.isPublic">{{ item.note }}</span>
+              <hr v-if="item.note" class="parting-line">
+              <span v-if="item.note" @click="setHref(item.cfi)">{{ item.note }}</span>
             </div>
           </div>
           <div v-if="showOthersNote" class="contents">
-
+            <div v-for="item in othersNoteList" :key="item.index" class="text bookInfo-text">
+              <hr class="parting-line">
+              <span @click="setHref(item.cfi)">{{ item.note }}</span>
+              <br>
+              <span>
+                <p style="text-align: right;">
+                  --{{ item.name }}
+                </p>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +117,8 @@
         <div id="contents">
           <el-form label-position="top" label-width="100px">
             <el-form-item label="笔记记录">
-              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText" resize="none">
+              <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" placeholder="请输入内容" v-model="noteText"
+                resize="none">
               </el-input>
             </el-form-item>
           </el-form>
@@ -129,8 +139,8 @@
 
 <script>
 import { mapState } from "vuex";
-import { useEpub } from "../js/Ebook.js"; 
-import { novelContent } from '../js/Api.js';
+import { useEpub } from "../js/Ebook.js";
+import { novelContent, getPersonalNote, getPublicNote } from '../js/Api.js';
 
 export default {
   name: "EBook",
@@ -160,24 +170,25 @@ export default {
         noteType: '',
         fontSize: '',
       },
+      oldPersonalNoteList: [],
       personalNoteList: [],
       othersNoteList: [],
     }
   },
   computed: {
-    ...mapState(['currentChapterId', 'currentBookId', ])
+    ...mapState(['currentChapterId', 'currentBookId',])
   },
   mounted() {
     this.$store.commit('setShowTopBar')
     this.epubReader = useEpub();
     this.loadEpub();
     this.loadMark()
-    
+
   },
   watch: {
-    'settings.nightTheme': function(nightTheme) {
-      console.log("call set night theme",nightTheme)
-      if(nightTheme)//true为深色模式
+    'settings.nightTheme': function (nightTheme) {
+      console.log("call set night theme", nightTheme)
+      if (nightTheme)//true为深色模式
         this.epubReader.setTheme(1)
       else
         this.epubReader.setTheme(0)
@@ -194,7 +205,7 @@ export default {
             height: window.innerHeight,
             allowScriptedContent: true
           });
-          let rendition = this.epubReader.getRendition()
+          const rendition = this.epubReader.getRendition()
           this.loadListener(rendition)
         })
         .catch(error => {
@@ -299,52 +310,78 @@ export default {
       })
     },
     takeNote() {
-      if(this.epubReader.checkCFIRangeLegal(this.noteCfiRange)){
-          if (this.settings.noteType == 'underline')
-            this.showNoteInput = true
-          this.epubReader.takeNote(this.settings.noteType, this.noteCfiRange)
-          console.log(this.noteList)
-        }
-        this.noteContents.window.getSelection().removeAllRanges()
-        this.noteCfiRange = null
+      if (this.epubReader.checkCFIRangeLegal(this.noteCfiRange)) {
+        if (this.settings.noteType == 'underline')
+          this.showNoteInput = true
+        this.epubReader.takeNote(this.settings.noteType, this.noteCfiRange)
+        this.personalNoteList.push({'note': null, 'cfi': this.noteCfiRange, 'isPublic': false})
+      }
+      this.noteContents.window.getSelection().removeAllRanges()
+      this.noteCfiRange = null
     },
     finishTakeNote(isTakeNote) {
       this.epubReader.setNoteText(this.noteText, this.isNotePublic, isTakeNote)
+      let note = this.personalNoteList.pop()
+      note.note = this.noteText
+      note.isPublic = this.isNotePublic
+      this.personalNoteList.push(note)
       this.isNotePublic = false
       this.noteText = null
       this.showNoteInput = false
     },
     loadMark() {
       //请求获取他人笔记与私人笔记
-      let personalNoteList
-      let othersNoteList
+      let user = 1 //use to test
       //处理personalNote
-      for(let note in personalNoteList) {
-        const type = note.type
-        const cfi = note.cfi
-        const noteText = note.noteText
-        const isPublic = note.isPublic
-        if(type == 'highlight') {
-          this.epubReader.takeNote(type, cfi)
-        }
-        else if(type == 'underline') {
-          this.epubReader.takeNote(type, cfi)
-          this.epubReader.setNoteText(noteText, isPublic, true)
-          this.personalNoteList.push({'note': noteText, 'cfi': cfi})
-        }
-        else {
-          console.error("type error in loadMark: ", type)
-        }
-      }
-      for(let note in othersNoteList) {
-        const cfi = note.cfi
-        const noteText = note.noteText
-        const name = note.
-      }
+      getPersonalNote(user, this.currentBookId, this.currentChapterId ? this.currentChapterId : 1)
+        .then(response => {
+          let personalNoteList = response.data.bookmarks
+          this.oldPersonalNoteList = personalNoteList
+          console.log("personalNoteList: ", personalNoteList)
+          personalNoteList.forEach(note => {
+            const type = note.type
+            const cfi = note.cfi
+            const noteText = note.note
+            const isPublic = note.isPublic
+            if (type == 'highlight') {
+              this.epubReader.takeNote(type, cfi)
+            }
+            else if (type == 'underline') {
+              this.epubReader.takeNote(type, cfi)
+              this.epubReader.setNoteText(noteText, isPublic, true)
+              this.personalNoteList.push({ 'note': noteText, 'cfi': cfi , 'isPublic': isPublic})
+            }
+            else {
+              console.error("type error in loadMark: ", type)
+            }
+          })
+          this.personalNoteList.reverse()
+          console.log("this.personalNoteList: ", this.personalNoteList)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+      getPublicNote(user, this.currentBookId, this.currentChapterId ? this.currentChapterId : 1)
+        .then(response => {
+          console.log(response)
+          let publicNoteList = response.data.bookmarks
+          publicNoteList.forEach(note => {
+            console.log("in foreach, note: ", note)
+            const cfi = note.cfi
+            const noteText = note.note
+            const name = note.user
+            this.othersNoteList.push({ 'cfi': cfi, 'note': noteText, 'name': name })
+          })
+          this.othersNoteList.reverse()
+          console.log("this.othersNoteList: ", this.othersNoteList)
+        })
+        .catch(error => {
+          console.error(error)
+        })
     },
     exit() {
       const url = '/book/' + this.currentBookId
-      if(this.currentBookId)
+      if (this.currentBookId)
         this.$router.push(url)
       else
         this.$router.push('/home')
@@ -354,16 +391,22 @@ export default {
     },
     emptyFunction() {
     },
-    setHref(href) {
+    setHref(href) { 
       console.log("set page to", href)
       this.epubReader.getRendition().display(href)
+    },
+    setToSearch(href) {
+      this.setHref(href)
       this.epubReader.highlight(href)
     },
+    saveNote() {
+
+    }
   },
   beforeDestroy() {
     // TODO: 销毁监听器
     this.$store.commit('setShowTopBar')
-    // saveNote()
+    this.$forceUpdatesaveNote()
   }
 };
 </script>
@@ -410,12 +453,14 @@ export default {
           object-fit: contain;
         }
 
-        #bookInfo-text {//对低高度适配性极差^^'
+        #bookInfo-text {
+          //对低高度适配性极差^^'
           margin-top: 5%;
           height: 95%;
           width: 60%;
           display: flex;
           flex-direction: column;
+
           // overflow: scroll;
           #block {
             width: 100%;
@@ -435,6 +480,7 @@ export default {
         max-height: 50%;
         overflow: scroll;
       }
+
       #body {
         width: 90%;
         margin: 5% 5%;
@@ -465,6 +511,7 @@ export default {
       background: white;
       border: 1px dashed black;
       z-index: 9999;
+
       #contents {
         margin: 5%;
       }
