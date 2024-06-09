@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from  rest_framework.filters import OrderingFilter,SearchFilter
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, get_object_or_404
@@ -185,23 +185,13 @@ class BookrackAPIView(APIView):
 
 #添加到书架
 class AddNoveltoCrackAPIView(APIView):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id')
         novel_id = request.query_params.get('novel_id')
-
-        # 获取最近阅读的章节或者小说的起始章节
-        recently_novel = models.recently_reading.objects.filter(user_id=user_id, Novel_id=novel_id).first()
-        chapter_id = recently_novel.chapter_id if recently_novel else models.Novel.objects.get(
-            pk=novel_id).chapter_start
-
-        # 删除最近阅读记录
-        if recently_novel:
-            recently_novel.delete()
 
         # 创建或更新书架记录
         bookrack, created = models.Novel_list.objects.update_or_create(
             user_id=user_id, Novel_id=novel_id,
-            defaults={'chapter_id': chapter_id}
         )
         message = '已添加到书架' if created else '书架已更新'
         return Response({'status': 200, 'msg': message})
@@ -392,7 +382,7 @@ class PublicBookmarkAPIView(APIView):
 
 #新建书签
 class CreateBookmarkAPIView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser,JSONParser)
 
     def post(self, request, *args, **kwargs):
         # 使用请求中的JSON数据创建BookmarkSerializer实例
@@ -435,15 +425,10 @@ class CreateBookmarkAPIView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class DeleteBookmarkAPIView(APIView):
     def delete(self, request):
-        user_id = request.query_params.get('user_id')
-        novel_id = request.query_params.get('novel_id')
-        chapter_id = request.query_params.get('chapter_id')
-
-        if not (user_id and novel_id and chapter_id):
-            return Response({"error": "必须提供user_id, novel_id和chapter_id参数。"}, status=status.HTTP_400_BAD_REQUEST)
+        cfi = request.query_params.get('cfi')
 
         try:
-            bookmark = models.Bookmark.objects.get(user_id=user_id, novel_id=novel_id, novel_chapter__id=chapter_id)
+            bookmark = models.Bookmark.objects.get(cfi=cfi)
             bookmark.delete()
             return Response({"删除成功！"},status=status.HTTP_204_NO_CONTENT)
         except models.Bookmark.DoesNotExist:
