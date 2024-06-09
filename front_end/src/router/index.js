@@ -82,7 +82,8 @@ const routes = [
   {// comments评论页面
     path:'/book/:bookId/comments',
     name: 'Comments',
-    component: Comments
+    component: Comments,
+    props: true,
   },// lzy
   {// 创作
     path:'/creation',

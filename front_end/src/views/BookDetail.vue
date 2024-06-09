@@ -87,13 +87,31 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { novelDetail, novelChapter } from '@/js/Api.js'; // 修改大小写以匹配文件名
+import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
   name: "BookDetail",
   data() {
     return {
-      book: {},
+      book: {
+        title: "",
+        author: "",
+        publisher: "",
+        subtitle: "",
+        publish_date: "",
+        pages: "",
+        price: "",
+        binding: "",
+        isbn: "",
+        rating: "",
+        rating_count: "",
+        description: "",
+        author_intro: "",
+        image: "",
+        rating_distribution: {},
+        professional_reviews: "",
+        table_of_contents: []
+      },
       currentRating: 0,
       finalRating: 0,
       reviews: [], // 评论数据
@@ -103,10 +121,11 @@ export default {
   },
   computed: {
     bookImage() {
-      return this.book.image ? require(`@/assets/${this.book.image}`) : '';
+      // 这里假设图片存放在项目的 public 目录下
+      return this.book.image ? this.book.image : 'default.png';
     },
     ratingDistribution() {
-      return this.book.rating_distribution || {};
+      return this.book.rating_distribution;
     },
     ratingText() {
       const ratings = ['很差', '较差', '还行', '推荐', '力荐'];
@@ -126,8 +145,7 @@ export default {
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
-        this.book = response.data; // 假设API返回的书籍数据在data属性中
-        console.log(response);
+        this.book = response;
         this.finalRating = this.book.rating;
       } catch (error) {
         console.error('Error fetching book details:', error);
@@ -136,7 +154,7 @@ export default {
     async fetchChapters(bookId) {
       try {
         const response = await novelChapter(bookId);
-        this.chapters = response.data.chapter_data.chapter_list;
+        this.chapters = response.chapter_data.chapter_list;
       } catch (error) {
         console.error('Error fetching chapters:', error);
       }
@@ -147,11 +165,7 @@ export default {
       this.$router.push({ name: 'Reader' });
     },
     linktoComments() {
-      if (this.book.id) {
-        this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
-      } else {
-        console.error('Book ID is undefined.');
-      }
+      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
     },
     setRating(star) {
       this.currentRating = star;
@@ -172,8 +186,10 @@ export default {
 };
 </script>
 
+
+
+
 <style scoped>
-/* 样式保持不变 */
 .book-detail {
   margin: 20px auto;
   max-width: 800px;

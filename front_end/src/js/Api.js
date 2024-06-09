@@ -123,7 +123,8 @@ export async function allNovels() {
 // 查找小说详细信息
 export async function novelDetail(novel_id) {
   try {
-    return await axios.get(`/novels/detail?id=${novel_id}`).data;
+    const response = await axios.get(`/novels/detail?id=${novel_id}`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching novel details:', error);  
     return error.code;
@@ -133,7 +134,8 @@ export async function novelDetail(novel_id) {
 // 查询全部章节
 export async function novelChapter(novel_id) {
   try {
-    return await axios.get(`/novels/chapter_list?id=${novel_id}`).data;
+    const response = await axios.get(`/novels/chapter_list?id=${novel_id}`);
+    return response.data;
   } catch (error) {
     return error.code;
   }
