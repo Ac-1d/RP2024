@@ -58,12 +58,11 @@ class Novel(models.Model):
     @property
     def chapter_list(self):
         chapter_list = []
-        for i in self.Novel.all():
+        chapters = Novel_chapter.objects.filter(novel=self)
+        for i in chapters.all():
             chapter_list.append({
-                'chapter_id': i.pk,
-                'is_free': i.is_free,
-                'price': i.price,
-                'novel_chapter': i.novel_chapter
+                'chapter_id': i.chapter_id,
+                'title': i.title,
             })
         return chapter_list
 
