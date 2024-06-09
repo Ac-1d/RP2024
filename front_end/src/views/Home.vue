@@ -28,7 +28,7 @@
 
         <!-- 书籍展示区域 -->
         <div class="books">
-          <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
+          <Book v-for="book in  paginatedBooks" :key="book.title" :book="book" />
         </div>
 
         <!-- 翻页栏 -->

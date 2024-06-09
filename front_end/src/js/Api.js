@@ -146,7 +146,7 @@ export async function register(data) {
         "mobile": data.mobile
     }).data.user_id;
   } catch(error) {
-    return error.code;
+    return error.code; 
   }
 }
 
@@ -178,3 +178,5 @@ export async function getPublicNote(user, book, chapter) {
     return error.code
   }
 }
+
+export async function postNote()

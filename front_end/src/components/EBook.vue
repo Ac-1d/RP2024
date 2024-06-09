@@ -400,7 +400,16 @@ export default {
       this.epubReader.highlight(href)
     },
     saveNote() {
-
+      this.personalNoteList.forEach(note => {
+        if(this.oldPersonalNoteList.includes(note) == false) {
+          //post
+        }
+      })
+      this.oldPersonalNoteList.forEach(note => {
+        if(this.personalNoteList.includes(note) == false) {
+          //delete
+        }
+      })
     }
   },
   beforeDestroy() {
