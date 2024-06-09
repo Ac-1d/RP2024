@@ -3,11 +3,11 @@
     <header class="header">
         <div class="header-content">
             <div class="avatar">
-                <img :src="user.avatar_path" alt="Avatar" />
+                <img :src="userInfo.avatar_path" alt="Avatar" />
             </div>
             <ul class="info" >
-            <li class='NickName'><strong>昵称：</strong>{{ user.nickName }}</li>
-                <li class='Level'><strong>等级：</strong>lv{{ user.level }}</li>
+            <li class='NickName'><strong>昵称：</strong>{{ userInfo.nickName }}</li>
+                <li class='Level'><strong>等级：</strong>lv{{ userInfo.level }}</li>
             </ul>
 
         </div>
@@ -16,10 +16,10 @@
     <aside class="sidebar">
       <ul class='infoSide'>
         <li><h1>资料卡片:</h1></li>
-        <li><strong>性别：</strong>{{ user.sex || '暂未选择' }}</li>
+        <li><strong>性别：</strong>{{ userInfo.sex || '暂未选择' }}</li>
         <li><strong>出生日期：</strong>{{ formattedBirth || '暂未填写' }}</li>
         <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
-        <li><strong>个性签名：<br/></strong>{{ user.signature || '暂未填写'}}</li>
+        <li><strong>个性签名：<br/></strong>{{ userInfo.signature || '暂未填写'}}</li>
         <br>
         <li>
         <el-button @click="showModi = true" type="primary" plain >
@@ -57,7 +57,6 @@ import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
-
   components: {
       ShelfBook,
       Modify_info,
@@ -77,11 +76,37 @@ export default {
           "tele":"15513107588",
           "password":'59jkb2h0',
       },
+      userInfo:{
+          "ID": "U88965",
+          "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
+          "level": 7,
+          "nickName": "pizza_k",
+          "sex": "女",
+          "birth": new Date('2004-07-13'),
+          "signature": "",
+          "tele":"15513107588",
+          "password":'59jkb2h0',
+      },
       showModi: false,
       currentPage: 1, // 当前页码
       booksPerPage: 12, // 每页显示的书籍数量
     };
   },
+
+  created() {
+    console.log(this.userInfo.nickName);
+    console.log(this.$store.state.userInfo);
+    this.userInfo.ID = this.$store.state.userInfo.id;
+    // this.userInfo.avatar_path = this.$store.state.userInfo.user_icon;
+    this.userInfo.sex = this.$store.state.userInfo.gender;
+    this.userInfo.password = this.$store.state.userInfo.password;
+    this.userInfo.nickName = this.$store.state.userInfo.username;
+    this.userInfo.birth = this.$store.state.userInfo.birth_date;
+    this.userInfo.signature = this.$store.state.userInfo.signature;
+    this.userInfo.tele = this.$store.state.userInfo.mobile;
+    console.log(this.userInfo.nickName);
+  },
+
   methods:{
       changeModify(newInfo){
         this.user.nickName = newInfo.nickName;
@@ -104,8 +129,21 @@ export default {
       this.currentPage = page;
     },
 
-
-  },
+    commitInfo: async function() {
+        let formData = new FormData();
+        formData.append('username', this.userInfo.nickName);
+        formData.append('gender', this.userInfo.sex);
+        formData.append('password', this.userInfo.password);
+        // formData.append('user_icon', this.userInfo.avatar_path);
+        formData.append('birth_date', this.userInfo.birth);
+        formData.append('signature', this.userInfo.signature);
+        fetch('/api/upload', {
+            method: 'PATCH',
+            body: formData
+    })
+    .then(response => response.json())
+           },
+   },
 
   computed:{
     hiddenTele(){

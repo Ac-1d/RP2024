@@ -10,8 +10,8 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="电话" prop="tele">
-        <el-input v-model="logForm.tele" autocomplete="off"></el-input>
+      <el-form-item label="用户名" prop="mobile">
+        <el-input v-model="logForm.mobile" autocomplete="off"></el-input>
       </el-form-item>
 
 
@@ -41,17 +41,12 @@ export default {
   data() {
     return {
       logForm: {
-        tele:'',
+        mobile:'',
         password: '',
       },
       rules :{
-         tele: [
-            { required: true, message: '请输入电话号码', trigger: 'blur' },
-            {
-                pattern: /^1[3-9]\d{9}$/, // 中国手机号正则，以1开头，第二位是3-9之间的数字，后面跟9位数字
-                message: '请输入正确的电话号码格式',
-                trigger: ['blur', 'change'] // 触发验证的时机，这里设定为失去焦点或值变化时
-            }
+         mobile: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
 
          ],
 
@@ -76,36 +71,38 @@ export default {
        this.$confirm('确认关闭？')
            .then(() => {
                console.log('close');
-               this.logForm.tele='',
+               this.logForm.mobile='',
                this.logForm.password= '',
                this.$emit('closedia');
            })
            .catch(() => {});
     },
 
+    async getUserInfo() {
+
+    },
+
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
             const userData = {
-              mobile:this.logForm.tele,
+              mobile:this.logForm.mobile,
               password:this.logForm.password,
             };
+            this.$refs[formName].resetFields();
 
-            const ans = this.$store.dispatch('login',userData);
-            console.log("得到ans:"+ans);
-            this.userInfo();
+            await this.$store.dispatch('login',userData);
+            await this.$store.dispatch('getUserInfo');
+            console.log('submit');
+            console.log(this.$store.getters.userInfo);
+
+            this.$emit('closedia');
+
         }else{
             console.log('信息错误!!');
             return false;
         }
       });
-    },
-    async userInfo() {
-      try {
-        await this.$store.dispatch('getUserInfo');
-      } catch (error) {
-        console.error('Error fetching info:', error);
-      }
     },
   },
 };

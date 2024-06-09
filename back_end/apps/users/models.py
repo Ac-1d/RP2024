@@ -17,22 +17,6 @@ class User(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set', blank=True,
                                               verbose_name='用户权限')
     is_author = models.BooleanField(default=False, verbose_name='是否为作者')
+    birth_date = models.DateField(verbose_name='出生日期', null=True, blank=True)
+    signature = models.CharField(max_length=255, verbose_name='个性签名', default='', blank=True)
 
-    @property
-    def lately_data(self):
-        lately_data = []
-        # print(self.user.all()[0].Novel.novel_name)
-        for i in self.user.all():
-            lately_data.append({
-                'novel_name':i.Novel.novel_name,
-                'novel_img': r'media/image/' + str(i.Novel.novel_img).split('\\')[-1],
-                'novel_detail':i.Novel.detail,
-                'total_words':i.Novel.total_words,
-                'novel_status':i.Novel.novel_status,
-                'novel_id':i.Novel.pk,
-                'novel_author':i.Novel.author.author_name,
-                'chapter_start':i.Novel.chapter_start,
-                'category':i.Novel.category.category_name
-            })
-        # print(lately_data)
-        return lately_data
