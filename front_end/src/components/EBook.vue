@@ -45,10 +45,6 @@
               <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
             </div>
           </div>
-          <!-- <div v-for="item in searchResult" :key="item.index" class="text">
-              <hr v-if="item.index != 1" class="parting-line">
-              <div @click="setHref(item.cfi)" v-html="item.excerpt"></div>
-          </div> -->
         </div>
       </div>
       <div id="setting" class="side-bar">
@@ -69,10 +65,6 @@
             <el-form-item label="删除笔记" v-if="!settings.isTakingNote">
               <el-switch v-model="settings.isRemovingNote"></el-switch>
             </el-form-item>
-            <!-- 可能不需要 -->
-            <el-form-item label="显示他人笔记">
-              <el-switch v-model="settings.showOthersNote"></el-switch>
-            </el-form-item>
             <el-form-item label="显示个人笔记">
               <el-switch v-model="settings.showPersonalNote"></el-switch>
             </el-form-item>
@@ -85,8 +77,12 @@
               <el-button type="primary" @click="changeFontSize">设置</el-button>
               <el-button @click="defaultFontSize">默认大小</el-button>
             </el-form-item>
+            <el-form-item>
+              <el-button type="danger" @click="exit">退出阅读</el-button>
+            </el-form-item>
           </el-form>
         </div>
+        <el-divider></el-divider>
         <el-form>
           <el-form-item>
             <el-button @click="showPersonalNote = true; showOthersNote = false">我的笔记</el-button>
@@ -132,13 +128,15 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { useEpub } from "../js/Ebook.js"; 
+import { novelContent } from '../js/Api.js';
 
 export default {
   name: "EBook",
   data() {
     return {
-      showTable: true,
+      showTable: false,
       showNavigation: true,
       showNoteInput: false,
       showPersonalNote: true,
@@ -166,42 +164,15 @@ export default {
       othersNoteList: [],
     }
   },
+  computed: {
+    ...mapState(['currentChapterId', 'currentBookId', ])
+  },
   mounted() {
     this.$store.commit('setShowTopBar')
     this.epubReader = useEpub();
     this.loadEpub();
-    //this.loadMark()
-    let rendition = this.epubReader.getRendition()
-    rendition.on("selected", (cfiRange, contents) => {
-      console.log("listener detectes text selected:", cfiRange, contents)
-      this.noteCfiRange = cfiRange
-      this.noteContents = contents
-      if(this.allowTakeNote){
-        this.takeNote()
-        this.allowTakeNote = false
-      }
-    })
-    rendition.on("mouseup", () => {
-      console.log("listener detectes mouseup")
-      if(this.settings.isTakingNote == false)
-        return
-      if(this.noteCfiRange){
-        this.takeNote()
-      }
-      else{
-        console.warn("cfiRange is undefined")
-        this.allowTakeNote = true
-      }
-    })
-    rendition.on("markClicked", (cfiRange) => {
-      console.log("listener detectes 'markClicked'")
-      console.log(cfiRange)
-      if (this.settings.isRemovingNote)
-        this.epubReader.removeMark(cfiRange)
-      else {
-        console.log(this.epubReader.getNoteText(cfiRange))
-      }
-    })
+    this.loadMark()
+    
   },
   watch: {
     'settings.nightTheme': function(nightTheme) {
@@ -214,9 +185,23 @@ export default {
   },
   methods: {
     loadEpub() {
-      //文件路径需要请求获取
-      const book = this.epubReader.createBook("books_tmp/moby-dick.epub");
-      console.log(book)
+      novelContent(this.currentBookId, this.currentChapterId)
+        .then(response => {
+          const book = this.epubReader.createBook(response.data.chapter_data.content);
+          this.loadBook(book)
+          this.epubReader.render("epub_render", {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            allowScriptedContent: true
+          });
+          let rendition = this.epubReader.getRendition()
+          this.loadListener(rendition)
+        })
+        .catch(error => {
+          console.error("error: ", error)
+        })
+    },
+    loadBook(book) {
       book.loaded.cover.then((cover) => {
         if (cover) {
           book.archive.createUrl(cover).then((_url) => {
@@ -239,11 +224,38 @@ export default {
         })
         console.log("parse navigation")
       })
-      this.epubReader.render("epub_render", {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        allowScriptedContent: true
-      });
+    },
+    loadListener(rendition) {
+      rendition.on("selected", (cfiRange, contents) => {
+        console.log("listener detectes text selected:", cfiRange, contents)
+        this.noteCfiRange = cfiRange
+        this.noteContents = contents
+        if (this.allowTakeNote) {
+          this.takeNote()
+          this.allowTakeNote = false
+        }
+      })
+      rendition.on("mouseup", () => {
+        console.log("listener detectes mouseup")
+        if (this.settings.isTakingNote == false)
+          return
+        if (this.noteCfiRange) {
+          this.takeNote()
+        }
+        else {
+          console.warn("cfiRange is undefined")
+          this.allowTakeNote = true
+        }
+      })
+      rendition.on("markClicked", (cfiRange) => {
+        console.log("listener detectes 'markClicked'")
+        console.log(cfiRange)
+        if (this.settings.isRemovingNote)
+          this.epubReader.removeMark(cfiRange)
+        else {
+          console.log(this.epubReader.getNoteText(cfiRange))
+        }
+      })
     },
     prevPage() {
       this.epubReader.prevPage();
@@ -304,6 +316,31 @@ export default {
     },
     loadMark() {
       //请求获取他人笔记与私人笔记
+      //处理personalNote
+      for(let note in this.personalNoteList) {
+        const type = note.type
+        const cfi = note.cfi
+        const noteText = note.noteText
+        const isPublic = note.isPublic
+        if(type == 'highlight') {
+          this.epubReader.takeNote(type, cfi)
+        }
+        else if(type == 'underline') {
+          this.epubReader.takeNote(type, cfi)
+          this.epubReader.setNoteText(noteText, isPublic, true)
+        }
+        else {
+          console.error("type error in loadMark: ", type)
+        }
+      }
+      
+    },
+    exit() {
+      const url = '/book/' + this.currentBookId
+      if(this.currentBookId)
+        this.$router.push(url)
+      else
+        this.$router.push('/home')
     },
     test() {
 
@@ -313,11 +350,13 @@ export default {
     setHref(href) {
       console.log("set page to", href)
       this.epubReader.getRendition().display(href)
+      this.epubReader.highlight(href)
     },
   },
   beforeDestroy() {
     // TODO: 销毁监听器
     this.$store.commit('setShowTopBar')
+    // saveNote()
   }
 };
 </script>
@@ -364,13 +403,13 @@ export default {
           object-fit: contain;
         }
 
-        #bookInfo-text {
+        #bookInfo-text {//对低高度适配性极差^^'
           margin-top: 5%;
           height: 95%;
           width: 60%;
           display: flex;
           flex-direction: column;
-
+          // overflow: scroll;
           #block {
             width: 100%;
           }
@@ -386,11 +425,13 @@ export default {
       #header {
         width: 90%;
         margin: 5% 5%;
+        max-height: 50%;
+        overflow: scroll;
       }
       #body {
         width: 90%;
         margin: 5% 5%;
-        height: calc(90% - 452px);
+        height: 50%;
         overflow: scroll;
       }
     }

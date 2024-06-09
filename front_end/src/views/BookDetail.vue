@@ -87,7 +87,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { novelDetail, novelChapter } from '@/js/Api.js'; // 修改大小写以匹配文件名
+import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
   name: "BookDetail",
@@ -121,7 +121,8 @@ export default {
   },
   computed: {
     bookImage() {
-      return require(`@/assets/${this.book.image}`);
+      // 这里假设图片存放在项目的 public 目录下
+      return this.book.image ? this.book.image : 'default.png';
     },
     ratingDistribution() {
       return this.book.rating_distribution;
@@ -161,10 +162,10 @@ export default {
     startReading() {
       this.setCurrentBookId(this.book.id);
       this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
-      this.$router.push({name: 'Reader'});
+      this.$router.push({ name: 'Reader' });
     },
     linktoComments() {
-      this.$router.push({name: 'Comments', params: {bookId: this.book.id}});
+      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
     },
     setRating(star) {
       this.currentRating = star;
@@ -184,6 +185,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .book-detail {
