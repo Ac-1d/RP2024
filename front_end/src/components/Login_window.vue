@@ -10,7 +10,7 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="电话" prop="mobile">
+      <el-form-item label="用户名" prop="mobile">
         <el-input v-model="logForm.mobile" autocomplete="off"></el-input>
       </el-form-item>
 
@@ -91,15 +91,12 @@ export default {
             };
             this.$refs[formName].resetFields();
 
-            const ans = await this.$store.dispatch('login',userData);
-            console.log('ans'+ans.msg);
-
-            if(ans.msg === '登录成功'){
-                await this.$store.dispatch('getUserInfo');
-                this.$emit('closedia');
-            }else{
-                alert("用户不存在或密码错误");
-            }
+            await this.$store.dispatch('login',userData);
+            await this.$store.dispatch('getUserInfo');
+            console.log('submit');
+            console.log(this.$store.getters.userInfo);
+            
+            this.$emit('closedia');
 
         }else{
             console.log('信息错误!!');

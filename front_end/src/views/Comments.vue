@@ -1,13 +1,14 @@
 <template>
   <el-container class="layout-round-middle">
+    <el-header><h1>书评——《{{ book.detail_data.novel_name }}》</h1></el-header>
     <!-- 评论显示 -->
     <el-main>
       <div v-for="(comment, index) in comments" :key="index">
-        <!-- 循环显示的每条评论 -->
+        <!-- 环绕显示的每条评论 -->
         <div>
           <el-row style="border-top: 1px solid grey;">
               <el-link class="text-larger" style="float: left;" type="primary">{{ comment.username }}</el-link>
-              <el-rate class="text-larger" style="float: left;" v-model="comment.up_number" 
+              <el-rate class="text-larger" style="float: left;" v-model="comment.up_number"
               disabled text-color="#ff9900"></el-rate>
               <el-link class="text-larger" style="float: left;" type="primary">{{ todate(comment.comment_time) }}</el-link>
           </el-row>
@@ -34,9 +35,8 @@
 </template>
 
 <script>
-import {addComments} from '@/js/Api.js';
-import {getComments} from '@/js/Api.js';
-import {extractDateTime} from '@/js/Time.js';
+import { addComments, getComments , novelDetail } from '@/js/Api.js';
+import { extractDateTime } from '@/js/Time.js';
 import Login_window from '@/components/Login_window.vue';
 
 import '@/css/text.css';
@@ -47,40 +47,39 @@ export default {
   components: { Login_window },
   data() {
     return {
-      bookId: 2, chapterId: 2,
-      
-      userInfo: null,
-
-      comments: null,// 已有评论
-
+      bookId: this.$store.state.currentBookId, // 从路由参数中获取 bookId
+      chapterId: this.$store.state.currentChapterId, // 从 Vuex 中获取当前章节ID
+      userInfo: this.$store.state.userInfo, // 从 Vuex 中获取用户信息
+      book: null,
+      comments: [], // 已有评论
       newComment: {
-        novel_id: null, 
-        chapter_id: null, 
-        // user_id: this.userInfo.id,
-        user_id: 3,
-
+        novel_id: this.$store.state.currentBookId,
+        chapter_id: this.$store.state.currentChapterId,
+        user_id: this.$store.state.userInfo.id,
         content: '',
-        up_number: 0,// 评级，代表用户支持度，0代表尚未评分
+        up_number: 0, // 评分，0表示未评分
       },
-
-      // 评级显示颜色
+      // 评分显示颜色
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
-
       // 显示登录界面
       logvisible: false,
     };
   },
-  async created() {// 该页面创建的时候，就通过向后端发送请求，载入评论
-    // this.bookId = this.$route.params.bookId;
-    const respond = await getComments(this.bookId, this.chapterId);
-    this.comments = respond;
-    this.newComment.novel_id = this.bookId;
-    this.newComment.chapter_id = this.chapterId;
-    if(this.$store.state.loggedIn)
-      this.userInfo = this.$store.state.userInfo; // 如果登录，载入当前用户信息
-    // console.log(this.comments);
+  async created() {
+    // console.log('current status');
+    await this.fetchComments();
+    this.book = await novelDetail(this.$store.state.currentBookId);
   },
   methods: {
+    async fetchComments() {
+      try {
+        const response = await getComments(this.$store.state.currentBookId, this.$store.state.currentChapterId);
+        console.log(response);
+        this.comments = response;
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    },
     todate(time) {
       return extractDateTime(time);
     },
@@ -91,19 +90,26 @@ export default {
       this.logvisible = false;
     },
     async addComment() {
-      let newComment = this.newComment;
-      if (this.userInfo == null) {
-        this.showLogdialog();return;
+      if (!this.userInfo) {
+        this.showLogdialog();
+        return;
       }
-      if (newComment.content == '') {
-        this.openMsg('请留下宝贵意见');return;
+      if (this.newComment.content === '') {
+        this.openMsg('请留下您的意见');
+        return;
       }
-      if (newComment.up_number == 0) {
-        this.openMsg('请您打分');return;
+      if (this.newComment.up_number === 0) {
+        this.openMsg('请为此书评分');
+        return;
       }
-      await addComments(newComment);
-      await getComments(this.bookId, this.chapterId);
-      this.content = '';
+      try {
+        await addComments(this.newComment, this.$store.state.verify.token);
+        // console.log('token' + this.$store.state.verify.token);
+        await this.fetchComments();
+        this.newComment.content = '';
+      } catch (error) {
+        console.error('Error adding comment:', error);
+      }
     },
     openMsg(msg) {
       this.$alert(msg, '提示', {
@@ -117,5 +123,181 @@ export default {
       });
     },
   }
-};  
+};
 </script>
+
+<style scoped>
+.book-detail {
+  margin: 20px auto;
+  max-width: 800px;
+  text-align: left;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.title-section {
+  flex: 2;
+}
+
+.rating-section {
+  flex: 1;
+  text-align: center;
+}
+
+.book-info {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.book-cover {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.book-cover:hover {
+  transform: scale(1.1);
+}
+
+.book-info img {
+  width: 150px;
+  height: 200px;
+  margin-right: 20px;
+}
+
+.details p {
+  margin: 5px 0;
+}
+
+.read-button {
+  display: block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.read-button:hover {
+  background-color: #0056b3;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rating h2 {
+  margin-bottom: 10px;
+}
+
+.score {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.rating-distribution {
+  margin-top: 10px;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.rating-bar .bar {
+  flex: 1;
+  height: 10px;
+  background: #eee;
+  margin: 0 10px;
+  position: relative;
+}
+
+.rating-bar .fill {
+  height: 100%;
+  background: orange;
+}
+
+.actions, .extra-actions {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.read-status {
+  margin-right: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+}
+
+.rating span {
+  margin-right: 5px;
+}
+
+.stars {
+  cursor: pointer;
+}
+
+.stars .active-star {
+  color: orange;
+}
+
+.stars .inactive-star {
+  color: #ccc;
+}
+
+.extra-actions a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: #007bff;
+}
+
+.extra-actions .icon {
+  margin-right: 5px;
+}
+
+.extra-actions .recommend {
+  padding: 5px 10px;
+  background-color: #dff0d8;
+  border: 1px solid #d6e9c6;
+  border-radius: 5px;
+  color: #3c763d;
+}
+
+.description, .author-info, .professional-reviews, .table-of-contents, .book-reviews, .book-chapters {
+  margin-bottom: 20px;
+}
+
+.description h2, .author-info h2, .professional-reviews h2, .table-of-contents h2, .book-reviews h2, .book-chapters h2 {
+  margin-bottom: 10px;
+}
+
+.table-of-contents ul, .book-chapters ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.comment {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+</style>

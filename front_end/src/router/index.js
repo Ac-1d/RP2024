@@ -28,9 +28,9 @@ const routes = [
     component: Home
   },
   {
-      path: '/categories-detail',
-      name: 'CategoriesDetail',
-      component: CategoriesDetail
+    path: '/categories-detail',
+    name: 'CategoriesDetail',
+    component: CategoriesDetail
   },
   {
     path: "/about",
@@ -82,9 +82,9 @@ const routes = [
     component: Mail
   },// lzy
   {// comments评论页面
-    path:'/book/:bookId/comments',
+    path:'/book/comments',
     name: 'Comments',
-    component: Comments
+    component: Comments,
   },// lzy
   {// 创作
     path:'/creation',

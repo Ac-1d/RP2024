@@ -32,21 +32,20 @@ export default new Vuex.Store({
       state.userInfo = userInfo;
     },
     setCurrentBookId(state, bookId){
-      state.currentBookId = bookId
+      state.currentBookId = bookId;
     },
     setCurrentChapterId(state, chapterId){
-      console.log("set current chapter id to ", chapterId)
-      state.currentChapterId = chapterId
+      state.currentChapterId = chapterId;
     }
   },
   actions: {
-    async login({ commit }, loginData) {
+    async login({ commit }, loginData) { 
       let mobile = loginData.mobile;
       let password = loginData.password;
       let msg = '登录失败';
       if (mobile && password) {
-        await axios.post("/users/login", {
-          mobile: mobile,
+        await axios.post("/users/login", {  
+          mobile: mobile,  
           password: password,
         }).then(response => {
           if (response.data.status == 200 && response.data.msg == '登录成功') {
@@ -55,7 +54,7 @@ export default new Vuex.Store({
           }
         }).catch(error => {
           msg = '验证失败，错误码：' + error.response.status;
-        })
+        });
       }
       return {msg: msg};
     },
@@ -75,13 +74,21 @@ export default new Vuex.Store({
       }).catch (error => {
         console.error(error);
         return '出现错误';
-      })
+      });
+    },
+    setCurrentBookId({ commit }, bookId) {
+      commit('setCurrentBookId', bookId);
+    },
+    setCurrentChapterId({ commit }, chapterId) {
+      commit('setCurrentChapterId', chapterId);
     }
   },
   getters: {
     loggedIn: state => state.loggedIn,
     showNavBar: state => state.showNavBar,
     userInfo: state => state.userInfo,
+    currentBookId: state => state.currentBookId,
+    currentChapterId: state => state.currentChapterId,
   },
   modules: {}
 });

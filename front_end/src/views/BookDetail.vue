@@ -86,10 +86,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-// import { mapState } from 'vuex';
-import axios from 'axios';
-import reviews from '@/assets/reviews.json'; // 导入评论数据
+// import { mapActions } from 'vuex';
+import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
   name: "BookDetail",
@@ -116,14 +114,15 @@ export default {
       },
       currentRating: 0,
       finalRating: 0,
-      reviews: reviews, // 加载评论数据
+      reviews: [], // 评论数据
       chapters: [], // 章节数据
       selectedChapter: null, // 选中的章节号
     };
   },
   computed: {
     bookImage() {
-      return require(`@/assets/${this.book.image}`);
+      // 这里假设图片存放在项目的 public 目录下
+      return this.book.image ? this.book.image : 'default.png';
     },
     ratingDistribution() {
       return this.book.rating_distribution;
@@ -133,28 +132,44 @@ export default {
       return ratings[this.currentRating - 1] || '';
     },
     filteredComments() {
-      return this.reviews.find(review => review.id === this.$route.params.bookId)?.comments || [];
+      return this.reviews;
     }
   },
   created() {
     const bookId = this.$route.params.bookId;
-    this.book = this.getBookById(bookId);
-    this.finalRating = this.book.rating; // 假设book.rating是最终评分
-    this.fetchChapters(bookId); // 获取章节数据
+    this.fetchBookDetails(bookId);
+    this.fetchChapters(bookId);
   },
   methods: {
-    ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
+    // ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
+    async fetchBookDetails(bookId) {
+      try {
+        const response = await novelDetail(bookId);
+        this.$store.dispatch('setCurrentBookId', bookId);
+        this.$store.dispatch('setCurrentChapterId', 0);
+        console.log(this.$store.state);
+        this.book = response;
+        this.finalRating = this.book.rating;
+      } catch (error) {
+        console.error('Error fetching book details:', error);
+      }
+    },
+    async fetchChapters(bookId) {
+      try {
+        const response = await novelChapter(bookId);
+        this.chapters = response.chapter_data.chapter_list;
+      } catch (error) {
+        console.error('Error fetching chapters:', error);
+      }
+    },
     startReading() {
-      this.$store.commit('setCurrentBookId', this.book.id);
-      this.$store.commit('setCurrentChapterId', this.selectedChapter || this.chapters[0]?.chapter_id);
-      this.$router.push({name: 'Reader'});
+      this.setCurrentBookId(this.book.id);
+      this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
+      this.$router.push({ name: 'Reader' });
     },
     linktoComments() {
-      this.$router.push({name: 'Comments', params: {bookId: this.book.id}});
-    },
-    getBookById(id) {
-      const booksData = require("@/assets/book.json");
-      return booksData.find(book => book.id == id);
+      console.log('book id' + this.book.id );
+      this.$router.push({ name: 'Comments'});
     },
     setRating(star) {
       this.currentRating = star;
@@ -168,22 +183,13 @@ export default {
       // 这里可以添加逻辑，例如将评分发送到服务器
       console.log(`评分为: ${star}`);
     },
-    fetchChapters(bookId) {
-      // 获取章节数据的API调用示例 有待封装
-      axios.get(`http://127.0.0.1:8000/novels/chapter_list`, {params: {novel_id: bookId}})
-          .then(response => {
-            this.chapters = response.data.chapter_data.chapter_list;
-          })
-          .catch(error => {
-            console.error("获取章节数据失败:", error);
-          });
-    },
     selectChapter(chapterId) {
       this.selectedChapter = chapterId;
     }
   }
 };
 </script>
+
 
 <style scoped>
 .book-detail {

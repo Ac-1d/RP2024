@@ -63,3 +63,74 @@ textarea {
 .pagination .page-dot.active {
   background-color: gray;
 }
+
+.home {
+  text-align: center;
+}
+
+.content {
+  display: flex;
+}
+
+/* 功能栏样式 */
+.side-bar {
+  flex: 0 0 200px; /* 固定宽度 */
+}
+
+/* 主内容区域样式 */
+.main-content {
+  flex: 1;
+}
+
+/* 顶部分类栏样式 */
+.category-bar {
+  text-align: left;
+  padding: 20px;
+}
+
+.category-bar .title {
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 20px;
+}
+
+.category-bar .categories {
+  display: inline-block;
+  padding: 0;
+  list-style: none;
+}
+
+.category-bar .categories li {
+  display: inline;
+  margin-right: 15px;
+  color: gray;
+  cursor: pointer;
+}
+
+.category-bar .categories li.active {
+  font-weight: bold;
+  color: black;
+}
+
+.category-bar .categories li a {
+  color: blue;
+  text-decoration: none;
+}
+
+.category-bar .categories li a:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background-color: lightgray;
+  margin: 10px 0;
+}
+
+/* 书籍展示区域样式 */
+.books {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* 左对齐 */
+}

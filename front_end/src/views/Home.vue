@@ -27,8 +27,8 @@
         <div class="separator"></div>
 
         <!-- 书籍展示区域 -->
-        <div class="books">  
-          <Book v-for="book in  paginatedBooks" :key="book.title" :book="book" />
+        <div class="books">
+          <Book v-for="book in paginatedBooks" :key="book.id" :book="book" />
         </div>
 
         <!-- 翻页栏 -->
@@ -45,8 +45,8 @@
 <script>
 import Book from "@/components/Book.vue";
 import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
-
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
+import axios from 'axios'; // 导入 axios
 
 export default {
   name: "Home",
@@ -57,7 +57,7 @@ export default {
   },
   data() {
     return {
-      books: booksData, // 使用本地的 books.json 数据
+      books: [], // 初始为空数组
       currentPage: 1, // 当前页码
       booksPerPage: 12, // 每页显示的书籍数量
       selectedCategory: "全部", // 当前选中的分类
@@ -69,7 +69,7 @@ export default {
       if (this.selectedCategory === "全部") {
         return this.books;
       }
-      return this.books.filter(book => book.category === this.selectedCategory);
+      return this.books.filter(book => book.category_name === this.selectedCategory);
     },
     totalPages() {
       return Math.ceil(this.filteredBooks.length / this.booksPerPage);
@@ -81,6 +81,16 @@ export default {
     }
   },
   methods: {
+    async fetchBooks() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/novels/novel'); // 使用正确的API路径
+        console.log("API response: ", response.data);
+        this.books = response.data.results || response.data; // 根据API返回数据的实际结构进行调整
+        console.log("this.books: ", this.books);
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -95,17 +105,22 @@ export default {
       this.currentPage = page;
     },
     filterBooks(category) {
+      console.log("Filtering books by category: ", category);
+      console.log("Current books: ", this.books);
       this.selectedCategory = category;
       this.currentPage = 1; // 重置到第一页
     },
     search() {
       if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
+        this.$router.push({name: 'Search', query: {q: this.query, c: 2}});
       }
     },
     goToCategoriesDetail() {
-      this.$router.push({ name: 'CategoriesDetail' });
+      this.$router.push({name: 'CategoriesDetail'});
     }
+  },
+  created() {
+    this.fetchBooks(); // 在组件创建时获取书籍数据
   }
 };
 </script>
