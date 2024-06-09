@@ -14,6 +14,10 @@
         <el-input v-model="regisForm.tele" autocomplete="off"></el-input>
       </el-form-item>
 
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="regisForm.email" autocomplete="off"></el-input>
+      </el-form-item>
+
       <el-form-item  label="用户名" prop="username">
         <el-input v-model="regisForm.username" autocomplete="off"></el-input>
       </el-form-item>
@@ -34,7 +38,7 @@
 </template>
 
 <script>
-
+import axios from 'axios';
 export default {
   name: "Register_window",
   props: {
@@ -46,6 +50,7 @@ export default {
     return {
       regisForm: {
         tele:'',
+        email: '',
         username: '',
         password: '',
         password2: '',
@@ -58,6 +63,11 @@ export default {
                 message: '请输入正确的电话号码格式',
                 trigger: ['blur', 'change'] // 触发验证的时机，这里设定为失去焦点或值变化时
             }
+
+         ],
+
+         email: [
+            { required: true, message: '请输入邮箱', trigger: 'blur' },
 
          ],
          username : [
@@ -97,6 +107,7 @@ export default {
            .then(() => {
                console.log('close');
                this.regisForm.tele='',
+               this.regisForm.email='',
                this.regisForm.username= '',
                this.regisForm.password= '',
                this.regisForm.password2= '',
@@ -109,7 +120,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-            alert('注册成功!');
+            this.register();
             this.$refs[formName].resetFields();
             this.$emit('closedia');
         }else{
@@ -117,6 +128,33 @@ export default {
             return false;
         }
       });
+    },
+    register: async function() {
+       try{
+          const userData = {
+              username:this.regisForm.username,
+              password:this.regisForm.password,
+              email:this.regisForm.email,
+              mobile:this.regisForm.tele,
+          };
+
+          const response = await axios.post('http://127.0.0.1:8000/users/register', userData);
+
+          console.log('注册接口响应详情:', response);
+
+          if (response.status === 400) {
+            throw new Error(`注册失败，状态码：${response.status}`);
+          } else{
+            alert('注册成功!,用户ID:'+response.data.user_id);
+          }
+       } catch(error) {
+           console.error('注册时发生错误:', error.message);
+           if (error.response && error.response.status === 400) {
+            alert('注册失败，邮箱格式错误或用户已注册');
+           } else {
+            alert('注册过程中出现未知错误');
+           }
+       }
     },
   },
 };

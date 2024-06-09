@@ -145,8 +145,8 @@ export default {
   methods: {
     ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     startReading() {
-      this.$store.commit('setCurrentBookId', this.book.id)
-      this.$store.commit('setCurrentChapterId', this.selectedChapter || this.chapters[0]?.chapter_id)
+      this.$store.commit('setCurrentBookId', this.book.id);
+      this.$store.commit('setCurrentChapterId', this.selectedChapter || this.chapters[0]?.chapter_id);
       this.$router.push({name: 'Reader'});
     },
     linktoComments() {

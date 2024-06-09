@@ -90,7 +90,7 @@
 
 
 <script>
-
+import axios from 'axios';
   export default {
     name:"Modify_info",
     props: {
@@ -200,9 +200,10 @@
             console.log(this.ruleForm);
 
             alert('提交成功!');
+            this.commitInfo();
             this.$emit('closedia');
             this.$emit('send',this.tempRuleForm);
-            this.tempRuleForm.nickName = 'wcnmaaaaa';
+
           } else {
             console.log('错误提交!!');
             return false;
@@ -235,6 +236,36 @@
         this.$refs[formName].resetFields();
         this.setFalse();
       },
+
+      commitInfo: async function() {
+        console.log('start');
+        let formData = new FormData();
+        formData.append('username', this.tempRuleForm.nickName);
+        let gender = 0;
+        if(this.tempRuleForm.sex === "女"){
+            gender = 1;
+        }
+        formData.append('gender', gender);
+        formData.append('password', this.tempRuleForm.password);
+        // formData.append('user_icon', this.userInfo.avatar_path);
+        let datetimeForDB = this.tempRuleForm.birth.toISOString().replace('Z', '').slice(0, 19);
+        formData.append('birth_date', datetimeForDB);
+        formData.append('signature', this.tempRuleForm.signature);
+        console.log(formData);
+        try {
+            const response = await axios.patch(`/users/register?user_id=${this.$store.state.userInfo.id}`, formData);
+            console.log('try');
+            if (response.status === 200 && response.data.message === '用户信息更新成功') {
+                console.log(response.data.message);
+
+                // 在此处处理成功更新的结果，例如通知用户或刷新列表
+            } else {
+                console.error('更新失败');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     },
 

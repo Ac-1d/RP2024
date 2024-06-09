@@ -224,7 +224,7 @@ class recently_reading(models.Model):
         verbose_name_plural='最近阅读表'
 
     @property
-    def novel_info(self):
+    def chapter_info(self):
         novel_dic = {}
         novel_dic['novel_name'] = self.Novel.novel_name
         novel_dic['novel_img'] = r'media/image/' + str(self.Novel.novel_img).split('\\')[-1]
@@ -235,7 +235,8 @@ class recently_reading(models.Model):
         novel_dic['novel_author'] = self.Novel.author.author_name
         novel_dic['chapter_start'] = self.Novel.chapter_start
         novel_dic['category'] = self.Novel.category.category_name
-        novel_dic['chapter_name'] = self.chapter.novel_chapter
+        novel_dic['chapter_id']=self.chapter.chapter_id
+        novel_dic['title'] = self.chapter.title
         return novel_dic
 
 #书签，高亮模型

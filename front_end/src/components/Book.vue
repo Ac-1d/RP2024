@@ -3,6 +3,7 @@
     <img :src="bookImage" :alt="book.title" @click="goToDetailPage" @mouseover="showDetails" @mouseleave="hideDetails" />
     <div class="title">{{ book.title }}</div>
     <div class="author">{{ book.author }}</div>
+
     <transition name="fade">
       <div class="details" v-if="isHovered">
         <h3>{{ book.title }}</h3>

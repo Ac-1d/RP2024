@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import axios from 'axios';  
+import axios from 'axios';
 
 Vue.use(Vuex);
 
@@ -14,12 +14,12 @@ export default new Vuex.Store({
     currentChapterId: null,
   },
   mutations: {
-    LOGIN(state, data) { 
+    LOGIN(state, data) {
       // data是登录请求返回数据
       state.loggedIn = true;
       state.verify = data;
-    },  
-    LOGOUT(state) {  
+    },
+    LOGOUT(state) {
       state.loggedIn = false;
       state.verify = null;
       state.userInfo = null;
@@ -40,13 +40,13 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async login({ commit }, loginData) { 
-      let username = loginData.username;
+    async login({ commit }, loginData) {
+      let mobile = loginData.mobile;
       let password = loginData.password;
       let msg = '登录失败';
-      if (username && password) {
-        await axios.post("/users/login", {  
-          username: username,  
+      if (mobile && password) {
+        await axios.post("/users/login", {
+          mobile: mobile,
           password: password,
         }).then(response => {
           if (response.data.status == 200 && response.data.msg == '登录成功') {
@@ -58,28 +58,28 @@ export default new Vuex.Store({
         })
       }
       return {msg: msg};
-    },  
+    },
     logout({ commit }) {
       commit('LOGOUT');
     },
-    async getUserInfo({ commit }) {  
+    async getUserInfo({ commit }) {
       if (!this.state.loggedIn) return '请先登录';
-      let token = this.state.verify.token;  
-      await axios.get('/users/userinfo', {  
-        headers: {  
-          'Authorization': `Bearer ${token}`  
-        }  
+      let token = this.state.verify.token;
+      await axios.get('/users/userinfo', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       }).then (response => {
         commit('GetUserInfo', response.data.info);
         return response.data.info;
-      }).catch (error => {  
+      }).catch (error => {
         console.error(error);
         return '出现错误';
       })
     }
   },
   getters: {
-    loggedIn: state => state.loggedIn,  
+    loggedIn: state => state.loggedIn,
     showNavBar: state => state.showNavBar,
     userInfo: state => state.userInfo,
   },

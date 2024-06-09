@@ -3,23 +3,24 @@
     <header class="header">
         <div class="header-content">
             <div class="avatar">
-                <img :src="user.avatar_path" alt="Avatar" />
+                <img :src="userInfo.avatar_path" alt="Avatar" />
             </div>
             <ul class="info" >
-            <li class='NickName'><strong>昵称：</strong>{{ user.nickName }}</li>
-                <li class='Level'><strong>等级：</strong>lv{{ user.level }}</li>
+            <li class='NickName'><strong>昵称：</strong>{{ userInfo.nickName }}</li>
+                <li class='Level'><strong>等级：</strong>lv{{ userInfo.level }}</li>
             </ul>
 
         </div>
     </header>
+
     <header class="down">
     <aside class="sidebar">
       <ul class='infoSide'>
         <li><h1>资料卡片:</h1></li>
-        <li><strong>性别：</strong>{{ user.sex || '暂未选择' }}</li>
+        <li><strong>性别：</strong>{{ userInfo.sex || '暂未选择' }}</li>
         <li><strong>出生日期：</strong>{{ formattedBirth || '暂未填写' }}</li>
         <li><strong>手机号：<br/></strong>{{ hiddenTele }}</li>
-        <li><strong>个性签名：<br/></strong>{{ user.signature || '暂未填写'}}</li>
+        <li><strong>个性签名：<br/></strong>{{ userInfo.signature || '暂未填写'}}</li>
         <br>
         <li>
         <el-button @click="showModi = true" type="primary" plain >
@@ -28,57 +29,124 @@
         </li>
       </ul>
     </aside>
-    <main class="main">
-      <Book v-for="book in paginatedBooks" :key="book.title" :book="book" />
-    </main>
-    </header>
-    <Modify_info :drawer="showModi" :ruleForm="user" @closedia="showModi = false" @send = "changeModify"></Modify_info>
+
+    <div class="main">
+     <ShelfBook
+         v-for="book in paginatedBooks"
+         :key="book.index"
+         :book="book"
+     />
+     </div>
+   </header>
+
+        <!-- 翻页栏 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
+          <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
+        </div>
+
+    <Modify_info :drawer="showModi" :ruleForm="userInfo" @closedia="showModi = false" @send = "changeModify"></Modify_info>
   </div>
 </template>
 
 <script>
-import Book from "@/components/Book.vue";
-import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
+import axios from 'axios';
+import ShelfBook from "@/components/ShelfBook.vue";
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
-   components: {
-      Book,
+  components: {
+      ShelfBook,
       Modify_info,
-   },
+  },
+
   data() {
     return {
-      books:booksData,
-      user:{
-         "ID": "U88965",
-         "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
-         "level": 7,
-         "nickName": "pizza_k",
-         "sex": "女",
-         "birth": new Date('2004-07-13'),
-         "signature": "",
-         "tele":"15513107588",
-         "password":'59jkb2h0',
+
+      userInfo:{
+          "ID": "U88965",
+          "avatar_path":"https://p2.ssl.qhimgs1.com/t047799700da192d488.jpg",
+          "level": 7,
+          "nickName": "pizza_k9999",
+          "sex": "女",
+          "birth": new Date('2004-07-13'),
+          "signature": "",
+          "tele":"15513107588",
+          "password":'59jkb2h0',
       },
       showModi: false,
+      books: [],
+      currentPage: 1, // 当前页码
+      booksPerPage: 21, // 每页显示的书籍数量
+
     };
   },
+
+  created() {
+    this.getBookShelfL();
+    console.log(this.userInfo.nickName);
+    console.log(this.$store.state.userInfo);
+    this.userInfo.ID = this.$store.state.userInfo.id;
+    // this.userInfo.avatar_path = this.$store.state.userInfo.user_icon;
+    this.userInfo.sex = this.$store.state.userInfo.gender;
+    this.userInfo.password = this.$store.state.userInfo.password;
+    this.userInfo.nickName = this.$store.state.userInfo.username;
+
+    let dateObj = new Date(this.$store.state.userInfo.birth_date);
+    let formattedDate = dateObj.toISOString().split('T')[0];
+    let birth = new Date(formattedDate);
+    this.userInfo.birth = birth;
+
+    this.userInfo.signature = this.$store.state.userInfo.signature;
+    this.userInfo.tele = this.$store.state.userInfo.mobile;
+    console.log(this.userInfo.nickName);
+  },
+
   methods:{
       changeModify(newInfo){
-        this.user.nickName = newInfo.nickName;
-        this.user.sex = newInfo.sex;
-        this.user.signature = newInfo.signature;
-        this.user.birth = newInfo.birth;
-        console.log('center'+this.user.nickName);
-
+        this.userInfo.nickName = newInfo.nickName;
+        this.userInfo.sex = newInfo.sex;
+        this.userInfo.signature = newInfo.signature;
+        this.userInfo.birth = newInfo.birth;
+        console.log('center'+this.userInfo.nickName);
+      },
+      getBookShelfL: async function(){
+        try {
+            const response = await axios.get('/novels/bookrack', {
+              params: {
+                user_id: this.$store.state.userInfo.id,
+                sort: 'preference'
+              }
+            });
+            console.log(response);
+            this.books = response.data.bookrack;
+            console.log(this.books);
+        }catch(error) {
+            console.log(error);
+        }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
       }
-  },
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page;
+    },
+
+   },
 
   computed:{
     hiddenTele(){
         console.log('TeleBegin');
-        const prefix = this.user.tele.substring(0, 3);
-        const suffix = this.user.tele.substring(this.user.tele.length - 2);
+        const prefix = this.userInfo.tele.substring(0, 3);
+        const suffix = this.userInfo.tele.substring(this.userInfo.tele.length - 2);
         console.log('TeleEnd');
         return `${prefix}****${suffix}`;
 
@@ -90,19 +158,27 @@ export default {
 
     formattedBirth() {
       let temp;
-      const year = this.user.birth.getFullYear();
-      temp = this.user.birth.getMonth() + 1;// 月份是从0开始的，所以需要+1
+      console.log("---");
+      console.log(this.userInfo.birth);
+      console.log(this.userInfo.birth instanceof Date);
+      const year = this.userInfo.birth.getFullYear();
+      temp = this.userInfo.birth.getMonth() + 1;// 月份是从0开始的，所以需要+1
       temp = temp.toString();
       const month = temp[1] ? temp : '0' +temp ;
-      temp = this.user.birth.getDate() ;
+      temp = this.userInfo.birth.getDate() ;
       temp = temp.toString();
       const day = temp[1] ? temp : '0' +temp ;
       return `${year}.${month}.${day}`;
     },
-    paginatedBooks() {
-    // 假设你有一个分页逻辑，这里简单返回全部书籍作为示例
-    return this.books;
+    totalPages() {
+      return Math.ceil(this.books.length / this.booksPerPage);
     },
+    paginatedBooks() {
+      const start = (this.currentPage - 1) * this.booksPerPage;
+      const end = start + this.booksPerPage;
+      console.log("paginatedBooks", this.books.slice(start, end));
+      return this.books.slice(start, end);
+    }
   },
 };
 </script>
@@ -117,7 +193,6 @@ export default {
 }
 
 .header {
-
   background-image: url('../assets/center_back.jpg');
   flex: 0 0 30%; /* 高度固定为30%，不可伸缩 */
   margin-top: 0.3%;
@@ -137,7 +212,9 @@ export default {
   flex: 1; /* 剩余空间均分给底部容器 */
   display: flex; /* 底部容器也需要是Flex布局来安排左右组件 */
   justify-content: space-between; /* 左右两侧分别靠边，中间自然间隔 */
+  width:90%;
   padding: 0 5%; /* 左右边界各留5%的间距 */
+  justify-content: flex-start; /* 左对齐 */
 }
 
 
