@@ -264,8 +264,14 @@ export default {
       rendition.on("markClicked", (cfiRange) => {
         console.log("listener detectes 'markClicked'")
         console.log(cfiRange)
-        if (this.settings.isRemovingNote)
+        if (this.settings.isRemovingNote){
           this.epubReader.removeMark(cfiRange)
+          this.personalNoteList.forEach(note => {
+            if(note.cfi == cfiRange){
+              this.personalNoteList.splice(this.personalNoteList.indexOf(note))
+            }
+          })
+        }
         else {
           console.log(this.epubReader.getNoteText(cfiRange))
         }
@@ -342,10 +348,13 @@ export default {
           this.oldPersonalNoteList = personalNoteList
           console.log("personalNoteList: ", personalNoteList)
           personalNoteList.forEach(note => {
+            console.log("in get personal note")
+            console.log("note: ", note)
             const type = note.type
             const cfi = note.cfi
             const noteText = note.note
-            const isPublic = note.isPublic
+            const isPublic = note.is_public
+            console.log("isPublic: ", isPublic)
             if (type == 'highlight') {
               this.epubReader.takeNote(type, cfi)
             }
@@ -403,15 +412,19 @@ export default {
       this.epubReader.highlight(href)
     },
     saveNote() {
+      console.log("personal note list: ", this.personalNoteList)
+      console.log("old personal note list: ", this.oldPersonalNoteList)
       this.personalNoteList.forEach(note => {
         if(this.oldPersonalNoteList.includes(note) == false) {
           //post
-          postNote(note)
+          console.log("call post note, ", note)
+          postNote(note, 8, this.currentBookId, this.currentChapterId)
         }
       })
       this.oldPersonalNoteList.forEach(note => {
         if(this.personalNoteList.includes(note) == false) {
           //delete
+          console.log("call delete note, ", note.cfi)
           deleteNote(note.cfi)
         }
       })
@@ -420,7 +433,7 @@ export default {
   beforeDestroy() {
     // TODO: 销毁监听器
     this.$store.commit('setShowTopBar')
-    this.$forceUpdatesaveNote()
+    this.saveNote()
   }
 };
 </script>
@@ -520,7 +533,7 @@ export default {
       left: 50%;
       transform: translateX(-50%);
       bottom: 10%;
-      height: 300px;
+      height: 400px;
       width: 500px;
       background: white;
       border: 1px dashed black;
