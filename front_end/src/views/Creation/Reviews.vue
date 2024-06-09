@@ -18,7 +18,7 @@
             <li>性别：{{ authorInfo.author_info.author_gender }}</li>
             <li>简介：{{ authorInfo.author_info.detail }}</li>
             <li>知名度：{{ authorInfo.author_info.popularity }}</li>
-            <li>作品评级：<el-rate :value="authorInfo.author_info.average_rating" disabled="true"></el-rate></li>
+            <li>作品评级：<el-rate :value="authorInfo.author_info.average_rating" :disabled="true"></el-rate></li>
           </ul>
         </div>
 

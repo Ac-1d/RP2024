@@ -9,7 +9,7 @@
         <ul class="info" v-if="authorInfo">
           <li class='NickName'><strong>昵称：</strong>{{ authorInfo.author_info.author_name }}</li>
           <li class='Level'><strong>知名度：</strong>{{ authorInfo.author_info.popularity }}分</li>
-          <li class="Level"><el-rate :value="authorInfo.author_info.average_rating" diabled="true">作品评价</el-rate></li>
+          <li class="Level"><el-rate :value="authorInfo.author_info.average_rating" :disabled="true">作品评价</el-rate></li>
         </ul>
       </div>
     </header>
@@ -35,6 +35,12 @@
             </span>
             <Upload/>
           </el-tab-pane>
+          <el-tab-pane>
+            <span slot="label">创建作品
+              <i class="el-icon-plus"> </i>
+            </span>
+            <NewNovel/>
+          </el-tab-pane>
         </el-tabs>
       </main>
     </header>
@@ -46,6 +52,7 @@
 import Works from '@/views/Creation/Works.vue';
 import Reviews from '@/views/Creation/Reviews.vue';
 import Upload from '@/views/Creation/Upload.vue';
+import NewNovel from '@/views/Creation/NewNovel.vue';
 import {authorInfo} from '@/js/Api.js';
 
 export default{
@@ -60,6 +67,7 @@ export default{
     Works,
     Reviews,
     Upload,
+    NewNovel,
   },
   async created() {
     const user_id = this.$store.state.userInfo.id;
