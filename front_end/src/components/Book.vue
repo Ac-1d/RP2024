@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     bookImage() {
-      return this.book.novel_img ? this.book.novel_img : require('@/assets/default.png');
+      return this.book.novel_img ? this.book.novel_img : require('@/assets/default-image.png');
     }
   },
   methods: {

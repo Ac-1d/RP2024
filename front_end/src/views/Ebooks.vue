@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h1>电子图书</h1>
-    <!-- 在这里添加电子图书的内容 -->
+    <h1>2023年度报告</h1>
+    <!-- 在这里添加年度报告的内容 -->
   </div>
 </template>
 
 <script>
 export default {
-  name: "Ebooks"
+  name: "Reports"
 };
 </script>
 

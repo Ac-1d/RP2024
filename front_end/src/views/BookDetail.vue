@@ -87,7 +87,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { novelDetail, novelChapter } from '@/js/Api.js';
+import { novelDetail, novelChapter } from '@/js/Api.js'; // 修改大小写以匹配文件名
 
 export default {
   name: "BookDetail",
@@ -121,8 +121,12 @@ export default {
   },
   computed: {
     bookImage() {
-      // 这里假设图片存放在项目的 public 目录下
-      return this.book.image ? this.book.image : 'default.png';
+      try {
+        return require(`@/assets/${this.book.image}`);
+      } catch (e) {
+        console.error('Error loading book image:', e);
+        return require('@/assets/default-image.png');
+      }
     },
     ratingDistribution() {
       return this.book.rating_distribution;
@@ -161,11 +165,11 @@ export default {
     },
     startReading() {
       this.setCurrentBookId(this.book.id);
-      this.setCurrentChapterId(this.selectedChapter || this.chapters[0]?.chapter_id);
-      this.$router.push({ name: 'Reader' });
+      this.setCurrentChapterId(1); // 从第一章开始阅读
+      this.$router.push({name: 'Reader'});
     },
     linktoComments() {
-      this.$router.push({ name: 'Comments', params: { bookId: this.book.id } });
+      this.$router.push({name: 'Comments', params: {bookId: this.book.id}});
     },
     setRating(star) {
       this.currentRating = star;
@@ -176,7 +180,6 @@ export default {
     rateBook(star) {
       this.finalRating = star;
       this.currentRating = star;
-      // 这里可以添加逻辑，例如将评分发送到服务器
       console.log(`评分为: ${star}`);
     },
     selectChapter(chapterId) {
@@ -185,7 +188,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .book-detail {
