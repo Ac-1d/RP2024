@@ -15,6 +15,7 @@ import Comments from "../views/Comments.vue";
 import Mail from "../views/Mail/Mail.vue";
 import Creation from "../views/Creation/Creation.vue";
 import CategoriesDetail from '@/views/CategoriesDetail.vue';
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -24,9 +25,9 @@ const routes = [
     component: Home
   },
   {
-      path: '/categories-detail',
-      name: 'CategoriesDetail',
-      component: CategoriesDetail
+    path: '/categories-detail',
+    name: 'CategoriesDetail',
+    component: CategoriesDetail
   },
   {
     path: "/about",
@@ -87,7 +88,8 @@ const routes = [
   {// comments评论页面
     path:'/book/:bookId/comments',
     name: 'Comments',
-    component: Comments
+    component: Comments,
+    props: true
   },// lzy
   {// 创作
     path:'/creation',

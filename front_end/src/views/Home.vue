@@ -69,7 +69,7 @@ export default {
       if (this.selectedCategory === "全部") {
         return this.books;
       }
-      return this.books.filter(book => book.category === this.selectedCategory);
+      return this.books.filter(book => book.category_name === this.selectedCategory);
     },
     totalPages() {
       return Math.ceil(this.filteredBooks.length / this.booksPerPage);
@@ -83,8 +83,10 @@ export default {
   methods: {
     async fetchBooks() {
       try {
-        const response = await axios.get('/api/books'); // 假设你的后端API路径是 /api/books
-        this.books = response.data;
+        const response = await axios.get('http://127.0.0.1:8000/novels/novel'); // 使用正确的API路径
+        console.log("API response: ", response.data);
+        this.books = response.data.results || response.data; // 根据API返回数据的实际结构进行调整
+        console.log("this.books: ", this.books);
       } catch (error) {
         console.error('Error fetching books:', error);
       }
@@ -103,16 +105,18 @@ export default {
       this.currentPage = page;
     },
     filterBooks(category) {
+      console.log("Filtering books by category: ", category);
+      console.log("Current books: ", this.books);
       this.selectedCategory = category;
       this.currentPage = 1; // 重置到第一页
     },
     search() {
       if (this.query.trim()) {
-        this.$router.push({name: 'Search', query: {q: this.query, c:2}});
+        this.$router.push({name: 'Search', query: {q: this.query, c: 2}});
       }
     },
     goToCategoriesDetail() {
-      this.$router.push({ name: 'CategoriesDetail' });
+      this.$router.push({name: 'CategoriesDetail'});
     }
   },
   created() {
