@@ -47,7 +47,9 @@ export default {
   components: { Login_window },
   data() {
     return {
-      bookId: 2, chapterId: 2,
+      bookId: this.$store.getters.currentBookId, 
+      
+      chapterId: this.$store.getters.currentChapterId,
       
       userInfo: null,
 
@@ -72,6 +74,7 @@ export default {
   },
   async created() {// 该页面创建的时候，就通过向后端发送请求，载入评论
     // this.bookId = this.$route.params.bookId;
+    console.log(this.bookId + ' ' + this.chapterId);
     const respond = await getComments(this.bookId, this.chapterId);
     this.comments = respond;
     this.newComment.novel_id = this.bookId;
@@ -79,6 +82,7 @@ export default {
     if(this.$store.state.loggedIn)
       this.userInfo = this.$store.state.userInfo; // 如果登录，载入当前用户信息
     // console.log(this.comments);
+    console.log();
   },
   methods: {
     todate(time) {

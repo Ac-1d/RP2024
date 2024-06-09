@@ -82,6 +82,8 @@ export default new Vuex.Store({
     loggedIn: state => state.loggedIn,  
     showNavBar: state => state.showNavBar,
     userInfo: state => state.userInfo,
+    currentBookId: state => state.currentBookId,
+    currentChapterId: state => state.currentChapterId,
   },
   modules: {}
 });
