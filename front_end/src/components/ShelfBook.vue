@@ -22,6 +22,7 @@
 
 <script>
 import axios from 'axios';
+import { mapActions } from 'vuex';
 export default {
   name: "ShelfBook",
   props: {
@@ -52,8 +53,11 @@ export default {
     hideDetails() {
       this.isHovered = false;
     },
+    ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     goToRead() {
-      this.$router.push({ name: 'BookDetail', params: { bookId: this.book.id } });
+      this.$store.commit('setCurrentBookId', this.book.novel_info.id);
+      this.$store.commit('setCurrentChapterId', this.book.novel_info.chapter_start);
+      this.$router.push({name: 'Reader'});
     },
     removeBook() {
         this.$confirm('确认删除', '提示', {
@@ -74,6 +78,8 @@ export default {
         });
      },
      remove: async function() {
+        console.log('userID'+this.$store.state.userInfo.id);
+        console.log('userID'+this.book.novel_info.id);
         try {
             const response = await axios.post(`http://127.0.0.1:8000/novels/delete_novel`, {
              novel_id: this.book.novel_info.id,
@@ -85,9 +91,9 @@ export default {
           // 在此处处理成功删除的结果，例如通知用户或刷新列表
         } else {
           console.error('删除失败');
-          alert
         }
-      } catch (error) {
+       } catch (error) {
+        console.log('------');
         console.error(error);
       }
      }

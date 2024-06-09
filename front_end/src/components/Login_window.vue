@@ -91,12 +91,15 @@ export default {
             };
             this.$refs[formName].resetFields();
 
-            await this.$store.dispatch('login',userData);
-            await this.$store.dispatch('getUserInfo');
-            console.log('submit');
-            console.log(this.$store.getters.userInfo);
+            const ans = await this.$store.dispatch('login',userData);
+            console.log('ans'+ans.msg);
 
-            this.$emit('closedia');
+            if(ans.msg === '登录成功'){
+                await this.$store.dispatch('getUserInfo');
+                this.$emit('closedia');
+            }else{
+                alert("用户不存在或密码错误");
+            }
 
         }else{
             console.log('信息错误!!');
