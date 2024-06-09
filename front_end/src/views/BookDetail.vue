@@ -86,8 +86,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import { novelDetail, novelChapter } from '@/js/Api.js'; // 修改大小写以匹配文件名
+import { novelDetail, novelChapter } from '@/js/Api.js';
 
 export default {
   name: "BookDetail",
@@ -121,12 +120,8 @@ export default {
   },
   computed: {
     bookImage() {
-      try {
-        return require(`@/assets/${this.book.image}`);
-      } catch (e) {
-        console.error('Error loading book image:', e);
-        return require('@/assets/default-image.png');
-      }
+      // 这里假设图片存放在项目的 public 目录下
+      return this.book.image ? this.book.image : 'default.png';
     },
     ratingDistribution() {
       return this.book.rating_distribution;
@@ -145,7 +140,6 @@ export default {
     this.fetchChapters(bookId);
   },
   methods: {
-    ...mapActions(['setCurrentBookId', 'setCurrentChapterId']),
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
@@ -156,20 +150,25 @@ export default {
       }
     },
     async fetchChapters(bookId) {
-      try {
-        const response = await novelChapter(bookId);
+    try {
+      const response = await novelChapter(bookId);
+      if (response && response.chapter_data) {
         this.chapters = response.chapter_data.chapter_list;
-      } catch (error) {
-        console.error('Error fetching chapters:', error);
+      } else {
+        console.error('Chapter data is undefined or invalid.');
       }
-    },
-    startReading() {
-      this.setCurrentBookId(this.book.id);
-      this.setCurrentChapterId(1); // 从第一章开始阅读
-      this.$router.push({name: 'Reader'});
-    },
+    } catch (error) {
+      console.error('Error fetching chapters:', error);
+    }
+  },
+  startReading() {
+    console.log("in book detail, book id: ", this.$route.params.bookId);
+    this.$store.dispatch('setCurrentBookId', this.$route.params.bookId);
+    this.$store.dispatch('setCurrentChapterId', 1);
+    this.$router.push({ name: 'Reader' });
+  },
     linktoComments() {
-      this.$router.push({name: 'Comments', params: {bookId: this.book.id}});
+      this.$router.push({ name: 'Comments', params: { bookId: this.$route.params.bookId } });
     },
     setRating(star) {
       this.currentRating = star;

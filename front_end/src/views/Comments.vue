@@ -46,8 +46,8 @@ export default {
   components: { Login_window },
   data() {
     return {
-      bookId: this.$route.params.bookId, // 从路由参数中获取 bookId
-      chapterId: this.$store.getters.currentChapterId, // 从 Vuex 中获取当前章节ID
+      bookId: this.$store.state.currentBookId, // 从路由参数中获取 bookId
+      chapterId: this.$store.state.currentChapterId, // 从 Vuex 中获取当前章节ID
       userInfo: this.$store.state.userInfo, // 从 Vuex 中获取用户信息
       comments: [], // 已有评论
       newComment: {
@@ -64,6 +64,10 @@ export default {
     };
   },
   async created() {
+    // console.log('current status');
+    await this.fetchComments();
+    // this.bookId = this.$route.getters.currentBookId;
+    // this.chapterId = this.$r
     this.newComment.novel_id = this.bookId;
     this.newComment.chapter_id = this.chapterId;
     await this.fetchComments();
@@ -71,7 +75,8 @@ export default {
   methods: {
     async fetchComments() {
       try {
-        const response = await getComments(this.bookId, this.chapterId);
+        const response = await getComments(this.$store.state.currentBookId, this.$store.state.currentChapterId);
+        console.log(response);
         this.comments = response;
       } catch (error) {
         console.error('Error fetching comments:', error);

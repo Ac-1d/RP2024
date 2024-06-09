@@ -28,7 +28,7 @@
 
         <!-- 书籍展示区域 -->
         <div class="books">
-          <Book v-for="book in paginatedBooks" :key="book.id" :book="book" />
+          <Book v-for="book in paginatedBooks" :key="book.id" :book="book" @click="goToBookDetail(book.id)" />
         </div>
 
         <!-- 翻页栏 -->
@@ -44,24 +44,24 @@
 
 <script>
 import Book from "@/components/Book.vue";
-import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
-import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
-import axios from 'axios'; // 导入 axios
+import MiddleNavBar from "@/components/MiddleNavBar.vue";
+import SideBar from "@/components/SideBar.vue";
+import axios from 'axios';
 
 export default {
   name: "Home",
   components: {
     Book,
-    MiddleNavBar, // 注册 MiddleNavBar 组件
-    SideBar // 注册 SideBar 组件
+    MiddleNavBar,
+    SideBar
   },
   data() {
     return {
-      books: [], // 初始为空数组
-      currentPage: 1, // 当前页码
-      booksPerPage: 12, // 每页显示的书籍数量
-      selectedCategory: "全部", // 当前选中的分类
-      query: "" // 搜索查询
+      books: [],
+      currentPage: 1,
+      booksPerPage: 12,
+      selectedCategory: "全部",
+      query: ""
     };
   },
   computed: {
@@ -83,9 +83,9 @@ export default {
   methods: {
     async fetchBooks() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/novels/novel'); // 使用正确的API路径
+        const response = await axios.get('http://127.0.0.1:8000/novels/novel');
         console.log("API response: ", response.data);
-        this.books = response.data.results || response.data; // 根据API返回数据的实际结构进行调整
+        this.books = response.data.results || response.data;
         console.log("this.books: ", this.books);
       } catch (error) {
         console.error('Error fetching books:', error);
@@ -108,7 +108,7 @@ export default {
       console.log("Filtering books by category: ", category);
       console.log("Current books: ", this.books);
       this.selectedCategory = category;
-      this.currentPage = 1; // 重置到第一页
+      this.currentPage = 1;
     },
     search() {
       if (this.query.trim()) {
@@ -117,10 +117,13 @@ export default {
     },
     goToCategoriesDetail() {
       this.$router.push({name: 'CategoriesDetail'});
+    },
+    goToBookDetail(bookId) {
+      this.$router.push({name: 'BookDetail', params: {bookId}});
     }
   },
   created() {
-    this.fetchBooks(); // 在组件创建时获取书籍数据
+    this.fetchBooks();
   }
 };
 </script>
@@ -134,17 +137,14 @@ export default {
   display: flex;
 }
 
-/* 功能栏样式 */
 .side-bar {
-  flex: 0 0 200px; /* 固定宽度 */
+  flex: 0 0 200px;
 }
 
-/* 主内容区域样式 */
 .main-content {
   flex: 1;
 }
 
-/* 顶部分类栏样式 */
 .category-bar {
   text-align: left;
   padding: 20px;
@@ -190,22 +190,20 @@ export default {
   margin: 10px 0;
 }
 
-/* 书籍展示区域样式 */
 .books {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start; /* 左对齐 */
+  justify-content: flex-start;
 }
 
-/* 翻页栏样式 */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  position: fixed; /* 固定位置 */
-  bottom: 20px; /* 距离底部 */
-  left: 50%; /* 水平居中 */
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
   transform: translateX(-50%);
   background: white;
   padding: 10px;
