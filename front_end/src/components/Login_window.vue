@@ -10,7 +10,7 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="用户名" prop="mobile">
+      <el-form-item label="电话" prop="mobile">
         <el-input v-model="logForm.mobile" autocomplete="off"></el-input>
       </el-form-item>
 

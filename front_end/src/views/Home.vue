@@ -5,7 +5,7 @@
 
     <div class="content">
       <!-- 功能栏 -->
-      <SideBar />
+
 
       <div class="main-content">
         <!-- 顶部分类栏 -->
@@ -45,7 +45,7 @@
 <script>
 import Book from "@/components/Book.vue";
 import MiddleNavBar from "@/components/MiddleNavBar.vue"; // 引用 MiddleNavBar 组件
-import SideBar from "@/components/SideBar.vue"; // 引用 SideBar 组件
+
 import booksData from "@/assets/book.json"; // 导入本地的 books.json 文件
 
 export default {
@@ -53,7 +53,7 @@ export default {
   components: {
     Book,
     MiddleNavBar, // 注册 MiddleNavBar 组件
-    SideBar // 注册 SideBar 组件
+
   },
   data() {
     return {
@@ -120,9 +120,7 @@ export default {
 }
 
 /* 功能栏样式 */
-.side-bar {
-  flex: 0 0 200px; /* 固定宽度 */
-}
+
 
 /* 主内容区域样式 */
 .main-content {

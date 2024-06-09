@@ -12,6 +12,7 @@
 
         </div>
     </header>
+
     <header class="down">
     <aside class="sidebar">
       <ul class='infoSide'>
@@ -28,21 +29,35 @@
         </li>
       </ul>
     </aside>
-    <main class="main">
-        <Shelf :mode="choose"/>
-    </main>
-    </header>
+
+    <div class="main">
+     <ShelfBook
+         v-for="book in paginatedBooks"
+         :key="book.index"
+         :book="book"
+     />
+     </div>
+   </header>
+
+        <!-- 翻页栏 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
+          <span v-for="page in totalPages" :key="page" :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
+        </div>
+
     <Modify_info :drawer="showModi" :ruleForm="userInfo" @closedia="showModi = false" @send = "changeModify"></Modify_info>
   </div>
 </template>
 
 <script>
-import Shelf from '@/views/Shelf.vue';
+import axios from 'axios';
+import ShelfBook from "@/components/ShelfBook.vue";
 import Modify_info from "@/components/Modify_information.vue";
 
 export default {
   components: {
-      Shelf,
+      ShelfBook,
       Modify_info,
   },
 
@@ -61,11 +76,15 @@ export default {
           "password":'59jkb2h0',
       },
       showModi: false,
+      books: [],
+      currentPage: 1, // 当前页码
+      booksPerPage: 21, // 每页显示的书籍数量
 
     };
   },
 
   created() {
+    this.getBookShelfL();
     console.log(this.userInfo.nickName);
     console.log(this.$store.state.userInfo);
     this.userInfo.ID = this.$store.state.userInfo.id;
@@ -92,6 +111,34 @@ export default {
         this.userInfo.birth = newInfo.birth;
         console.log('center'+this.userInfo.nickName);
       },
+      getBookShelfL: async function(){
+        try {
+            const response = await axios.get('/novels/bookrack', {
+              params: {
+                user_id: this.$store.state.userInfo.id,
+                sort: 'preference'
+              }
+            });
+            console.log(response);
+            this.books = response.data.bookrack;
+            console.log(this.books);
+        }catch(error) {
+            console.log(error);
+        }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    goToPage(page) {
+      this.currentPage = page;
+    },
 
    },
 
@@ -123,7 +170,15 @@ export default {
       const day = temp[1] ? temp : '0' +temp ;
       return `${year}.${month}.${day}`;
     },
-
+    totalPages() {
+      return Math.ceil(this.books.length / this.booksPerPage);
+    },
+    paginatedBooks() {
+      const start = (this.currentPage - 1) * this.booksPerPage;
+      const end = start + this.booksPerPage;
+      console.log("paginatedBooks", this.books.slice(start, end));
+      return this.books.slice(start, end);
+    }
   },
 };
 </script>
@@ -138,7 +193,6 @@ export default {
 }
 
 .header {
-
   background-image: url('../assets/center_back.jpg');
   flex: 0 0 30%; /* 高度固定为30%，不可伸缩 */
   margin-top: 0.3%;
@@ -158,7 +212,9 @@ export default {
   flex: 1; /* 剩余空间均分给底部容器 */
   display: flex; /* 底部容器也需要是Flex布局来安排左右组件 */
   justify-content: space-between; /* 左右两侧分别靠边，中间自然间隔 */
+  width:90%;
   padding: 0 5%; /* 左右边界各留5%的间距 */
+  justify-content: flex-start; /* 左对齐 */
 }
 
 
@@ -210,6 +266,7 @@ export default {
 .main {
   flex:1;
   background-color: #fff;
+  display: flex;
   flex-wrap: wrap;
   justify-content: flex-start; /* 左对齐 */
 }

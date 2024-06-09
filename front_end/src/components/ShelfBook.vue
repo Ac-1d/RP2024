@@ -81,9 +81,11 @@ export default {
         console.log('userID'+this.$store.state.userInfo.id);
         console.log('userID'+this.book.novel_info.id);
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/novels/delete_novel`, {
-             novel_id: this.book.novel_info.id,
-             user_id: this.$store.state.userInfo.id,
+            const response = await axios.post('/novels/delete_novel', {
+                params: {
+                    novel_id: this.book.novel_info.id,
+                    user_id: this.$store.state.userInfo.id,
+                }
         });
 
         if (response.status === 200 && response.data.status === 'success') {
