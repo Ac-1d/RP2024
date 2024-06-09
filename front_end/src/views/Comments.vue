@@ -2,224 +2,120 @@
   <el-container class="layout-round-middle">
     <!-- 评论显示 -->
     <el-main>
-      <div v-for="(comment, index) in paginatedComments" :key="index">
+      <div v-for="(comment, index) in comments" :key="index">
         <!-- 循环显示的每条评论 -->
         <div>
           <el-row style="border-top: 1px solid grey;">
-            <el-col :span="20" >
-              <el-link class="text-larger" style="float: left;" type="primary">{{ comment.author }}</el-link>
-              <el-rate class="text-larger" style="float: left;" v-model="comment.rank_value" 
+              <el-link class="text-larger" style="float: left;" type="primary">{{ comment.username }}</el-link>
+              <el-rate class="text-larger" style="float: left;" v-model="comment.up_number" 
               disabled text-color="#ff9900"></el-rate>
-              <el-link class="text-larger" style="float: left;" type="primary">{{ comment.time }}</el-link>
-            </el-col>
-            <el-col :span="16">
-              <div class="auto-wrap">
-                <p class="text-medium">{{ comment.text }} </p>
-              </div>
-            </el-col>
-            <el-col :span="16">
-              <el-button class="text-larger" style="float: left;" type="text" 
-              icon="el-icon-caret-top" @click="likeComment(index)">{{ comment.likes > 0 ? comment.likes:'' }}</el-button>
-              <el-button class="text-larger" style="float: left;" type="text" 
-              icon="el-icon-edit" @click="beginReply(index)">回复{{ comment.replies.length }}</el-button>
-              <el-button class="text-larger" style="float: left;" type="text" 
-              :icon="comment.showReply ? 'el-icon-arrow-up':'el-icon-arrow-down' " @click="showReply(index)"></el-button>
-              <!-- element的type如果为text，则结果是文字按钮 -->
-            </el-col>
-            <!-- 回复区 -->
-            <el-col v-if="comment.showReply">  
-              <!-- 回复显示 -->
-              <div style="margin-left: 100px" v-for="(reply, replyIndex) in comment.replies" 
-              :key="replyIndex" class="auto-wrap">  
-                <div>
-                  <el-link class="text-larger">{{ reply.author }}</el-link>
-                </div>
-                <p class="text-medium">{{ reply.text }}</p>  
-              </div>  
-            </el-col>
+              <el-link class="text-larger" style="float: left;" type="primary">{{ todate(comment.comment_time) }}</el-link>
           </el-row>
+          <el-row><div class="auto-wrap">
+            <p class="text-medium">{{ comment.comment_content }} </p>
+          </div></el-row>
         </div>
-      </div>
-      <!-- 翻页栏 -->
-      <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">&lt;</button>
-        <span v-for="page in totalPages" :key="page" 
-        :class="['page-dot', { active: page === currentPage }]" @click="goToPage(page)"></span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">&gt;</button>
       </div>
     </el-main>
     <!-- 评论、回复框 -->
     <el-footer style="min-height: 10vh;">
       <el-form :inline="true">
-        <el-form-item style="width: 20vw;">
-          <div><el-rate v-model="value" :colors="colors"></el-rate>
-          <el-button v-if="replying" @click="endReply" style="float: left;">返回评论</el-button><!-- 退出回复，返回评论 -->
-          <el-button @click="addComment" style="float: left;">发送</el-button></div>
+        <el-form-item style="width:60vw;">
+          <textarea style="width: 60vw; border: 1px solid black;" v-model="newComment.content"></textarea>
         </el-form-item>
-        <el-form-item>
-          <el-input :placeholder="replying?('正在回复'+comments[replyIndex].author):('输入评论')"
-          type="textarea" v-model="content" maxlength="10000" show-word-limit 
-          style="width: 60vw; display: flex; min-height: 10vh;"/>
+        <el-form-item style="width:10vw;">
+          <el-rate v-model="newComment.up_number" :colors="colors"></el-rate>
+          <el-button @click="addComment" style="float: left;">发送</el-button>
         </el-form-item>
       </el-form>
     </el-footer>
+    <Login_window :dialogflag="logvisible" @closedia="closeDialog"></Login_window>
   </el-container>
 </template>
 
 <script>
-import {currentTime} from "../js/Time.js";
-import bookComments from '@/assets/comments.json';
+import {addComments} from '@/js/Api.js';
+import {getComments} from '@/js/Api.js';
+import {extractDateTime} from '@/js/Time.js';
+import Login_window from '@/components/Login_window.vue';
+
 import '@/css/text.css';
 import '@/css/layout.css';
-export default {
-  name: "CommentBlock",
-  components: {
-  },
-  props: {
-    myname: {
-      type: String,
-      default: '匿名'
-    },// 传入用户名
-    myid: {
-      type: Number,
-      default: 100
-      // 传入用户id
-    }
-  },
 
+export default {
+  name: "Comments",
+  components: { Login_window },
   data() {
     return {
-      bookId: 1,
-      userInfo: this.$store.state,
-      currentPage: 1, // 当前是第几页
-      commentsPerPage: 5,
-      value: 0, // 当前用户选择的评分
-      comments: bookComments,// 已有评论
-      content: '',// 输入内容
-      replying: false,// 正在回复
-      replyIndex: 0,// 回复的评论号
+      bookId: 2, chapterId: 2,
+      
+      userInfo: null,
+
+      comments: null,// 已有评论
+
+      newComment: {
+        novel_id: null, 
+        chapter_id: null, 
+        // user_id: this.userInfo.id,
+        user_id: 3,
+
+        content: '',
+        up_number: 0,// 评级，代表用户支持度，0代表尚未评分
+      },
+
+      // 评级显示颜色
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+
+      // 显示登录界面
+      logvisible: false,
     };
   },
-  created() {
-    const bookId = this.$route.params.bookId;
-    this.bookId = bookId;
-    // console.log('id is : '+bookId);
-    this.comments = this.getCommentsByBookId(bookId);
+  async created() {// 该页面创建的时候，就通过向后端发送请求，载入评论
+    // this.bookId = this.$route.params.bookId;
+    const respond = await getComments(this.bookId, this.chapterId);
+    this.comments = respond;
+    this.newComment.novel_id = this.bookId;
+    this.newComment.chapter_id = this.chapterId;
+    if(this.$store.state.loggedIn)
+      this.userInfo = this.$store.state.userInfo; // 如果登录，载入当前用户信息
+    // console.log(this.comments);
   },
   methods: {
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
+    todate(time) {
+      return extractDateTime(time);
+    },
+    showLogdialog() {
+      this.logvisible = true;
+    },
+    closeDialog() {
+      this.logvisible = false;
+    },
+    async addComment() {
+      let newComment = this.newComment;
+      if (this.userInfo == null) {
+        this.showLogdialog();return;
       }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
+      if (newComment.content == '') {
+        this.openMsg('请留下宝贵意见');return;
       }
+      if (newComment.up_number == 0) {
+        this.openMsg('请您打分');return;
+      }
+      await addComments(newComment);
+      await getComments(this.bookId, this.chapterId);
+      this.content = '';
     },
-    goToPage(page) {
-      this.currentPage = page;
-    },
-    goback() {
-      this.$router.push({ name: 'BookDetail', params: {bookId: this.bookId}  });
-    },
-    getCommentsByBookId(id) {
-      const commentsData = require("@/assets/comments.json");
-      return commentsData.find(comment => comment.id == id).comments;
-    },
-    addComment() {
-      if (this.content) {
-        if (this.replying) {
-          const newReply = {
-            text: this.content, 
-            author: this.myname
-          };
-          this.comments[this.replyIndex].replies.push(newReply);
-          this.endReply();
+    openMsg(msg) {
+      this.$alert(msg, '提示', {
+        confirmButtonText: '确定',
+        callback: action => {
+          this.$message({
+            type: 'info',
+            message: `action: ${ action }`
+          });
         }
-        else {
-          const newComment = { 
-            rank_value: this.value,
-            text: this.content, 
-            author: this.myname, 
-            showReply: false,
-            likes: 0, 
-            replyText: '',
-            replies: [],
-            time: currentTime()
-          };
-          this.comments.push(newComment);
-        }
-        this.content = '';
-      }
+      });
     },
-    likeComment(index) {
-      if (index < this.comments.length && index >= 0) {
-        this.comments[index].likes++;
-      }
-    },
-    showReply(index) {
-      if (index < this.comments.length && index >= 0) {  
-        this.comments[index].showReply = !(this.comments[index].showReply);
-      }  
-    },
-    beginReply(index){
-      this.replyIndex=index;
-      this.replying=true;
-    },
-    endReply(){
-      this.replyIndex=0;
-      this.replying=false;
-    }
-  },
-  computed: {
-    totalPages() {
-      return Math.ceil(this.comments.length / this.commentsPerPage);
-    },
-    paginatedComments() {
-      const start = (this.currentPage - 1) * this.commentsPerPage;
-      const end = start + this.commentsPerPage;
-      return this.comments.slice(start, end);
-    }
   }
 };  
 </script>
-
-<style>
-/* 翻页栏样式 */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  position: fixed; /* 固定位置 */
-  bottom: 20px; /* 距离底部 */
-  left: 50%; /* 水平居中 */
-  transform: translateX(-50%);
-  background: white;
-  padding: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-}
-
-.pagination button {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.pagination .page-dot {
-  width: 10px;
-  height: 10px;
-  background-color: lightgray;
-  border-radius: 50%;
-  margin: 0 5px;
-  cursor: pointer;
-}
-
-.pagination .page-dot.active {
-  background-color: gray;
-}
-</style>

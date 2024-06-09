@@ -249,6 +249,7 @@ class Bookmark(models.Model):
     novel = models.ForeignKey(Novel, on_delete=models.CASCADE, verbose_name='小说')
     novel_chapter = models.ForeignKey(Novel_chapter, on_delete=models.CASCADE, verbose_name='章节')
     is_public = models.BooleanField(default=False, verbose_name='是否公开')
+    type = models.CharField(max_length=255, verbose_name='具体类型',default=None)
 
     @property
     def chapter_id(self):
