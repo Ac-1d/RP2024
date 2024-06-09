@@ -166,13 +166,12 @@ export async function addComments(comment, token) {
       headers: {
         'Authorization': `Bearer ${token}`
       },
-      body: {
-        "novel": comment.novel_id,
-        "chapter": comment.chapter_id,
+        "novel_id": comment.novel_id,
+        "chapter_id": comment.chapter_id,
         "user": comment.user_id,
         "comment_content": comment.content,
         "up_number": comment.up_number,
-      }
+      
     });
     return response.data;
   } catch (error) {
