@@ -8,7 +8,7 @@
         </div>
         <ul class="info" v-if="authorInfo">
           <li class='NickName'><strong>昵称：</strong>{{ authorInfo.author_info.author_name }}</li>
-          <li class='Level'><strong>知名度：</strong>{{ authorInfo.author_info.popularity }}分</li>
+          <li class='Level'><strong>知名度：</strong>{{ authorInfo.author_info.popularity ?  authorInfo.author_info.popularity : 90}}分</li>
           <li class="Level"><el-rate :value="authorInfo.author_info.average_rating" :disabled="true">作品评价</el-rate></li>
         </ul>
       </div>
@@ -76,10 +76,13 @@ export default{
     this.authorInfo = info;
     console.log(this.authorInfo);
 
-    let string = this.authorInfo.author_info.author_icon;  
-    let delimiter = 'http://127.0.0.1:8000/';  
-    let parts = string.split(delimiter);  
-    this.imgsrc = 'user_' + parts[1];
+    // let string = this.authorInfo.author_info.author_icon;  
+    // let delimiter = 'http://127.0.0.1:8000/';  
+    // let parts = string.split(delimiter);  
+    // this.imgsrc = 'user_' + parts[1];
+    // this.imgsrc=`..\\..\\public\\user_icon\\default.jpg`;
+    // this.imgsrc='..\\..\\..\\public\\user_icon\\default.jpg';
+    this.imgsrc = require('@/assets/Avatar.jpg')
     console.log(this.imgsrc);
   },
   methods: {

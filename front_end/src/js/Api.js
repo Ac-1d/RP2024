@@ -216,7 +216,7 @@ export async function register(data) {
 
 export async function getPersonalNote(user, book, chapter) {
   try {
-    return await axios.get(`/novels/get_bookmarks?user_id=${8}&novel_id=${book}&chapter_id=${chapter}`)
+    return await axios.get(`/novels/get_bookmarks?user_id=${user}&novel_id=${book}&chapter_id=${chapter}`)
   } catch (error) {
     return error.code;
   }
@@ -224,7 +224,7 @@ export async function getPersonalNote(user, book, chapter) {
 
 export async function getPublicNote(user, book, chapter) {
   try {
-    return await axios.get(`/novels/public_get_bookmarks?user_id=${8}&novel_id=${book}&chapter_id=${chapter}`)
+    return await axios.get(`/novels/public_get_bookmarks?user_id=${user}&novel_id=${book}&chapter_id=${chapter}`)
   } catch (error) {
     return error.code
   }
@@ -236,7 +236,7 @@ export async function postNote(note, user_id, novel_id, chapter_id){
     console.log({
       'cfi': note.cfi,
       'note': note.note ? note.note : 'null',
-      'user_id': 8,
+      'user_id': user_id,
       'novel_id': novel_id,
       'chapter_id': chapter_id,
       'is_public': note.is_public,
@@ -245,7 +245,7 @@ export async function postNote(note, user_id, novel_id, chapter_id){
     return await axios.post(`/novels/create_bookmarks`, {
       'cfi': note.cfi,
       'note': note.note ? note.note : 'null',
-      'user_id': 8,
+      'user_id': user_id,
       'novel_id': novel_id,
       'chapter_id': chapter_id ? chapter_id : 1,
       'is_public': note.note ? note.ispublic : false,

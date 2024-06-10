@@ -45,7 +45,7 @@
 <script>
 import Book from "@/components/Book.vue";
 import MiddleNavBar from "@/components/MiddleNavBar.vue";
-import SideBar from "@/components/SideBar.vue";
+// import SideBar from "@/components/SideBar.vue";
 import axios from 'axios';
 
 export default {
@@ -53,7 +53,7 @@ export default {
   components: {
     Book,
     MiddleNavBar,
-    SideBar
+    // SideBar
   },
   data() {
     return {

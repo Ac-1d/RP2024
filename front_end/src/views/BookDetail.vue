@@ -38,6 +38,7 @@
       <button class="read-status">想读</button>
       <button class="read-status">在读</button>
       <button class="read-status">读过</button>
+      <button @click="addToShelf" :class="{'added-to-shelf': isAddedToShelf}" class="read-status">加入书架</button>
       <div class="rating">
         <span>评价:</span>
         <div class="stars" @mouseleave="resetRating">
@@ -116,12 +117,13 @@ export default {
       reviews: [], // 评论数据
       chapters: [], // 章节数据
       selectedChapter: null, // 选中的章节号
+      isAddedToShelf: false, // 是否已加入书架
     };
   },
   computed: {
     bookImage() {
-      // 这里假设图片存放在项目的 public 目录下
-      return this.book.image ? this.book.image : 'default.png';
+      // 使用相对路径
+      return require('@/assets/default-image.png');
     },
     ratingDistribution() {
       return this.book.rating_distribution;
@@ -143,9 +145,6 @@ export default {
     async fetchBookDetails(bookId) {
       try {
         const response = await novelDetail(bookId);
-        this.$store.dispatch('setCurrentBookId', bookId);
-        this.$store.dispatch('setCurrentChapterId', 0);
-        console.log(this.$store.state);
         this.book = response;
         this.finalRating = this.book.rating;
       } catch (error) {
@@ -153,25 +152,28 @@ export default {
       }
     },
     async fetchChapters(bookId) {
-    try {
-      const response = await novelChapter(bookId);
-      if (response && response.chapter_data) {
-        this.chapters = response.chapter_data.chapter_list;
-      } else {
-        console.error('Chapter data is undefined or invalid.');
+      try {
+        const response = await novelChapter(bookId);
+        if (response && response.chapter_data) {
+          this.chapters = response.chapter_data.chapter_list;
+        } else {
+          console.error('Chapter data is undefined or invalid.');
+        }
+      } catch (error) {
+        console.error('Error fetching chapters:', error);
       }
-    } catch (error) {
-      console.error('Error fetching chapters:', error);
-    }
-  },
-  startReading() {
-    console.log("in book detail, book id: ", this.$route.params.bookId);
-    this.$store.dispatch('setCurrentBookId', this.$route.params.bookId);
-    this.$store.dispatch('setCurrentChapterId', 1);
-    this.$router.push({ name: 'Reader' });
-  },
+    },
+    startReading() {
+      console.log("in book detail, book id: ", this.$route.params.bookId);
+      this.$store.dispatch('setCurrentBookId', this.$route.params.bookId);
+      this.$store.dispatch('setCurrentChapterId', 1);
+      this.$router.push({name: 'Reader'});
+    },
+    addToShelf() {
+      this.isAddedToShelf = true;
+    },
     linktoComments() {
-      this.$router.push({ name: 'Comments', params: { bookId: this.$route.params.bookId } });
+      this.$router.push({name: 'Comments', params: {bookId: this.$route.params.bookId}});
     },
     setRating(star) {
       this.currentRating = star;
@@ -253,6 +255,20 @@ export default {
 
 .read-button:hover {
   background-color: #0056b3;
+}
+
+.read-status {
+  margin-right: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.read-status.added-to-shelf {
+  background-color: #28a745; /* 设置变绿色 */
+  color: white;
 }
 
 .rating {

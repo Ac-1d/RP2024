@@ -46,10 +46,11 @@ export default{
     const info = await authorInfo(user_id);
     this.authorInfo = info;
 
-    let string = this.authorInfo.author_info.author_icon;
-    let delimiter = 'http://127.0.0.1:8000/';  
-    let parts = string.split(delimiter);  
-    this.imgsrc = 'user_' + parts[1];
+    // let string = this.authorInfo.author_info.author_icon;
+    // let delimiter = 'http://127.0.0.1:8000/';  
+    // let parts = string.split(delimiter);  
+    // this.imgsrc = 'user_' + parts[1];
+    this.imgsrc = require('@/assets/Avatar.jpg')
     // console.log(this.imgsrc);
     // console.log('authorInfo:');
     // console.log(this.authorInfo);

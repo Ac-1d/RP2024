@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     bookImage() {
-      return this.book.novel_img ? this.book.novel_img : require('@/assets/default-image.png');
+      return this.book.novel_img.split('http://127.0.0.1:8000/')[1];
     }
   },
   methods: {
