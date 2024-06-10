@@ -11,17 +11,17 @@
           <el-form style="float: left;">
             <el-form-item label="作品名" label-position="left" label-width="80px" style="width: 30vw;">
               <el-input v-model="newWork.workName"></el-input></el-form-item>
-            <el-form-item label="备注" label-position="left" label-width="80px" style="width: 30vw;">
+            <el-form-item label="介绍" label-position="left" label-width="80px" style="width: 30vw;">
               <el-input v-model="newWork.intro"></el-input></el-form-item>
-            <el-form-item label="章节" label-position="left" label-width="80px" style="width: 30vw;">
-              <el-input v-model="newWork.chapter"></el-input></el-form-item>
+            <!-- <el-form-item label="章节数" label-position="left" label-width="80px" style="width: 30vw;">
+              <el-input v-model="newWork.chapter"></el-input></el-form-item> -->
             <el-form-item label="分类" label-position="left" label-width="80px" style="width: 30vw;">
               <el-select v-model="newWork.category" placeholder="请选择">
                 <el-option
                   v-for="item in category"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item.pk"
+                  :label="item.category_name"
+                  :value="item.pk">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -77,11 +77,8 @@ export default{
   },
   async created() {
     // this.works = await novels(this.author_name).results; 
+    console.log( await category());
     this.category = await category();
-    // this.category.forEach(ele => {
-    //   ele.value = 
-    // })
-    console.log("in created, category: ", this.category)
   },
   computed: {
     formData() {
@@ -90,9 +87,14 @@ export default{
       formData.append('novel_name', this.newWork.workName);
       formData.append('detail', this.newWork.intro);
       formData.append('author', this.$store.getters.userInfo.id);
+      formData.append('total_words', 500)
+      formData.append('category', this.newWork.category)
+      formData.append('chapter_start', 0)
+      formData.append('chapter_end', 0)
       if (this.fileList) {  
         formData.append('novel_img', this.fileList);  
       }  
+      
       return formData;
     }
   },
@@ -112,24 +114,6 @@ export default{
     },
     uploadFile() {
       // 添加文件
-    },
-    // preview(index){
-    //   console.log('preview updates of my work, workid=' + index);
-    // },
-    // submit(index){
-    //   console.log('updating my work, workid=' + index);
-    // },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-    },
-    beforeRemove(file) {
-      return this.$confirm(`确定移除 ${ file.name }？`);
     },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
