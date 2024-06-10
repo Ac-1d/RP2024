@@ -63,7 +63,7 @@ export default {
       // console.log(info);
       this.authorInfo = info;
       this.books = info.author_info.related_novels;
-      console.log(this.books);
+      // console.log(this.books);
     },
     prevPage() {
       if (this.currentPage > 1) {

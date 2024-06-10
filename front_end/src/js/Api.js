@@ -78,6 +78,7 @@ export async function updateChapterInfo(novel_id, chapter_id, formData) {
 export async function category() {
   try {
     const response = await axios.get('/novels/category_all');
+    console.log("in get, response: ", response.data)
     return response.data;
   } catch (error) {
     console.error('Error fetching categories:', error);

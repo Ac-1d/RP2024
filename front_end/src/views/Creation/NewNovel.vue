@@ -78,6 +78,10 @@ export default{
   async created() {
     // this.works = await novels(this.author_name).results; 
     this.category = await category();
+    // this.category.forEach(ele => {
+    //   ele.value = 
+    // })
+    console.log("in created, category: ", this.category)
   },
   computed: {
     formData() {
