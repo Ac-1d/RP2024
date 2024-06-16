@@ -105,13 +105,22 @@ export default{
 
     //   console.log('preview my new Work');
     // },
+    // async submitNew(){
+    //   // let url = this.url;
+    //   // axios.post({url, params: this.newWork});
+    //   createNovel(this.formData);
+
+    //   console.log('submit my new work');
+    // },
     async submitNew(){
       // let url = this.url;
       // axios.post({url, params: this.newWork});
-      createNovel(this.formData);
+      await createNovel(this.formData);
+      this.$message.success('提交成功');// 添加的代码
 
       console.log('submit my new work');
     },
+
     uploadFile() {
       // 添加文件
     },

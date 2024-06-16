@@ -153,27 +153,45 @@ export async function novelContent(novel_id, chapter_id) {
 }
 
 // 上传评论
-export async function addComments(comment, token) {
-  console.log({
-    "novel": comment.novel_id,
-    "chapter": comment.chapter_id,
+// export async function addComments(comment, token) {
+//   console.log({
+//     "novel": comment.novel_id,
+//     "chapter": comment.chapter_id,
+//     "user": comment.user_id,
+//     "comment_content": comment.content,
+//     "up_number": comment.up_number,
+//   });
+//   console.log(token);
+//   try {
+//     const response = await axios.post('/novels/add_comments',{
+//       headers: {
+//         'Authorization': `Bearer ${token}`
+//       },
+//         "novel_id": comment.novel_id,
+//         "chapter_id": comment.chapter_id,
+//         "user": comment.user_id,
+//         "comment_content": comment.content,
+//         "up_number": comment.up_number,
+      
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error adding comment:', error);
+//     return error.code;
+//   }
+// }
+
+export async function addComments(comment) {
+  let data = {
+    "novel_id": comment.novel_id,
+    "chapter_id": comment.chapter_id,
     "user": comment.user_id,
     "comment_content": comment.content,
     "up_number": comment.up_number,
-  });
-  console.log(token);
+  };
+  // console.log(data);
   try {
-    const response = await axios.post('/novels/add_comments',{
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-        "novel_id": comment.novel_id,
-        "chapter_id": comment.chapter_id,
-        "user": comment.user_id,
-        "comment_content": comment.content,
-        "up_number": comment.up_number,
-      
-    });
+    const response = await axios.post('/novels/add_comments', data);
     return response.data;
   } catch (error) {
     console.error('Error adding comment:', error);
@@ -240,7 +258,7 @@ export async function postNote(note, user_id, novel_id, chapter_id){
       'user_id': user_id,
       'novel_id': novel_id,
       'chapter_id': chapter_id,
-      'is_public': note.is_public,
+      'is_public': note.note ? note.isPublic : false,
       'type': note.note ? 'underline' : 'highlight'
     })
     return await axios.post(`/novels/create_bookmarks`, {
@@ -249,7 +267,7 @@ export async function postNote(note, user_id, novel_id, chapter_id){
       'user_id': user_id,
       'novel_id': novel_id,
       'chapter_id': chapter_id ? chapter_id : 1,
-      'is_public': note.note ? note.ispublic : false,
+      'is_public': note.note ? note.isPublic : false,
       'type': note.note ? 'underline' : 'highlight'
     })
   } catch (error) {

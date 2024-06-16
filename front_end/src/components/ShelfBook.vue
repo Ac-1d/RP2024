@@ -1,9 +1,9 @@
 <template>
-  <div class="book">
+  <div class="book" v-if="cansee">
     <img :src="book.novel_info.novel_img" :alt="book.novel_info.novel_name" @click="goToRead" @mouseover="showDetails" @mouseleave="hideDetails" />
     <div class="title">{{ book.novel_info.novel_name }}</div>
-    <div class="author">{{ book.novel_info.author_namw }}</div>
-    <i class="el-icon-remove" @click = "removeBook"></i>
+    <div class="author">{{ book.novel_info.author_nam6w }}</div>
+    <i class="el-icon-remove" @click = "removeBook1()"></i>
 
     <transition name="fade">
       <div class="details" v-if="isHovered">
@@ -34,11 +34,15 @@ export default {
   },
   data() {
     return {
-      isHovered: false
+      isHovered: false,
+      cansee:true,
     };
   },
-
+  emits:['look'],
   methods: {
+    cantLook(){
+        this.$emit('look');
+    },
     bookState() {
         console.log("book is"+this.book);
         if(this.book.novel_info.novel_status == 0){
@@ -47,6 +51,7 @@ export default {
             return "已完结";
         }
     },
+
     showDetails() {
       this.isHovered = true;
     },
@@ -77,9 +82,29 @@ export default {
           });
         });
      },
+    removeBook1() {
+        this.$confirm('确认删除', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.cansee=false;
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+     },
+
      remove: async function() {
         console.log('userID'+this.$store.state.userInfo.id);
-        console.log('userID'+this.book.novel_info.id);
+        console.log('novelID'+this.book.novel_info.id);
+
         try {
             const response = await axios.post('/novels/delete_novel', {
                 params: {
@@ -88,10 +113,11 @@ export default {
                 }
         });
 
-        if (response.status === 200 && response.data.status === 'success') {
+        if (response.status === 200) {
           console.log(response.data.msg);
           // 在此处处理成功删除的结果，例如通知用户或刷新列表
         } else {
+          console.log(response.data.msg);
           console.error('删除失败');
         }
        } catch (error) {

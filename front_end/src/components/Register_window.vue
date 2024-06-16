@@ -145,7 +145,12 @@ export default {
           if (response.status === 400) {
             throw new Error(`注册失败，状态码：${response.status}`);
           } else{
-            alert('注册成功!,用户ID:'+response.data.user_id);
+            this.$message({
+              showClose:true,
+              message:'注册成功',
+              type:'success'
+
+            });
           }
        } catch(error) {
            console.error('注册时发生错误:', error.message);
