@@ -7,7 +7,6 @@ import Ebooks from "../views/Ebooks.vue";
 import Rankings from "../views/Rankings.vue";
 import Reports from "../views/Reports.vue";
 import Search from "../views/Search.vue";
-import About from "../views/About.vue";
 import Reader from "../views/Reader.vue";
 import Comments from "../views/Comments.vue";
 import Mail from "../views/Mail/Mail.vue";
@@ -30,11 +29,6 @@ const routes = [
       path: '/categories-detail',
       name: 'CategoriesDetail',
       component: CategoriesDetail
-  },
-  {
-    path: "/about",
-    name: "About",
-    component: About
   },
   {
     path: "/reader",

@@ -14,7 +14,6 @@
         <div id="bookInfo-header">
           <img :src="coverUrl" id="bookInfo-cover">
           <div id="bookInfo-text">
-            <!-- 文本无法垂直方向居中 -->
             <p id="title" class="text bookInfo-text">{{ metadata.title }}</p>
             <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
             <p class="text bookInfo-text">已读：12h</p>
