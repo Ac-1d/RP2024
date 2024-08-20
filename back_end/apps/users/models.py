@@ -7,6 +7,8 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.contrib.auth.models import AbstractUser
 #用户表
 class User(AbstractUser):
+    class Meta:
+        app_label = 'users'
     mobile = models.CharField(max_length=11,verbose_name='手机号',unique=True)
     user_icon = models.FileField(upload_to='user_icon',default='user_icon/default.jpg',verbose_name='用户头像')
     gender = models.IntegerField(choices=((0,'男'),(1,'女')),default=0,verbose_name='用户性别')

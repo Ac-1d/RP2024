@@ -6,6 +6,6 @@ from . import views
 urlpatterns = [
     path('login',views.LoginAPIView.as_view()),#登录接口
     path('userinfo',views.UserInfoAPIView.as_view()),#用户信息接口
-    path('register',views.RegisterView.as_view()),#注册接口
+    path('register',views.RegisterView.as_view(),name='register'),#注册接口
     path('backdoor',views.BackdoorAPIView.as_view()),#后门接口
 ]

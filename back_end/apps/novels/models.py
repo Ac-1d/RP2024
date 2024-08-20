@@ -1,7 +1,7 @@
 import os
 
 from django.db import models
-from ..users.models import User
+from apps.users.models import User
 from django.conf import settings
 from django.db.models import Sum, Avg
 
@@ -16,6 +16,8 @@ def novel_detail(detail):
 # Create your models here.
 # 小说表
 class Novel(models.Model):
+    class Meta:
+        app_label = 'novels'
     novel_img = models.FileField(upload_to='image/', default='image/default.jpg', verbose_name='小说图片')
     novel_status = models.IntegerField(choices=((0, '连载中'), (1, '已完结')), verbose_name='小说状态')
     novel_name = models.CharField(max_length=64, verbose_name='小说名字')
