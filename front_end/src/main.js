@@ -10,7 +10,7 @@ Vue.use(ElementUI);
 
 Vue.prototype.$axios = axios;
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000'; // 设置请求的基地址 
+axios.defaults.baseURL = 'http://47.93.0.24:8000'; // 设置请求的基地址 改为网站的ip地址
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
