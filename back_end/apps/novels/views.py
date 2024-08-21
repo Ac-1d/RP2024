@@ -433,3 +433,4 @@ class DeleteBookmarkAPIView(APIView):
             return Response({"删除成功！"},status=status.HTTP_204_NO_CONTENT)
         except models.Bookmark.DoesNotExist:
             return Response({"error": "未找到对应的书签"}, status=status.HTTP_404_NOT_FOUND)
+
