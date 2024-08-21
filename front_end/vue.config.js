@@ -1,5 +1,6 @@
 // vue.config.js  
 module.exports = {  
+  assetsDir: "static",
   devServer: {  
     proxy: {  
       '/api': {  
