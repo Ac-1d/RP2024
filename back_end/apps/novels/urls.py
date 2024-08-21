@@ -5,10 +5,10 @@ from . import views
 
 urlpatterns = [
     path('create_novel', views.CreateNovelView.as_view(),name='create_novel'), #新建小说接口
-    path('create_chapter', views.CreateNovelChapterView.as_view()), #新建章节接口
-    path('category_all',views.CategoryAllAPIView.as_view()),  #查询所有的小说分类
-    path('category',views.CategoryAPIView.as_view()),  #按分类查询小说(第二排序为推荐）
-    path('novel',views.NovelAllAPIView.as_view()),#超级搜索小说
+    path('create_chapter', views.CreateNovelChapterView.as_view(),name='create_chapter'), #新建章节接口
+    path('category_all',views.CategoryAllAPIView.as_view(),name='category_all'),  #查询所有的小说分类
+    path('category',views.CategoryAPIView.as_view(),name='category'),  #按分类查询小说(第二排序为推荐）
+    path('novel',views.NovelAllAPIView.as_view(),name='novel_list'),#超级搜索小说
     path('detail',views.DetailAPIView.as_view()),  #按ID查询小说
     path('chapter_list',views.DetailListAPIView.as_view()),  #查询指定小说所有章节
     path('chapter',views.ChapterContentAPIView.as_view()), #指定章节的详细信息
