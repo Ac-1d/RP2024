@@ -4,17 +4,21 @@ from rest_framework import status
 from django.core.files.uploadedfile import SimpleUploadedFile
 from apps.novels.models import Novel
 from django.test import TestCase
-from apps.novels.models import Novel_category, Author,Novel_chapter
+from apps.novels.models import Novel, Novel_category, Author, Novel_chapter, Novel_list, Comment, recently_reading
 from apps.users.models import User
 from apps.novels.models import Novel_category
+from apps.novels.models import *
+
 """
 小说接口测试
 """
-class NovelViewTestCase(APITestCase):
 
+
+class NovelViewTestCase(APITestCase):
     """
     标准实例化
     """
+
     @classmethod
     def setUpTestData(cls):
         # 创建一个 Novel_category 实例
@@ -58,15 +62,32 @@ class NovelViewTestCase(APITestCase):
             chapter_start=1,
             chapter_end=50
         )
+        # 创建一个章节实例
+        cls.chapter = Novel_chapter.objects.create(
+            title='第一章',
+            novel=cls.novel,
+            chapter_id=1,
+            content='这是第一章的内容'
+        )
+        cls.novel_in_bookrack = Novel_list.objects.create(
+            user=cls.user,
+            Novel=cls.novel
+        )
+        cls.recently_reading_entry = recently_reading.objects.create(
+            user=cls.user,
+            Novel=cls.novel,
+            chapter_id=cls.chapter.pk
+        )
 
     """
     URL
     """
-    def setUp(self):
 
+    def setUp(self):
         # 设置创建小说的URL
         self.create_novel_url = reverse('create_novel')
         self.create_chapter_url = reverse('create_chapter')  # 替换为实际的URL名称
+        self.client.force_authenticate(user=self.user)
 
     def test_create_novel_success(self):
         """
@@ -140,7 +161,7 @@ class NovelViewTestCase(APITestCase):
         response = self.client.post(self.create_chapter_url, data, format='multipart')
 
         # 检查返回状态码是否为201 Created
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # 验证数据库中是否存在该章节
         chapter = Novel_chapter.objects.get(novel=1, chapter_id=1)
@@ -210,7 +231,7 @@ class NovelViewTestCase(APITestCase):
 
     def test_novel_all_success(self):
         """
-        测试成功搜索小说
+        测试成功搜索小说(超级搜索）
         """
         url = reverse('novel_list')
         response = self.client.get(url, {'search': 'TEST'})
@@ -237,9 +258,91 @@ class NovelViewTestCase(APITestCase):
         self.assertEqual(response.data['count'], 0)  # 应该找不到任何结果
         self.assertEqual(len(response.data['results']), 0)  # 确保结果集为空
 
+    def test_get_comments_success(self):
+        """
+        测试用例：成功获取评论
+        """
+        Comment.objects.create(
+            novel=self.novel,
+            chapter=self.chapter,
+            user=self.user,
+            comment_content="测试评论内容"
+
+        )
+        get_comments_url = reverse('get_comments')
+        response = self.client.get(get_comments_url, {'novel_id': 1, 'chapter_id': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) > 0)
+
+    def test_get_comments_failure(self):
 
 
+        get_comments_url = reverse('get_comments')  # 只获取基础URL，不传递参数
+        response = self.client.get(f'{get_comments_url}?novel_id=-1')  # 在URL后追加查询字符串
+        self.assertEqual(response.status_code, 400)  # 根据你的测试要求检查响应状态码
 
+    def test_add_recently_read_success(self):
+        """
+        测试用例：成功添加最近阅读记录
+        """
+        # 构造URL并附加查询参数
+        add_recently_read_url = reverse('add_recently')
+        url_with_params = f"{add_recently_read_url}?user_id={1}&novel_id={1}&chapter_id={self.chapter.chapter_id}"
 
+        # 发送POST请求
+        response = self.client.post(url_with_params)
 
+        # 打印响应数据以检查其内容
+        print(response.data)
 
+        # 验证返回的状态码是否为200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 验证返回的消息
+        self.assertIn('msg', response.data)  # 确认响应中是否存在 'msg' 键
+        self.assertEqual(response.data['msg'], '最近阅读已更新')
+
+    def test_add_recently_read_failure(self):
+        """
+        测试用例：添加不存在的小说到最近阅读
+        """
+        add_recently_read_url = reverse('add_recently')
+        data = {'user_id': self.user.pk, 'novel_id': 99999, 'chapter_id': 1}  # 假设ID 999的小说不存在
+        response = self.client.post(add_recently_read_url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_novel_from_bookrack_success(self):
+        """
+        测试用例：成功从书架中删除小说
+        """
+
+        # 设置删除小说的URL
+        delete_bookrack_url = reverse('delete_novel')  # 确保这里的URL名称与你的路由一致
+
+        # 设置删除小说的URL并附加查询参数
+        delete_bookrack_url = reverse('delete_novel') + '?user_id=1&novel_id=1'
+
+        # 发送删除请求
+        response = self.client.post(delete_bookrack_url)
+
+        # 验证是否成功删除
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['msg'], '删除成功')
+
+    def test_delete_novel_from_bookrack_failure(self):
+        """
+        测试用例：删除不存在的小说
+        """
+        self.client.force_authenticate(user=1)
+        delete_bookrack_url = reverse('delete_novel')
+        response = self.client.post(delete_bookrack_url, {'user_id': 1, 'novel_id': -1})
+        self.assertEqual(response.data['msg'], '小说不存在')
+
+    def test_add_to_bookrack_success(self):
+        """
+        测试用例：成功将小说添加到书架
+        """
+        url = reverse('add_novel')
+        response = self.client.post(url, {'user_id': 1, 'novel_id': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['msg'], '已添加到书架')

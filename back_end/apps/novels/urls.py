@@ -13,12 +13,12 @@ urlpatterns = [
     path('chapter_list',views.DetailListAPIView.as_view()),  #查询指定小说所有章节
     path('chapter',views.ChapterContentAPIView.as_view()), #指定章节的详细信息
     path('bookrack',views.BookrackAPIView.as_view()),#查询书架的内容
-    path('add_novel', views.AddNoveltoCrackAPIView.as_view()),#向书架添加
-    path('add_recently', views.RecentlyNovelAPIView.as_view()),#最近阅读
+    path('add_novel', views.AddNoveltoCrackAPIView.as_view(),name='add_novel'),#向书架添加
+    path('add_recently', views.RecentlyNovelAPIView.as_view(),name='add_recently'),#最近阅读
     path('get_recently', views.RecentlyNovelListAPIView.as_view()),#最近阅读查询
-    path('delete_novel',views.DeleteNovelAPIView.as_view()),#从书架删除
-    path('add_comments', views.AddCommentView.as_view()),#上传评论
-    path('get_comments', views.GetCommentsView.as_view()),#获取评论
+    path('delete_novel',views.DeleteNovelAPIView.as_view(),name='delete_novel'),#从书架删除
+    path('add_comments', views.AddCommentView.as_view(),name='add_comments'),#上传评论
+    path('get_comments', views.GetCommentsView.as_view(),name='get_comments'),#获取评论
     path('author_register',views.RegisterAsAuthorAPIView.as_view()),#注册成为作者
     path('author_info',views.CheckAuthorAPI.as_view()),#作者信息（面板）
     path('get_bookmarks',views.BookmarkListAPIView.as_view()),#获取指定书签

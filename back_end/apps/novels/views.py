@@ -228,14 +228,20 @@ class DeleteNovelAPIView(APIView):
         novel_id = request.query_params.get('novel_id')
         user_id = request.query_params.get('user_id')
 
-        novel_obj = models.Novel_list.objects.filter(user=user_id,Novel_id=novel_id).first()
+        # 尝试从 Novel_list 中获取记录
+        novel_obj = models.Novel_list.objects.filter(user=user_id, Novel_id=novel_id).first()
         if novel_obj:
             novel_obj.delete()
-            return Response({'status':200,'msg':'删除成功'})
-        else:
-            novel_obj = models.recently_reading.objects.filter(user=request.user,Novel_id=novel_id).first()
+            return Response({'status': 200, 'msg': '删除成功'})
+
+        # 如果 Novel_list 中没有记录，再尝试从 recently_reading 中获取记录
+        novel_obj = models.recently_reading.objects.filter(user_id=user_id, Novel_id=novel_id).first()
+        if novel_obj:
             novel_obj.delete()
             return Response({'status': 200, 'msg': '删除成功'})
+
+        # 如果都找不到，返回删除失败的消息
+        return Response({'status': 404, 'msg': '小说不存在'})
 
 
 #评论上传接口
