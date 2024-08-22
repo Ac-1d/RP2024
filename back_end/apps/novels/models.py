@@ -188,7 +188,7 @@ class Comment(models.Model):
     novel= models.ForeignKey('Novel', related_name='novel_comments', db_constraint=False,
                               on_delete=models.CASCADE)  # 评论的小说
     chapter= models.ForeignKey('Novel_chapter', related_name='chapter_comments', db_constraint=False,
-                                on_delete=models.CASCADE,default=0)  # 评论的章节
+                                on_delete=models.CASCADE,null=True)  # 评论的章节
     up_number = models.IntegerField(default=0)  # 评分
 
 
@@ -200,7 +200,7 @@ class Novel_list(models.Model):
     Novel = models.ForeignKey(to='Novel', related_name='Novel_list', null=True, db_constraint=Novel,
                               on_delete=models.DO_NOTHING, verbose_name='小说外键')
     user = models.ForeignKey(User, db_constraint=False, related_name='user', on_delete=models.DO_NOTHING,
-                              verbose_name='用户外键',default=None)
+                              verbose_name='用户外键',null=True)
     # chapter = models.ForeignKey(to=Novel_chapter, null=True, related_name='chapter', db_constraint=False,
     #                             on_delete=models.DO_NOTHING, verbose_name='章节id')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
@@ -217,7 +217,7 @@ class recently_reading(models.Model):
     Novel = models.ForeignKey(to='Novel', related_name='recently', null=True, db_constraint=Novel,
                               on_delete=models.DO_NOTHING, verbose_name='小说外键')
     user = models.ForeignKey(User, db_constraint=False, related_name='recently_user', on_delete=models.DO_NOTHING,
-                              verbose_name='用户外键',default=None)
+                              verbose_name='用户外键',null=True)
     chapter = models.ForeignKey(to=Novel_chapter, null=True, related_name='recently_chapter', db_constraint=False,
                                 on_delete=models.DO_NOTHING, verbose_name='章节id')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
@@ -249,4 +249,4 @@ class Bookmark(models.Model):
     novel = models.ForeignKey(Novel, on_delete=models.CASCADE, verbose_name='小说')
     novel_chapter = models.ForeignKey(Novel_chapter, on_delete=models.CASCADE, verbose_name='章节')
     is_public = models.BooleanField(default=False, verbose_name='是否公开')
-    type = models.CharField(max_length=255, verbose_name='具体类型',default=None)
+    type = models.CharField(max_length=255, verbose_name='具体类型',null=True, blank=True)
