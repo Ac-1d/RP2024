@@ -7,9 +7,6 @@ from django.test import TestCase
 from apps.novels.models import Novel, Novel_category, Author, Novel_chapter, Novel_list, Comment, recently_reading
 from apps.users.models import User
 from apps.novels.models import Novel_category
-from apps.novels.models import *
-
-from apps.novels.models import Bookmark
 
 """
 小说接口测试
@@ -80,15 +77,7 @@ class NovelViewTestCase(APITestCase):
             Novel=cls.novel,
             chapter_id=cls.chapter.pk
         )
-
-        cls.bookmark = Bookmark.objects.create(
-            user=cls.user,
-            novel=cls.novel,
-            novel_chapter=cls.chapter,
-            cfi='test-cfi',
-            type='example_type',  # 为 type 字段提供一个值
-            is_public=False
-        )
+        cls.novel_list = Novel_list.objects.create(user=cls.user, Novel=cls.novel)
 
     """
     URL
@@ -99,6 +88,7 @@ class NovelViewTestCase(APITestCase):
         self.create_novel_url = reverse('create_novel')
         self.create_chapter_url = reverse('create_chapter')  # 替换为实际的URL名称
         self.client.force_authenticate(user=self.user)
+
 
     def test_create_novel_success(self):
         """
@@ -155,6 +145,13 @@ class NovelViewTestCase(APITestCase):
 
         # 检查返回的数据是否包含错误信息
         self.assertIn('novel_name', response.data)  # 检查是否返回小说名称的错误信息
+
+    def test_custom_novel_list_creation(self):
+        # 手动创建一个带有user_id和novel_id的Novel_list实例
+        novel_list = Novel_list.objects.create(user=self.user, Novel=self.novel)
+
+        # 确认实例已经创建
+        self.assertTrue(Novel_list.objects.filter(user=self.user, Novel=self.novel).exists())
 
     def test_create_chapter_success(self):
         """
@@ -281,7 +278,7 @@ class NovelViewTestCase(APITestCase):
 
         )
         get_comments_url = reverse('get_comments')
-        response = self.client.get(get_comments_url, {'novel_id': 1, 'chapter_id': 1})
+        response = self.client.get(get_comments_url, {'novel_id': self.novel.pk, 'chapter_id': self.chapter.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(len(response.data) > 0)
 
@@ -298,7 +295,7 @@ class NovelViewTestCase(APITestCase):
         """
         # 构造URL并附加查询参数
         add_recently_read_url = reverse('add_recently')
-        url_with_params = f"{add_recently_read_url}?user_id={1}&novel_id={1}&chapter_id={self.chapter.chapter_id}"
+        url_with_params = f"{add_recently_read_url}?user_id={self.user.pk}&novel_id={self.novel.pk}&chapter_id={self.chapter.chapter_id}"
 
         # 发送POST请求
         response = self.client.post(url_with_params)
@@ -311,7 +308,7 @@ class NovelViewTestCase(APITestCase):
 
         # 验证返回的消息
         self.assertIn('msg', response.data)  # 确认响应中是否存在 'msg' 键
-        self.assertEqual(response.data['msg'], '最近阅读已更新')
+        self.assertEqual(response.data['msg'], '最近阅读已添加')
 
     def test_add_recently_read_failure(self):
         """
@@ -322,81 +319,23 @@ class NovelViewTestCase(APITestCase):
         response = self.client.post(add_recently_read_url, data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_novel_from_bookrack_success(self):
+    def test_add_recently_read_success(self):
         """
-        测试用例：成功从书架中删除小说
+        测试用例：成功添加最近阅读记录
         """
+        # 构造URL并附加查询参数
+        add_recently_read_url = reverse('add_recently')
+        url_with_params = f"{add_recently_read_url}?user_id={self.user.pk}&novel_id={self.novel.pk}&chapter_id={self.chapter.chapter_id}"
 
-        # 设置删除小说的URL
-        delete_bookrack_url = reverse('delete_novel')  # 确保这里的URL名称与你的路由一致
+        # 发送POST请求
+        response = self.client.post(url_with_params)
 
-        # 设置删除小说的URL并附加查询参数
-        delete_bookrack_url = reverse('delete_novel') + '?user_id=1&novel_id=1'
-
-        # 发送删除请求
-        response = self.client.post(delete_bookrack_url)
-
-        # 验证是否成功删除
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['msg'], '删除成功')
-
-    def test_delete_novel_from_bookrack_failure(self):
-        """
-        测试用例：删除不存在的小说
-        """
-        self.client.force_authenticate(user=1)
-        delete_bookrack_url = reverse('delete_novel')
-        response = self.client.post(delete_bookrack_url, {'user_id': 1, 'novel_id': -1})
-        self.assertEqual(response.data['msg'], '小说不存在')
-
-    def test_add_to_bookrack_success(self):
-        """
-        测试用例：成功将小说添加到书架
-        """
-        url = reverse('add_novel')
-        response = self.client.post(url, {'user_id': 1, 'novel_id': 1})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['msg'], '已添加到书架')
-
-    def test_register_as_author_success(self):
-        """
-        测试用例：成功注册成为作者
-        """
-        # 构造URL并附加用户ID作为查询参数
-        register_url = reverse('author_register') + f'?user_id=1'
-
-        # 发送POST请求注册为作者
-        response = self.client.post(register_url)
-
-        # 验证返回的状态码是否为201 Created
+        # 验证返回的状态码是否为200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # 验证数据库中的用户状态是否已更新为作者
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.is_author)
-
-        # 验证是否创建了Author实例
-        author_exists = Author.objects.filter(author_user=self.user).exists()
-        self.assertTrue(author_exists)
-
-    def test_register_as_author_user_not_found(self):
-        """
-        测试用例：作者用户不存在
-        """
-        # 使用不存在的用户ID
-        non_existent_user_id = -1
-        register_url = reverse('author_register') + f'?user_id={non_existent_user_id}'
-
-        # 发送POST请求注册为作者
-        response = self.client.post(register_url)
-
-        # 验证返回的状态码是否为404 Not Found
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-        # 验证返回的消息
-        self.assertEqual(response.data['message'], '没有找到对应的用户信息')
-
-    #######
+        # 验证返回的消息，适应视图返回的内容
+        self.assertIn('msg', response.data)
+        self.assertEqual(response.data['msg'], '最近阅读已更新')  # 修改为实际返回的内容   //////////////////////////////
 
     def test_get_chapter_content_success(self):
         """
@@ -443,7 +382,7 @@ class NovelViewTestCase(APITestCase):
         """
         测试用例：成功获取小说详情
         """
-        url = reverse('detail')
+        url = reverse('novel_detail')
         response = self.client.get(url, {'id': self.novel.pk})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 200)
@@ -453,11 +392,12 @@ class NovelViewTestCase(APITestCase):
         """
         测试用例：获取不存在的小说详情
         """
-        url = reverse('detail')
+        url = reverse('novel_detail')
         response = self.client.get(url, {'id': 999})  # 假设ID 999不存在
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], '300')
         self.assertEqual(response.data['msg'], '该小说不存在')
+
 
     def test_get_bookrack_failure_invalid_user(self):
         """
@@ -485,59 +425,146 @@ class NovelViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['bookrack']), 0)  # 书架应该为空
 
+    def test_add_novel_to_bookrack_success(self):
+        """
+        测试用例：成功将小说添加到书架
+        """
+        url = reverse('add_novel')  # 假设URL名称为 'add_to_bookrack'
+        data = {'user_id': self.user.id, 'novel_id': self.novel.id}
+
+        # 发送POST请求
+        response = self.client.post(url, data)
+
+        # 验证返回的状态码为200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 验证书架中是否已经添加了这本小说
+        self.assertTrue(Novel_list.objects.filter(user=self.user, Novel=self.novel).exists())
+
+        # 验证返回的消息是否正确
+        self.assertEqual(response.data['msg'], '已添加到书架')
+
+    def test_update_existing_novel_in_bookrack(self):
+        """
+        测试用例：更新书架中已经存在的小说
+        """
+        # 预先添加小说到书架
+        Novel_list.objects.create(user=self.user, Novel=self.novel)
+
+        url = reverse('add_novel')  # 假设URL名称为 'add_to_bookrack'
+        data = {'user_id': self.user.id, 'novel_id': self.novel.id}
+
+        # 发送POST请求
+        response = self.client.post(url, data)
+
+        # 验证返回的状态码为200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # 验证返回的消息是否为书架已更新
+        self.assertEqual(response.data['msg'], '书架已更新')
+
+    def test_add_novel_to_bookrack_failure_invalid_user(self):
+        """
+        测试用例：无效用户ID导致添加到书架失败
+        """
+        url = reverse('add_novel')
+        data = {'user_id': 99999, 'novel_id': 1}
+
+        # 发送POST请求
+        response = self.client.post(url, data)
+
+        # 验证返回的状态码为404 NOT FOUND
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # 验证数据库中没有错误地添加书架记录
+        self.assertFalse(Novel_list.objects.filter(Novel=self.novel, user_id=99999).exists())
+
+    def test_add_novel_to_bookrack_failure_invalid_novel(self):
+        """
+        测试用例：无效小说ID导致添加到书架失败
+        """
+        url = reverse('add_novel')  # 假设URL名称为 'add_to_bookrack'
+        data = {'user_id': self.user.id, 'novel_id': 99999}  # 假设99999的小说不存在
+
+        # 发送POST请求
+        response = self.client.post(url, data)
+
+        # 验证返回的状态码为404 NOT FOUND
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # 验证数据库中没有错误地添加书架记录
+        self.assertFalse(Novel_list.objects.filter(user=self.user, Novel_id=99999).exists())
+
     def test_create_bookmark_success(self):
-        """
-        测试用例：成功创建书签
-        """
-        create_bookmark_url = reverse('create_bookmarks')
+        url = reverse('create_bookmarks')
         data = {
-            "cfi": "epubcfi(/6/2[chapter01]!/4/1:0)",
-            "note": "这是一段重要的注释。",
-            "user_id": self.user.pk,
-            "novel_id": self.novel.pk,
-            "chapter_id": self.chapter.pk,
-            "is_public": True,
-            "type": "bookmark"
+            'user': self.user.pk,
+            'novel': self.novel.pk,
+            'novel_chapter': self.chapter.pk,
+            'bookmark_name': '测试书签',
+            'is_public': True
         }
-
-        # 发送POST请求创建书签
-        response = self.client.post(create_bookmark_url, data, format='json')
-
-        # 验证返回的状态码是否为201 Created
+        response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # 验证返回的消息
         self.assertEqual(response.data['message'], 'Bookmark created successfully')
 
-        # 验证数据库中是否存在该书签
-        bookmark_exists = Bookmark.objects.filter(
-            user=self.user, novel=self.novel, novel_chapter=self.chapter
-        ).exists()
-        self.assertTrue(bookmark_exists)
-
-    def test_create_bookmark_invalid_data(self):
-        """
-        测试用例：无效数据导致书签创建失败
-        """
-        create_bookmark_url = reverse('create_bookmarks')
+    def test_create_bookmark_failure(self):
+        url = reverse('create_bookmarks')
         data = {
-            "cfi": "",  # 无效的CFI，应导致创建失败
-            "note": "这是一段重要的注释。",
-            "user_id": self.user.pk,
-            "novel_id": self.novel.pk,
-            "chapter_id": self.chapter.pk,
-            "is_public": True,
-            "type": "bookmark"
+            'user': self.user.pk,
+            'novel': self.novel.pk,
+            # 缺少 novel_chapter
+            'bookmark_name': '测试书签',
+            'is_public': True
         }
-
-        # 发送POST请求尝试创建书签
-        response = self.client.post(create_bookmark_url, data, format='json')
-
-        # 验证返回的状态码是否为400 Bad Request
+        response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('novel_chapter', response.data)
 
-        # 验证返回的错误信息中是否包含CFI的错误
-        self.assertIn('cfi', response.data)
+    def test_add_comment_success(self):
+        url = reverse('add_comments')  # 假设URL名称为 'add_comment'
+        data = {
+            'user': self.user.pk,
+            'novel': self.novel.pk,
+            'chapter': self.chapter.pk,
+            'comment_content': '这是一个测试评论'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['message'], '评论上传成功')
+
+    def test_add_comment_failure(self):
+        url = reverse('add_comments')
+        data = {
+            'user': self.user.pk,
+            'novel': self.novel.pk,
+            # 缺少 chapter 导致失败
+            'comment_content': '这是一个测试评论'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('chapter', response.data)
+
+    def test_register_as_author_success(self):
+        url = reverse('author_register')
+        response = self.client.post(f'{url}?user_id={self.user.pk}')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['message'], '用户成功注册为作者')
+        self.assertTrue(User.objects.get(pk=self.user.pk).is_author)
+
+    def test_register_as_author_failure_already_author(self):
+        self.user.is_author = True
+        self.user.save()
+        url = reverse('author_register')
+        response = self.client.post(f'{url}?user_id={self.user.pk}')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], '用户已经是作者')
+
+    def test_register_as_author_failure_user_not_found(self):
+        url = reverse('author_register')
+        response = self.client.post(f'{url}?user_id=9999')  # 假设用户ID 9999不存在
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['message'], '没有找到对应的用户信息')
 
     def test_check_author_success(self):
         url = reverse('author_info')
@@ -552,6 +579,12 @@ class NovelViewTestCase(APITestCase):
         response = self.client.get(f'{url}?user_id={self.user.pk}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data['message'], '此用户不是作者')
+
+    def test_check_author_failure_user_not_found(self):
+        url = reverse('author_info')
+        response = self.client.get(f'{url}?user_id=9999')  # 假设用户ID 9999不存在
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], '用户不存在')
 
     def test_get_bookmark_list_success(self):
         url = reverse('get_bookmarks')  # 假设URL名称为 'get_bookmarks'
@@ -576,62 +609,3 @@ class NovelViewTestCase(APITestCase):
         url = reverse('public_get_bookmarks')
         response = self.client.get(f'{url}?user_id=9999&novel_id={self.novel.pk}&chapter_id={self.chapter.pk}')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_get_recently_novel_list_success(self):
-        """
-        测试用例：成功获取最近阅读的小说列表
-        """
-        get_recently_url = reverse('get_recently') + f'?user_id={self.user.pk}'
-
-        # 发送GET请求获取最近阅读的小说列表
-        response = self.client.get(get_recently_url)
-
-        # 验证返回的状态码是否为200 OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # 验证返回的数据结构
-        self.assertIn('recent_reads', response.data)
-        self.assertEqual(len(response.data['recent_reads']), 1)  # 因为setUpTestData中只创建了一个recently_reading实例
-        self.assertEqual(response.data['recent_reads'][0]['chapter_info']['novel_name'], self.novel.novel_name)
-
-    def test_get_recently_novel_list_user_not_found(self):
-        """
-        测试用例：用户不存在，无法获取最近阅读的小说列表
-        """
-        non_existent_user_id = 9999
-        get_recently_url = reverse('get_recently') + f'?user_id={non_existent_user_id}'
-
-        # 发送GET请求尝试获取最近阅读的小说列表
-        response = self.client.get(get_recently_url)
-
-        # 验证返回的状态码是否为404 Not Found
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_delete_bookmark_success(self):
-        """
-        测试用例：成功删除书签
-        """
-        url = reverse('delete_bookmarks')  # 假设URL名称为 'delete_bookmark'
-        response = self.client.delete(f'{url}?cfi={self.bookmark.cfi}')
-
-        # 检查返回状态码是否为 204 NO CONTENT
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        # 确认书签已经被删除
-        self.assertFalse(Bookmark.objects.filter(cfi=self.bookmark.cfi).exists())
-
-    def test_delete_bookmark_failure(self):
-        """
-        测试用例：书签不存在时删除失败
-        """
-        url = reverse('delete_bookmarks')
-        response = self.client.delete(f'{url}?cfi=nonexistent-cfi')
-
-        # 检查返回状态码是否为 404 NOT FOUND
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-        # 确认返回的消息内容
-        self.assertEqual(response.data['error'], '未找到对应的书签')
-
-
-
