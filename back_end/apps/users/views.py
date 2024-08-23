@@ -95,7 +95,7 @@ class UserInfoAPIView(APIView):
 
         return Response({'info': response_data})
 
-#注册接口
+#注册接口 tested
 class RegisterView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     def post(self, request, *args, **kwargs):
@@ -120,7 +120,7 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+#后门接口
 class BackdoorAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
