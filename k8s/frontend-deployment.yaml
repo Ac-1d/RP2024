@@ -12,9 +12,10 @@ spec:
       labels:
         app: frontend
     spec:
+      dnsPolicy: ClusterFirst
       containers:
       - name: frontend
-        image: lizhy462/frontend:dev
+        image: lizhy462/frontend:test
         ports:
         - containerPort: 80  # 使用 Dockerfile 中的端口
 ---
@@ -29,4 +30,5 @@ spec:
     - protocol: TCP
       port: 80       # Kubernetes 服务的端口
       targetPort: 80 # 容器的端口
+      nodePort: 31000
   type: NodePort

@@ -39,7 +39,8 @@ spec:
     spec:
       containers:
       - name: db
-        image: lizhy462/db:dev
+#        image: lizhy462/db:dev
+        image: mysql:8
         env:
           - name: MYSQL_DATABASE
             value: "RP2024"
