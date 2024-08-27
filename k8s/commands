@@ -1,10 +1,6 @@
 #build.sh
 # 构建镜像
 # 上传docker hub仓库
-docker build -t frontend-image2 ../front_end
-docker tag frontend-image2 lizhy462/frontend:test
-docker push lizhy462/frontend:test
-
 
 docker build -t backend-image ../back_end
 docker tag backend-image lizhy462/backend:dev
