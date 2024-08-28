@@ -14,7 +14,7 @@
     </ul>
     <div class="book-list">
       <div class="book-item" v-for="book in filteredBooks" :key="book.id" @click="goToBookDetail(book.id)">
-        <img :src="require(`@/assets/${book.image}`)" :alt="book.title" class="book-image" />
+        <img :src="getBookImage(book.image)" :alt="book.title" class="book-image" />
         <div class="book-info">
           <h2 class="book-title">{{ book.title }}</h2>
           <p class="book-author">{{ book.author }} / {{ book.publish_date }} / {{ book.publisher }} / {{ book.price }}</p>
@@ -33,14 +33,14 @@
 </template>
 
 <script>
-import axios from 'axios'; // 导入 axios
+import books from '@/assets/book.json'; // 导入本地 JSON 文件
 
 export default {
   name: "CategoriesDetail",
   data() {
     return {
-      books: [], // 初始为空数组
-      selectedCategory: "全部" // 当前选中的分类
+      books: books, // 使用导入的 JSON 数据
+      selectedCategory: "全部"
     };
   },
   computed: {
@@ -52,27 +52,19 @@ export default {
     }
   },
   methods: {
-    async fetchBooks() {
-      try {
-        const response = await axios.get('http://127.0.0.1:8000/novels/novel'); // 使用正确的API路径
-        this.books = response.data;
-      } catch (error) {
-        console.error('Error fetching books:', error);
-      }
-    },
     filterBooks(category) {
       this.selectedCategory = category;
     },
     renderStars(rating) {
-      const stars = Math.round(rating / 2); // 将评分转换为5颗星的比例
-      return "★".repeat(stars) + "☆".repeat(5 - stars); // 返回星星字符
+      const stars = Math.round(rating / 2);
+      return "★".repeat(stars) + "☆".repeat(5 - stars);
     },
     goToBookDetail(bookId) {
-      this.$router.push({ name: 'BookDetail', params: { bookId } });
+      this.$router.push({name: 'BookDetail', params: {bookId}});
+    },
+    getBookImage(image) {
+      return require(`@/assets/${image}`);
     }
-  },
-  created() {
-    this.fetchBooks(); // 在组件创建时获取书籍数据
   }
 };
 </script>
@@ -80,8 +72,8 @@ export default {
 <style scoped>
 .categories-detail {
   padding: 20px;
-  max-width: 700px; /* 限制内容区域的最大宽度 */
-  margin: 0 auto; /* 居中对齐 */
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .title {
@@ -93,10 +85,10 @@ export default {
 .categories {
   display: flex;
   flex-wrap: wrap;
-  padding: 8px; /* 内边距 */
+  padding: 8px;
   list-style: none;
   margin-bottom: 20px;
-  background-color: #e6e2dd; /* 淡黄色背景 */
+  background-color: #e6e2dd;
 }
 
 .categories li {
@@ -113,7 +105,7 @@ export default {
 .book-list {
   display: flex;
   flex-direction: column;
-  min-height: 500px; /* 固定最小高度，减少内容高度变化引起的抖动 */
+  min-height: 500px;
 }
 
 .book-item {
@@ -121,16 +113,16 @@ export default {
   justify-content: space-between;
   margin-bottom: 20px;
   width: 100%;
-  border: 1px solid #ccc; /* 添加边框 */
-  border-radius: 5px; /* 边框圆角 */
-  padding: 10px; /* 添加内边距 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-  cursor: pointer; /* 鼠标变为手型 */
-  transition: transform 0.3s ease; /* 添加过渡效果 */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
 .book-item:hover {
-  transform: scale(1.05); /* 放大效果 */
+  transform: scale(1.05);
 }
 
 .book-image {
@@ -140,7 +132,7 @@ export default {
 }
 
 .book-info {
-  text-align: left; /* 将文本左对齐 */
+  text-align: left;
   flex-grow: 1;
 }
 
@@ -192,7 +184,7 @@ export default {
   transition: opacity 0.5s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.fade-enter, .fade-leave-to {
   opacity: 0;
 }
 </style>

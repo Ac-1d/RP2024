@@ -1,9 +1,8 @@
 <template>
   <div class="top-nav-bar" v-if="showNavBar">
     <div class="left-links">
-      <router-link to="/">Home</router-link>
+      <router-link to="/">主页</router-link>
       <router-link to="/BookShelf">书架</router-link>
-      <router-link to="/reader">Reader</router-link>
       <router-link to="/creation">创作中心</router-link>
       <router-link to="/mail">站内信</router-link>
       <router-link to="/Center">个人中心</router-link>

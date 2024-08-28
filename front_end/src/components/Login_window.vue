@@ -10,7 +10,7 @@
 
     <el-form :model="logForm" :rules="rules" ref="logForm" label-width="80px">
       <el-image :src="require('@/assets/log.png')"></el-image>
-      <el-form-item label="用户名" prop="mobile">
+      <el-form-item label="电话" prop="mobile">
         <el-input v-model="logForm.mobile" autocomplete="off"></el-input>
       </el-form-item>
 
@@ -22,7 +22,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="submitForm('logForm')">登录</el-button>
-        <el-button  @click="logdialogCancel('logForm')">取消</el-button>
+        <el-button  @click="logdialogclose">取消</el-button>
 
       </el-form-item>
     </el-form>
@@ -58,6 +58,13 @@ export default {
       },
     };
   },
+  watch: {
+    // 使用 watch 来监视 dialogflag 的变化
+    dialogflag(newValue, oldValue) {
+      // 当 dialogflag 的值发生变化时，这个函数会被调用
+      console.log('dialogflag 的值从', oldValue, '变成了', newValue);
+    },
+  },
   methods: {
     logdialogCancel(formName) {
       this.$confirm('确认关闭？')
@@ -68,18 +75,7 @@ export default {
           .catch(() => {});
     },
     logdialogclose() {
-       this.$confirm('确认关闭？')
-           .then(() => {
-               console.log('close');
-               this.logForm.mobile='',
-               this.logForm.password= '',
-               this.$emit('closedia');
-           })
-           .catch(() => {});
-    },
-
-    async getUserInfo() {
-
+        this.$emit('closedia');
     },
 
     submitForm(formName) {
@@ -91,12 +87,15 @@ export default {
             };
             this.$refs[formName].resetFields();
 
-            await this.$store.dispatch('login',userData);
-            await this.$store.dispatch('getUserInfo');
-            console.log('submit');
-            console.log(this.$store.getters.userInfo);
-            
-            this.$emit('closedia');
+            const ans = await this.$store.dispatch('login',userData);
+            console.log('ans'+ans.msg);
+
+            if(ans.msg === '登录成功'){
+                await this.$store.dispatch('getUserInfo');
+                this.$emit('closedia');
+            }else{
+                alert("用户不存在或密码错误");
+            }
 
         }else{
             console.log('信息错误!!');

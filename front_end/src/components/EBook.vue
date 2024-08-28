@@ -14,7 +14,6 @@
         <div id="bookInfo-header">
           <img :src="coverUrl" id="bookInfo-cover">
           <div id="bookInfo-text">
-            <!-- 文本无法垂直方向居中 -->
             <p id="title" class="text bookInfo-text">{{ metadata.title }}</p>
             <p id="author" class="text bookInfo-text">作者：{{ metadata.creator }}</p>
             <p class="text bookInfo-text">已读：12h</p>
@@ -175,10 +174,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentChapterId', 'currentBookId',])
+    ...mapState(['currentChapterId', 'currentBookId', 'userInfo'])
   },
   mounted() {
     this.$store.commit('setShowTopBar')
+    console.log("userInfo: ", this.userInfo)
     this.epubReader = useEpub();
     this.loadEpub();
     this.loadMark()
@@ -341,6 +341,7 @@ export default {
       let note = this.personalNoteList.pop()
       note.note = this.noteText
       note.isPublic = this.isNotePublic
+      console.log(" note is public : ", note.isPublic)
       this.personalNoteList.push(note)
       this.isNotePublic = false
       this.noteText = null
@@ -348,7 +349,7 @@ export default {
     },
     loadMark() {
       //请求获取他人笔记与私人笔记
-      let user = 1 //use to test
+      let user = this.userInfo.id //use to test
       //处理personalNote
       getPersonalNote(user, this.currentBookId, this.currentChapterId ? this.currentChapterId : 1)
         .then(response => {
@@ -390,7 +391,7 @@ export default {
             console.log("in foreach, note: ", note)
             const cfi = note.cfi
             const noteText = note.note
-            const name = note.user
+            const name = note.user_name
             this.othersNoteList.push({ 'cfi': cfi, 'note': noteText, 'name': name })
           })
           this.othersNoteList.reverse()
@@ -427,7 +428,7 @@ export default {
         if(this.oldPersonalNoteList.includes(note) == false) {
           //post
           console.log("call post note, ", note)
-          postNote(note, 8, this.currentBookId, this.currentChapterId)
+          postNote(note, this.userInfo.id, this.currentBookId, this.currentChapterId)
         }
       })
       this.oldPersonalNoteList.forEach(note => {

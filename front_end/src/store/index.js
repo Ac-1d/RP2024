@@ -39,6 +39,25 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    // async login({ commit }, loginData) { 
+    //   let mobile = loginData.mobile;
+    //   let password = loginData.password;
+    //   let msg = '登录失败';
+    //   if (mobile && password) {
+    //     await axios.post("/users/login", {  
+    //       mobile: mobile,  
+    //       password: password,
+    //     }).then(response => {
+    //       if (response.data.status == 200 && response.data.msg == '登录成功') {
+    //         commit('LOGIN', response.data);
+    //         msg = '登录成功';
+    //       }
+    //     }).catch(error => {
+    //       msg = '验证失败，错误码：' + error.response.status;
+    //     });
+    //   }
+    //   return {msg: msg};
+    // },
     async login({ commit }, loginData) { 
       let mobile = loginData.mobile;
       let password = loginData.password;
@@ -51,6 +70,9 @@ export default new Vuex.Store({
           if (response.data.status == 200 && response.data.msg == '登录成功') {
             commit('LOGIN', response.data);
             msg = '登录成功';
+            console.log('成为作者');
+            axios.post(`novels/author_register?user_id=${response.data.id}`);
+            console.log('成为作者完成');
           }
         }).catch(error => {
           msg = '验证失败，错误码：' + error.response.status;

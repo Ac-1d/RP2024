@@ -72,11 +72,15 @@ export default {
       return this.books.filter(book => book.category_name === this.selectedCategory);
     },
     totalPages() {
+      console.log("call total pages")
+      console.log(Math.ceil(this.filteredBooks.length / this.booksPerPage))
       return Math.ceil(this.filteredBooks.length / this.booksPerPage);
     },
     paginatedBooks() {
+      console.log("call paginated books")
       const start = (this.currentPage - 1) * this.booksPerPage;
       const end = start + this.booksPerPage;
+      console.log(this.filteredBooks.slice(start, end))
       return this.filteredBooks.slice(start, end);
     }
   },
@@ -86,6 +90,7 @@ export default {
         const response = await axios.get('http://127.0.0.1:8000/novels/novel');
         console.log("API response: ", response.data);
         this.books = response.data.results || response.data;
+        console.log("in fetch books books: ", this.books)
         console.log("this.books: ", this.books);
       } catch (error) {
         console.error('Error fetching books:', error);

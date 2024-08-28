@@ -23,8 +23,4 @@ yarn-error.log*
 
 # Personal notes
 note.md
-<<<<<<< HEAD
-tests/private_test/
-=======
 tests/private_test
->>>>>>> 92ebfd1db681dd0ab55cc7b276a9da1442d7d965

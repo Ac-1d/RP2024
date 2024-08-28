@@ -94,6 +94,27 @@ export default {
     closeDialog() {
       this.logvisible = false;
     },
+    // async addComment() {
+    //   if (!this.userInfo) {
+    //     this.showLogdialog();
+    //     return;
+    //   }
+    //   if (this.newComment.content === '') {
+    //     this.openMsg('请留下您的意见');
+    //     return;
+    //   }
+    //   if (this.newComment.up_number === 0) {
+    //     this.openMsg('请为此书评分');
+    //     return;
+    //   }
+    //   try {
+    //     await addComments(this.newComment);
+    //     await this.fetchComments();
+    //     this.newComment.content = '';
+    //   } catch (error) {
+    //     console.error('Error adding comment:', error);
+    //   }
+    // },
     async addComment() {
       if (!this.userInfo) {
         this.showLogdialog();
@@ -108,10 +129,10 @@ export default {
         return;
       }
       try {
-        await addComments(this.newComment, this.$store.state.verify.token);
-        // console.log('token' + this.$store.state.verify.token);
+        await addComments(this.newComment);
         await this.fetchComments();
         this.newComment.content = '';
+        this.$message.success('提交成功');// 添加的代码
       } catch (error) {
         console.error('Error adding comment:', error);
       }

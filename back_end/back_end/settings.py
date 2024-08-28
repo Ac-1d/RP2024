@@ -26,6 +26,9 @@ SECRET_KEY = 'django-insecure-^!*qoxkmlh1wr71@u@nwe#dk*i2*k7i5@5^v^^lhv_4yg2$7^r
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = ['*']
 
 
 # Application definition
@@ -58,7 +61,7 @@ ROOT_URLCONF = 'back_end.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'front_end/dist')], # 部署用
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,6 +135,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 部署用
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "front_end/dist/static"),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
