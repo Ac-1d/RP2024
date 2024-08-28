@@ -43,7 +43,7 @@ RUN apt-get update && \
 # into this layer.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-
+    python -m pip install -r requirements.txt
 
 # Verify that gunicorn is installed.
 RUN pip install gunicorn
