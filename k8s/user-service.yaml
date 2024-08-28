@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: user-service # 修改容器的名字为 user-service
+        # 这里设置成如果镜像存在就不拉取
+        imagePullPolicy: IfNotPresent
         image: user-service-image # 修改镜像名字为 code-user-service
         ports:
         - containerPort: 8000
-        # env:
-        #   - name: DATABASE-URL
-        #     value: "mysql://root:root@db:3306/RP2024"
+        env:
+          - name: DATABASE-URL
+            value: "mysql://root:root@user-db:3306/user"
 ---
 apiVersion: v1
 kind: Service

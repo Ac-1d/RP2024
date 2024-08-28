@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-novel
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  hostPath:
+    path: /mnt/data/db  # 在你的 Kubernetes 节点上创建一个目录用于存储数据
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-novelc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: novel-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: novel-db
+  template:
+    metadata:
+      labels:
+        app: novel-db
+    spec:
+      containers:
+      - name: novel-db
+        image: mysql:8
+        env:
+          - name: MYSQL_DATABASE
+            value: "novel"
+          - name: MYSQL_ROOT_PASSWORD
+            value: "root"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-novel-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-novel-storage
+        persistentVolumeClaim:
+          claimName: db-novelc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: novel-db
+spec:
+  selector:
+    app: novel-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

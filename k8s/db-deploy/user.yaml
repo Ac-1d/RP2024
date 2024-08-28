@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-user
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  hostPath:
+    path: /mnt/data/db  # 在你的 Kubernetes 节点上创建一个目录用于存储数据
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-userc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      containers:
+      - name: user-db
+        image: mysql:8
+        env:
+          - name: MYSQL_DATABASE
+            value: "user"
+          - name: MYSQL_ROOT_PASSWORD
+            value: "root"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-user-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-user-storage
+        persistentVolumeClaim:
+          claimName: db-userc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-db
+spec:
+  selector:
+    app: user-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

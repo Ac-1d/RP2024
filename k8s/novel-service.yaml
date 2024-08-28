@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: novel-service # 修改容器的名字为 novel-service
+      # 这里设置成如果镜像存在就不拉取
+        imagePullPolicy: IfNotPresent
         image: novel-service-image # 修改镜像名字为 novel-service
         ports:
-        - containerPort: 8001
-        # env:
-        #   - name: DATABASE-URL
-        #     value: "mysql://root:root@db:3306/RP2024"
+        - containerPort: 8000
+        env:
+          - name: DATABASE-URL
+            value: "mysql://root:root@novel-db:3306/novel"
 ---
 apiVersion: v1
 kind: Service
@@ -30,7 +32,7 @@ spec:
     app: novel-service # 确保选择器与 Deployment 中的 label 一致
   ports:
     - protocol: TCP
-      port: 8001
-      targetPort: 8001
+      port: 8000
+      targetPort: 8000
       nodePort: 30001 
   type: NodePort
