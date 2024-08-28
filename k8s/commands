@@ -1,16 +1,12 @@
 #build.sh
 # 构建镜像
-docker build -t frontend-image ../front_end
-docker build -t backend-image ../back_end
-docker build -t mysql-image ../db
-
 # 上传docker hub仓库
-docker tag frontend-image lizhy462/frontend:dev
-docker push lizhy462/frontend:dev
 
+docker build -t backend-image ../back_end
 docker tag backend-image lizhy462/backend:dev
 docker push lizhy462/backend:dev
 
+docker build -t mysql-image ../db
 docker tag mysql-image lizhy462/db:dev
 docker push lizhy462/db:dev
 

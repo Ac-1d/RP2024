@@ -1,0 +1,223 @@
+// pipeline {
+//     agent any
+//
+//     environment { // 定义环境变量
+//         DOCKER_REGISTRY = 'lizhy462'
+//         DJANGO_IMAGE_NAME = 'backend:dev'
+//         VUE_IMAGE_NAME = 'frontend:dev'
+//         MYSQL_IMAGE_NAME = 'lizhy462/db:dev'
+// //         KUBE_CONTEXT = 'your-kube-context'
+//     }
+//
+//     stages { // 定义构建阶段
+//         stage('Checkout') {
+//             steps {
+//                 git branch: 'master', credentialsId: 'git-credentials', url: ' https://gitee.com/li-yiranPizza/reading-platform.git'
+//             }
+//         }
+//
+//         stage('Build Docker Images') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+//                     script {
+//                         sh """
+//                         # 构建 MySQL 镜像
+//                         cat > mysql-db/Dockerfile <<EOF
+//                         FROM mysql:8.0
+//
+//                         # 设置环境变量
+//                         ENV MYSQL_ROOT_PASSWORD=root
+//                         ENV MYSQL_DATABASE=mysite
+//
+//                         # 添加初始化脚本
+//                         COPY ./db/data.sql /docker-entrypoint-initdb.d/
+//
+//                         # 添加启动脚本
+//                         RUN echo "#!/bin/bash\\n\\
+//                             while ! mysqladmin ping -h localhost -u root --password=\$MYSQL_ROOT_PASSWORD; do\\n\\
+//                                 echo \\"Waiting for MySQL to be ready...\\n\\"\\n\
+//                                 sleep 2\\n\\
+//                             done\\n\\
+//                             echo \\"Changing user authentication plugin...\\n\\"\\n\
+//                             mysql -uroot -p\$MYSQL_ROOT_PASSWORD << EOF\\n\\
+//                             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '\$MYSQL_ROOT_PASSWORD';\\n\\
+//                             ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '\$MYSQL_ROOT_PASSWORD';\\n\\
+//                             FLUSH PRIVILEGES;\\n\\
+//                             EOF\\n\\
+//                             exec \"\$@\"" > /setup_mysql.sh
+//
+//                         # 设置脚本可执行权限
+//                         RUN chmod +x /setup_mysql.sh
+//
+//                         # 在容器启动时执行脚本
+//                         ENTRYPOINT ["/setup_mysql.sh"]
+//                         EOF
+//
+//                         docker build -t ${DOCKER_REGISTRY}/${MYSQL_IMAGE_NAME} mysql-db/
+//
+//                         # 构建 Django 后端镜像
+//                         docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME} django-backend/mysite/
+//
+//                         # 构建 Vue 前端镜像
+//                         docker build -t ${DOCKER_REGISTRY}/${VUE_IMAGE_NAME} vue-frontend/my-vue-app/
+//
+//                         # Tag and push Docker images to your registry
+//                         docker login -u $DOCKER_USER -p $DOCKER_PASS
+//                         docker push ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}
+//                         docker push ${DOCKER_REGISTRY}/${VUE_IMAGE_NAME}
+//                         docker push ${DOCKER_REGISTRY}/${MYSQL_IMAGE_NAME}
+//                         """
+//                     }
+//                 }
+//             }
+//         }
+//
+//         stage('Deploy to Kubernetes') {
+//             steps {
+//                 script {
+// //                     kubectl set context ${KUBE_CONTEXT}
+//                     kubectl apply -f k8s/django-deployment.yaml
+//                     kubectl apply -f vue-deployment.yaml
+//                     kubectl apply -f mysql-deployment.yaml
+//
+//                     echo "Waiting for all deployments to be ready..."
+//                     kubectl wait --for=condition=Ready pod --all --timeout=120s
+//                 }
+//             }
+//         }
+//     }
+//
+//     post { // 定义构建后的操作
+//         always {
+//             script {
+//                 // Clean up resources if needed
+//                 // kubectl delete -f django-deployment.yaml
+//                 // kubectl delete -f vue-deployment.yaml
+//                 // kubectl delete -f mysql-deployment.yaml
+//             }
+//         }
+//
+//         failure {
+//             echo 'Build failed!'
+//         }
+//
+//         success {
+//             echo 'Build succeeded!'
+//         }
+//     }
+// }
+pipeline {
+    agent env
+
+    environment { // 定义环境变量
+        DOCKER_REGISTRY = 'lizhy462'
+        DJANGO_IMAGE_NAME = 'backend:dev'
+        VUE_IMAGE_NAME = 'frontend:dev'
+        MYSQL_IMAGE_NAME = 'lizhy462/db:dev'
+//         KUBE_CONTEXT = 'your-kube-context'
+    }
+
+    stages {
+
+        stage('Echo start') {
+            steps {
+                echo "start"
+
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                // git branch: "${env.BRANCH_NAME ?: env.DEFAULT_BRANCH}", // 动态获取分支名，如果没有则使用默认分支
+                git branch: 'master',
+                    url: 'https://gitee.com/li-yiranPizza/reading-platform.git'
+            }
+        }
+
+        stage('Echo Branch Name') {
+            steps {
+                echo "stage1 finish"
+                echo "Current branch: ${env.BRANCH_NAME}"
+                echo "Current branch CHANGE: ${env.CHANGE_BRANCH}"
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // 安装前端依赖
+                sh 'cd front_end && npm ci'
+                // 安装后端依赖
+                sh 'cd back_end && conda env create -f environment.yml'
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                sh 'cd front_end && npm run build'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                sh 'cd back_end'
+                sh 'conda env create -f environment.yml'
+                sh 'source activate RP2024'
+                sh 'python manage.py makemigrations'
+                sh 'python manage.py migrate'
+                sh 'python manage.py collectstatic --no-input'
+
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // 测试后端
+                sh 'cd back_end && python manage.py test'
+            }
+        }
+
+        stage('Database Migrations') {
+            steps {
+                sh 'cd back_end && python manage.py migrate'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t ${DOCKER_IMAGE_FRONT}:${env.GIT_BRANCH} -f ./front_end/Dockerfile'
+                sh 'docker build -t ${DOCKER_IMAGE_BACK}:${env.GIT_BRANCH} -f ./back_end/Dockerfile'
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-pizza', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker push ${DOCKER_IMAGE_FRONT}:${BRANCH_NAME}'
+                    sh 'docker push ${DOCKER_IMAGE_BACK}:${BRANCH_NAME}'
+                }
+            }
+        }
+
+        // 注释掉与Kubernetes相关的部分
+        // stage('Deploy') {
+        //     steps {
+        //         sh 'kubectl set image deployment/backend-deployment backend=${DOCKER_IMAGE_BACK}:${BRANCH_NAME}'
+        //         sh 'kubectl set image deployment/frontend-deployment frontend=${DOCKER_IMAGE_FRONT}:${BRANCH_NAME}'
+        //         sh 'kubectl rollout status deployment/backend-deployment'
+        //         sh 'kubectl rollout status deployment/frontend-deployment'
+        //     }
+        // }
+    }
+
+    post {
+        success {
+            echo 'Pipeline succeeded.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+
+
+}
