@@ -51,6 +51,38 @@ spec:
         volumeMounts:
         - name: db-storage
           mountPath: /var/lib/mysql
+        # pizza_change: 添加资源限制
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+          requests:
+            cpu: "0.5"
+            memory: "1Gi"
+        # pizza_change: 添加健康检查探针
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h127.0.0.1
+            - -uroot
+            - -proot
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h127.0.0.1
+            - -uroot
+            - -proot
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3
+      # pizza_end
       volumes:
       - name: db-storage
         persistentVolumeClaim:
