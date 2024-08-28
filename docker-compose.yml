@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: ./back_end
+      dockerfile: Dockerfile
+    command: gunicorn back_end.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./back_end:/app
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=RP2024
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=3306
+    networks:
+      - app-network
+  db:
+    image: mysql:latest
+#    build:
+#      context: ./db
+#      dockerfile: Dockerfile
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: RP2024
+    ports:
+      - '3307:3306'
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./front_end
+      dockerfile: Dockerfile
+    volumes:
+      - ./front_end:/app
+    ports:
+      - '80:80'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

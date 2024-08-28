@@ -51,7 +51,6 @@ export default {
             return "已完结";
         }
     },
-
     showDetails() {
       this.isHovered = true;
     },

@@ -39,7 +39,6 @@ const routes = [
     path: "/bookshelf",
     name: "Bookshelf",
     component: Bookshelf,
-
   },
   {
     path: "/ebooks",
