@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: lizhy462/frontend:dev
+        image: frontend-image
         ports:
         - containerPort: 80  # 使用 Dockerfile 中的端口
 ---
