@@ -14,3 +14,7 @@ docker push lizhy462/db:dev
 kubectl apply -f frontend-deployment.yaml
 kubectl apply -f backend-deployment.yaml
 kubectl apply -f mysql-deployment.yaml
+kubectl apply -f frontend-hpa.yaml
+kubectl apply -f backend-hpa.yaml
+kubectl apply -f frontend-vpa.yaml
+kubectl apply -f backend-vpa.yaml
