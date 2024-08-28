@@ -29,4 +29,5 @@ spec:
     - protocol: TCP
       port: 80       # Kubernetes 服务的端口
       targetPort: 80 # 容器的端口
+      nodePort: 32000
   type: NodePort
