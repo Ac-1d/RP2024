@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: web # 修改容器的名字为 web-1
-        image: lizhy462/backend:dev # 修改镜像名字为 code-web
+        image: pizzak/backend:test # 修改镜像名字为 code-web
         ports:
         - containerPort: 8000
         env:
@@ -22,20 +22,20 @@ spec:
             value: "mysql://root:root@db:3306/RP2024"
 
         # pizza_change: 添加健康检查探针
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 20
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          failureThreshold: 3
+#        livenessProbe:
+#          httpGet:
+#            path: /healthz
+#            port: 8000
+#          initialDelaySeconds: 15
+#          periodSeconds: 20
+#          failureThreshold: 3
+#        readinessProbe:
+#          httpGet:
+#            path: /readyz
+#            port: 8000
+#          initialDelaySeconds: 5
+#          periodSeconds: 10
+#          failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service
