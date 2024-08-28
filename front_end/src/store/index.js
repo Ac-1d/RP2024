@@ -63,7 +63,7 @@ export default new Vuex.Store({
       let password = loginData.password;
       let msg = '登录失败';
       if (mobile && password) {
-        await axios.post("/users/login", {  
+        await axios.post(`http://${process.env.VUE_APP_BACKEND_SERVICE}:${process.env.VUE_APP_BACKEND_PORT}/users/login`, {
           mobile: mobile,  
           password: password,
         }).then(response => {
@@ -86,7 +86,7 @@ export default new Vuex.Store({
     async getUserInfo({ commit }) {
       if (!this.state.loggedIn) return '请先登录';
       let token = this.state.verify.token;
-      await axios.get('/users/userinfo', {
+      await axios.get(`http://${process.env.VUE_APP_BACKEND_SERVICE}:${process.env.VUE_APP_BACKEND_PORT}/users/userinfo`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
