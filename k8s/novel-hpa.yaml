@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: frontend-hpa
+  name: novel-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: frontend
+    name: novel-service
   minReplicas: 1
-  maxReplicas: 7
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

@@ -12,16 +12,28 @@ spec:
       labels:
         app: reader-service # 修改 label 为 reader-service
     spec:
+      # priorityClassName: low-priority
       containers:
       - name: reader-service # 修改容器的名字为 reader-service
       # 这里设置成如果镜像存在就不拉取
         imagePullPolicy: IfNotPresent
         image: reader-service-image # 修改镜像名字为 reader-service-image
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #       command: ["sh", "-c", "cmd.sh"]
         ports:
         - containerPort: 8000
         env:
           - name: DATABASE-URL
             value: "mysql://root:root@reader-db:3306/reader"
+        resources:
+          requests:
+            cpu: "100m"  # 例如，为 reader-service 设置 100 毫核的 CPU 请求
+            memory: "100Mi"  # 为 reader-service 设置 256Mi 的内存请求
+          limits:
+            cpu: "300m"  # 为 reader-service 设置 500 毫核的 CPU 限制
+            memory: "300Mi"  # 为 reader-service 设置 512Mi 的内存限制
 ---
 apiVersion: v1
 kind: Service

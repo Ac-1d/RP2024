@@ -2,17 +2,30 @@ pipeline {
     agent any
     
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         echo 'Checking out code...'
-        //         bat 'ping github.com'
-        //         git(
-        //             branch: 'master',
-        //             credentialsId: '5d76cd9f-c6fe-4d87-97c0-3c1b35f067b5',
-        //             url: 'http://github.com/Ac-1d/RP2024.git'
-        //         )
-        //     }
-        // }
+        stage('Clear') {
+            steps {
+                bat 'kubectl delete deployment novel-service'
+                bat 'kubectl delete deployment user-service'
+                bat 'kubectl delete deployment reader-service'
+                bat 'kubectl delete deployment frontend'
+                
+                bat 'kubectl delete svc novel-service'
+                bat 'kubectl delete svc user-service'
+                bat 'kubectl delete svc reader-service'
+                bat 'kubectl delete svc frontend-service'
+            }
+        }
+        stage('Checkout') {
+            steps {
+                echo 'Checking out code...'
+                bat 'ping github.com'
+                git(
+                    branch: 'master',
+                    credentialsId: '5d76cd9f-c6fe-4d87-97c0-3c1b35f067b5',
+                    url: 'http://github.com/Ac-1d/RP2024.git'
+                )
+            }
+        }
         stage('Build') {
             steps {
                 echo 'build stage'
@@ -29,7 +42,17 @@ pipeline {
         stage('Test') {
             steps {
                 // 压力测试等
-                echo 'start test'
+                echo 'test novel-service'
+                bat 'conda activate WWW'
+                bat 'python ./RP_Novel_Service/manage.py test'
+                
+                echo 'test reader-service'
+                bat 'python ./RP_Reader_Service/manage.py test'
+                
+                echo 'test user-service'
+                bat 'python ./RP_User_Service/manage.py test'
+                
+                bat 'conda deactivate'
             }
         }
         stage('Deploy') {
@@ -48,25 +71,22 @@ pipeline {
                 
                 // 前端服务
                 bat 'kubectl apply -f ./k8s/frontend-deployment.yaml'
+                
+                bat 'kubectl apply -f ./k8s/components.yaml'
 
                 // HPA VPA
-                bat 'kubectl apply -f frontend-hpa.yaml'
-                bat 'kubectl apply -f novel-hpa.yaml'
-                bat 'kubectl apply -f user-hpa.yaml'
-                bat 'kubectl apply -f reader-hpa.yaml'
+                bat 'kubectl apply -f ./k8s/frontend-hpa.yaml'
+                bat 'kubectl apply -f ./k8s/novel-hpa.yaml'
+                bat 'kubectl apply -f ./k8s/user-hpa.yaml'
+                bat 'kubectl apply -f ./k8s/reader-hpa.yaml'
                 
-                bat 'kubectl apply -f frontend-vpa.yaml'
-                bat 'kubectl apply -f novel-vpa.yaml'
-                bat 'kubectl apply -f user-vpa.yaml'
-                bat 'kubectl apply -f reader-vpa.yaml'
+                bat 'kubectl apply -f ./k8s/frontend-vpa.yaml'
+                bat 'kubectl apply -f ./k8s/novel-vpa.yaml'
+                bat 'kubectl apply -f ./k8s/user-vpa.yaml'
+                bat 'kubectl apply -f ./k8s/reader-vpa.yaml'
+                
                 // bat 'kubectl delete -f .'
             }
         }
     }
-    
-    // post {
-    //     always {
-    //          cleanWs()
-    //     }
-    // }
 }

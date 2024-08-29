@@ -15,25 +15,32 @@ spec:
       dnsPolicy: ClusterFirst
       containers:
       - name: frontend
+        imagePullPolicy: IfNotPresent
         image: frontend-image
         ports:
         - containerPort: 80  # 使用 Dockerfile 中的端口
-
+        resources:
+          requests:
+            cpu: "200m"  # 例如，为 reader-service 设置 100 毫核的 CPU 请求
+            memory: "300Mi"  # 为 reader-service 设置 256Mi 的内存请求
+          limits:
+            cpu: "600m"  # 为 reader-service 设置 500 毫核的 CPU 限制
+            memory: "600Mi"  # 为 reader-service 设置 512Mi 的内存限制
         # pizza_change: 添加健康检查探针
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 80
-          initialDelaySeconds: 15
-          periodSeconds: 20
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          failureThreshold: 3
+        # livenessProbe:
+        #   httpGet:
+        #     path: /healthz
+        #     port: 80
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 20
+        #   failureThreshold: 3
+        # readinessProbe:
+        #   httpGet:
+        #     path: /readyz
+        #     port: 80
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        #   failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service

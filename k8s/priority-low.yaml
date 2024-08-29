@@ -1,0 +1,7 @@
+PriorityClass:apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 100  # 低优先级值
+globalDefault: false
+description: "This priority class is for low-priority pods."
