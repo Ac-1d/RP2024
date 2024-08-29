@@ -90,8 +90,12 @@ DATABASES = {
         'PASSWORD': 'root',
         'HOST': 'user-db',
         'PORT': '3306',
+        'OPTIONS': {
+            'auth_plugin': 'mysql_native_password'
+        }
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -90,6 +90,9 @@ DATABASES = {
         'PASSWORD': 'root',
         'HOST': 'novel-db', # 服务名代指host主机
         'PORT': '3306', 
+        'OPTIONS': {
+            'auth_plugin': 'mysql_native_password'
+        }
     }
 }
 

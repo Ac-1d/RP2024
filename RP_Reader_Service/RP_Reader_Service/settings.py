@@ -92,6 +92,9 @@ DATABASES = {
         'PASSWORD': 'root',
         'HOST': 'reader-db',
         'PORT': '3306',
+        'OPTIONS': {
+            'auth_plugin': 'mysql_native_password'
+        }
     }
 }
 

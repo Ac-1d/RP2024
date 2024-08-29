@@ -48,6 +48,18 @@ pipeline {
                 
                 // 前端服务
                 bat 'kubectl apply -f ./k8s/frontend-deployment.yaml'
+
+                // HPA VPA
+                bat 'kubectl apply -f frontend-hpa.yaml'
+                bat 'kubectl apply -f novel-hpa.yaml'
+                bat 'kubectl apply -f user-hpa.yaml'
+                bat 'kubectl apply -f reader-hpa.yaml'
+                
+                bat 'kubectl apply -f frontend-vpa.yaml'
+                bat 'kubectl apply -f novel-vpa.yaml'
+                bat 'kubectl apply -f user-vpa.yaml'
+                bat 'kubectl apply -f reader-vpa.yaml'
+                // bat 'kubectl delete -f .'
             }
         }
     }

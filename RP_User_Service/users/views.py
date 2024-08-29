@@ -22,6 +22,7 @@ import jwt
 from django.http import HttpRequest, JsonResponse
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import *
+from . import serializers
 """
 通信用接口
 """

@@ -39,7 +39,12 @@ spec:
     spec:
       containers:
       - name: user-db
+        
+        # 这里设置成如果镜像存在就不拉取
+        imagePullPolicy: IfNotPresent
         image: mysql:8
+        # command:  --default-authentication-plugin=mysql_native_password
+
         env:
           - name: MYSQL_DATABASE
             value: "user"
